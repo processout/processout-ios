@@ -107,8 +107,15 @@ public struct PODynamicCheckoutConfiguration {
     /// Request to fetch invoice to initiate a payment.
     public let invoiceRequest: POInvoiceRequest
 
-    /// Express checkout section configuration.
-    public let expressCheckout: ExpressCheckout
+    /// Controls the visibility and appearance of the saved payment methods.
+    ///
+    /// Set this value to `nil` to hide the entire "Express Checkout" section and omit saved
+    /// payments from the flow.
+    ///
+    /// This setting does not affect the availability of other payment options configured via
+    /// `card` or `alternativePayment`, nor does it affect whether the user can save
+    /// a payment method.
+    public let expressCheckout: ExpressCheckout?
 
     /// Card collection configuration.
     public let card: PODynamicCheckoutCardConfiguration
@@ -135,10 +142,10 @@ public struct PODynamicCheckoutConfiguration {
     /// Localization configuration. Defaults to device localization.
     public let localization: LocalizationConfiguration
 
-    // Creates configuration instance.
+    /// Creates configuration instance.
     public init(
         invoiceRequest: POInvoiceRequest,
-        expressCheckout: ExpressCheckout = .init(),
+        expressCheckout: ExpressCheckout? = .init(),
         card: PODynamicCheckoutCardConfiguration = .init(),
         alternativePayment: PODynamicCheckoutAlternativePaymentConfiguration = .init(),
         passKitPaymentButtonType: PKPaymentButtonType = .plain,
@@ -160,3 +167,4 @@ public struct PODynamicCheckoutConfiguration {
         self.localization = localization
     }
 }
+

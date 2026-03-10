@@ -158,6 +158,9 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
     private func createExpressMethodsSection(
         state: DynamicCheckoutInteractorState.Started, processedPaymentMethodId: String?
     ) -> DynamicCheckoutViewModelState.Section? {
+        guard let configuration = interactor.configuration.expressCheckout else {
+            return nil
+        }
         let expressItems = state.paymentMethods.compactMap { paymentMethod in
             createExpressPaymentItem(for: paymentMethod, processedPaymentMethodId: processedPaymentMethodId)
         }
@@ -166,7 +169,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         }
         return .init(
             id: SectionId.expressMethods,
-            header: createExpressMethodsSectionHeader(state: state),
+            header: createExpressMethodsSectionHeader(state: state, configuration: configuration),
             items: expressItems,
             isTight: false,
             areBezelsVisible: false
@@ -174,9 +177,10 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
     }
 
     private func createExpressMethodsSectionHeader(
-        state: DynamicCheckoutInteractorState.Started
+        state: DynamicCheckoutInteractorState.Started,
+        configuration: PODynamicCheckoutConfiguration.ExpressCheckout
     ) -> DynamicCheckoutViewModelState.SectionHeader? {
-        let resolvedConfiguration = interactor.configuration.expressCheckout.resolved(
+        let resolvedConfiguration = configuration.resolved(
             defaultTitle: String(
                 resource: .DynamicCheckout.expressCheckout, configuration: interactor.configuration.localization
             )
