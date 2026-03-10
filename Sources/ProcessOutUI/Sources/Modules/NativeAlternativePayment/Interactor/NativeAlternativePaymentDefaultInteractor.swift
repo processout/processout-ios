@@ -139,29 +139,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         }
         let task = Task {
             do {
-                let didOpenUrl: Bool
-                switch currentState.redirect.type {
-                case .deepLink:
-                    didOpenUrl = await openDeepLink(url: currentState.redirect.url)
-                case .web:
-                    let authenticationRequest = POAlternativePaymentAuthenticationRequest(
-                        url: currentState.redirect.url,
-                        callback: configuration.redirect.callback,
-                        prefersEphemeralSession: configuration.redirect.prefersEphemeralSession
-                    )
-                    _ = try await alternativePaymentsService.authenticate(request: authenticationRequest)
-                    didOpenUrl = true
-                default:
-                    throw POFailure(errorDescription: "Unknown redirect type.", code: .Mobile.internal)
-                }
-                let response = try await serviceAdapter.continuePayment(
-                    with: .init(
-                        flow: configuration.flow,
-                        redirect: currentState.redirect.confirmationRequired ? .init(success: didOpenUrl) : nil,
-                        localeIdentifier: configuration.localization.localeOverride?.identifier
-                    )
-                )
-                try await setState(with: response)
+                try await uncheckedRedirect(to: currentState.redirect)
             } catch {
                 setFailureState(error: error)
             }
@@ -233,29 +211,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             logger.error("Attempted to handle headless redirect while not in starting state. Ignoring.")
             return
         }
-        let didOpenUrl: Bool
-        switch redirect.type {
-        case .deepLink:
-            didOpenUrl = await openDeepLink(url: redirect.url)
-        case .web:
-            let authenticationRequest = POAlternativePaymentAuthenticationRequest(
-                url: redirect.url,
-                callback: configuration.redirect.callback,
-                prefersEphemeralSession: configuration.redirect.prefersEphemeralSession
-            )
-            _ = try await alternativePaymentsService.authenticate(request: authenticationRequest)
-            didOpenUrl = true
-        default:
-            throw POFailure(errorDescription: "Unknown redirect type.", code: .Mobile.internal)
-        }
-        let response = try await serviceAdapter.continuePayment(
-            with: .init(
-                flow: configuration.flow,
-                redirect: redirect.confirmationRequired ? .init(success: didOpenUrl) : nil,
-                localeIdentifier: configuration.localization.localeOverride?.identifier
-            )
-        )
-        try await setState(with: response)
+        try await uncheckedRedirect(to: redirect)
     }
 
     // MARK: - Started State
@@ -321,6 +277,47 @@ final class NativeAlternativePaymentDefaultInteractor:
     }
 
     private var cancelationEnablingTask: Task<Void, Never>?
+
+    // MARK: - Redirecting State
+
+    private func uncheckedRedirect(to redirect: PONativeAlternativePaymentRedirectV2) async throws {
+        delegate?.nativeAlternativePayment(
+            didEmitEvent: .willStartRedirect(.init(redirect: redirect))
+        )
+        let didOpenUrl: Bool
+        switch redirect.type {
+        case .deepLink:
+            didOpenUrl = await openDeepLink(url: redirect.url)
+        case .web:
+            let authenticationRequest = POAlternativePaymentAuthenticationRequest(
+                url: redirect.url,
+                callback: configuration.redirect.callback,
+                prefersEphemeralSession: configuration.redirect.prefersEphemeralSession
+            )
+            _ = try await alternativePaymentsService.authenticate(request: authenticationRequest)
+            didOpenUrl = true
+        default:
+            throw POFailure(errorDescription: "Unknown redirect type.", code: .Mobile.internal)
+        }
+        let response = try await serviceAdapter.continuePayment(
+            with: .init(
+                flow: configuration.flow,
+                redirect: redirect.confirmationRequired ? .init(success: didOpenUrl) : nil,
+                localeIdentifier: configuration.localization.localeOverride?.identifier
+            )
+        )
+        try await setState(with: response)
+    }
+
+    private func openDeepLink(url: URL) async -> Bool {
+        let options: [UIApplication.OpenExternalURLOptionsKey: Any]
+        if url.scheme == "https" || url.scheme == "http" { // Determines whether link could be universal
+            options = [.universalLinksOnly: true]
+        } else {
+            options = [:]
+        }
+        return await UIApplication.shared.open(url, options: options)
+    }
 
     // MARK: - Awaiting Completion State
 
@@ -901,18 +898,6 @@ final class NativeAlternativePaymentDefaultInteractor:
             )
         )
         return nil
-    }
-
-    // MARK: - Redirect Utils
-
-    private func openDeepLink(url: URL) async -> Bool {
-        let options: [UIApplication.OpenExternalURLOptionsKey: Any]
-        if url.scheme == "https" || url.scheme == "http" { // Determines whether link could be universal
-            options = [.universalLinksOnly: true]
-        } else {
-            options = [:]
-        }
-        return await UIApplication.shared.open(url, options: options)
     }
 }
 

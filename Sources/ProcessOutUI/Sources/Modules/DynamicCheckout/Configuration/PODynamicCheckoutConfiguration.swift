@@ -167,4 +167,3 @@ public struct PODynamicCheckoutConfiguration {
         self.localization = localization
     }
 }
-
