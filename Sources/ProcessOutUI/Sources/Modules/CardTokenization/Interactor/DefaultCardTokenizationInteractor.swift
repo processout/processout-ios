@@ -42,7 +42,8 @@ final class DefaultCardTokenizationInteractor:
             expiration: .init(id: \.expiration, formatter: cardExpirationFormatter),
             cvc: .init(id: \.cvc, shouldCollect: configuration.cvc != nil, formatter: CardSecurityCodeFormatter()),
             cardholderName: .init(id: \.cardholderName, shouldCollect: configuration.cardholderName != nil),
-            address: defaultAddressParameters
+            address: defaultAddressParameters,
+            shouldSaveCard: configuration.saving.map { $0.isRequired || $0.isOnByDefault } ?? false,
         )
         state = .started(newState)
         delegate?.cardTokenizationDidEmitEvent(.didStart)
@@ -124,11 +125,11 @@ final class DefaultCardTokenizationInteractor:
     }
 
     func setShouldSaveCard(_ shouldSaveCard: Bool) {
-        guard case .started(var newState) = state else {
+        guard case .started(var newState) = state, let configuration = configuration.saving else {
             return
         }
         logger.debug("Will change card saving selection to \(shouldSaveCard)")
-        newState.shouldSaveCard = shouldSaveCard
+        newState.shouldSaveCard = configuration.isRequired || shouldSaveCard
         state = .started(newState)
         delegate?.cardTokenizationDidEmitEvent(.parametersChanged)
     }

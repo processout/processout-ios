@@ -163,6 +163,23 @@ public struct POCardTokenizationConfiguration {
         }
     }
 
+    /// Card saving options.
+    @MainActor
+    public struct Saving {
+
+        /// Initial selection state.
+        public let isOnByDefault: Bool
+
+        /// If `true`, saving is enforced and cannot be disabled by the user.
+        public let isRequired: Bool
+
+        /// Creates a saving configuration.
+        public init(isOnByDefault: Bool = false, isRequired: Bool = false) {
+            self.isOnByDefault = isRequired ? true : isOnByDefault
+            self.isRequired = isRequired
+        }
+    }
+
     /// Custom title. Use empty string to hide title.
     public let title: String?
 
@@ -188,9 +205,10 @@ public struct POCardTokenizationConfiguration {
     /// Card billing address collection configuration.
     public let billingAddress: BillingAddress
 
-    /// Indicates whether the UI should display a control that allows the user
-    /// to choose whether to save their card details for future payments.
-    public let isSavingAllowed: Bool
+    /// Card saving configuration.
+    ///
+    /// Set to `nil` to hide the “Save card” control entirely.
+    public let saving: Saving?
 
     /// Submit button configuration.
     public var submitButton: SubmitButton {
@@ -221,7 +239,7 @@ public struct POCardTokenizationConfiguration {
         preferredScheme: PreferredScheme? = .init(),
         cardScanner: CardScanner? = .init(),
         billingAddress: BillingAddress = .init(),
-        isSavingAllowed: Bool = false,
+        saving: Saving? = nil,
         submitButton: SubmitButton? = .init(),
         cancelButton: CancelButton? = .init(),
         prefersInlineControls: Bool = false,
@@ -238,7 +256,7 @@ public struct POCardTokenizationConfiguration {
         self._submitButton = submitButton
         self.cancelButton = cancelButton
         self.billingAddress = billingAddress
-        self.isSavingAllowed = isSavingAllowed
+        self.saving = saving
         self.prefersInlineControls = prefersInlineControls
         self.localization = localization
         self.metadata = metadata
@@ -267,6 +285,13 @@ extension POCardTokenizationConfiguration {
         cvc != nil
     }
 
+    /// Indicates whether the UI should display a control that allows the user
+    /// to choose whether to save their card details for future payments.
+    @available(*, deprecated, message: "Configure using `saving` object instead.")
+    public var isSavingAllowed: Bool {
+        saving != nil
+    }
+
     /// Primary action text, such as "Submit".
     @available(*, deprecated, renamed: "primaryButton.title")
     public var primaryActionTitle: String? {
@@ -277,6 +302,40 @@ extension POCardTokenizationConfiguration {
     @available(*, deprecated, renamed: "cancelButton.title")
     public var cancelActionTitle: String? {
         cancelButton == nil ? "" : cancelButton?.title
+    }
+
+    @available(*, deprecated)
+    @_disfavoredOverload
+    public init(
+        title: String? = nil,
+        cardholderName: TextField? = .init(),
+        cardNumber: TextField = .init(),
+        expirationDate: TextField = .init(),
+        cvc: TextField? = .init(),
+        preferredScheme: PreferredScheme? = .init(),
+        cardScanner: CardScanner? = .init(),
+        billingAddress: BillingAddress = .init(),
+        isSavingAllowed: Bool = false,
+        submitButton: SubmitButton? = .init(),
+        cancelButton: CancelButton? = .init(),
+        prefersInlineControls: Bool = false,
+        localization: LocalizationConfiguration = .device(),
+        metadata: [String: String]? = nil
+    ) {
+        self.title = title
+        self.cardholderName = cardholderName
+        self.cardNumber = cardNumber
+        self.expirationDate = expirationDate
+        self.cvc = cvc
+        self.preferredScheme = preferredScheme
+        self.cardScanner = cardScanner
+        self._submitButton = submitButton
+        self.cancelButton = cancelButton
+        self.billingAddress = billingAddress
+        self.saving = isSavingAllowed ? .init() : nil
+        self.prefersInlineControls = prefersInlineControls
+        self.localization = localization
+        self.metadata = metadata
     }
 
     @available(*, deprecated)
@@ -302,7 +361,7 @@ extension POCardTokenizationConfiguration {
         self._submitButton = .init(title: primaryActionTitle)
         self.cancelButton = cancelActionTitle?.isEmpty == true ? nil : .init(title: cancelActionTitle)
         self.billingAddress = billingAddress
-        self.isSavingAllowed = isSavingAllowed
+        self.saving = isSavingAllowed ? .init() : nil
         self.prefersInlineControls = false
         self.localization = .device()
         self.metadata = metadata
