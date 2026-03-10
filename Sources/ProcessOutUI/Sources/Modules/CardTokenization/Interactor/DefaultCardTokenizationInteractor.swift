@@ -125,7 +125,9 @@ final class DefaultCardTokenizationInteractor:
     }
 
     func setShouldSaveCard(_ shouldSaveCard: Bool) {
-        guard case .started(var newState) = state, configuration.saving?.isRequired != true else {
+        guard case .started(var newState) = state,
+              let configuration = configuration.saving,
+              !configuration.isRequired else {
             return
         }
         logger.debug("Will change card saving selection to \(shouldSaveCard)")

@@ -95,7 +95,9 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
             ),
             cardScanner: configuration.card.cardScanner.map(POCardTokenizationConfiguration.CardScanner.init),
             billingAddress: billingAddressConfiguration(with: methodConfiguration),
-            isSavingAllowed: methodConfiguration.savingAllowed,
+            saving: methodConfiguration.savingAllowed
+                ? configuration.saving.map { .init(isOnByDefault: $0.isOnByDefault, isRequired: $0.isRequired) }
+                : nil,
             submitButton: submitButtonConfiguration(with: configuration.submitButton),
             cancelButton: nil,
             prefersInlineControls: true,

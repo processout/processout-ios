@@ -44,6 +44,23 @@ public struct PODynamicCheckoutConfiguration {
         }
     }
 
+    /// Payment method saving options.
+    @MainActor
+    public struct Saving {
+
+        /// Initial selection state.
+        public let isOnByDefault: Bool
+
+        /// If `true`, saving is enforced and cannot be disabled by the user.
+        public let isRequired: Bool
+
+        /// Creates a saving configuration.
+        public init(isOnByDefault: Bool = false, isRequired: Bool = false) {
+            self.isOnByDefault = isRequired ? true : isOnByDefault
+            self.isRequired = isRequired
+        }
+    }
+
     /// Payment success configuration.
     @MainActor
     public struct PaymentSuccess {
@@ -112,9 +129,8 @@ public struct PODynamicCheckoutConfiguration {
     /// Set this value to `nil` to hide the entire "Express Checkout" section and omit saved
     /// payments from the flow.
     ///
-    /// This setting does not affect the availability of other payment options configured via
-    /// `card` or `alternativePayment`, nor does it affect whether the user can save
-    /// a payment method.
+    /// This setting does not affect the availability of other payment options , nor does it affect
+    /// whether the user can save a payment method.
     public let expressCheckout: ExpressCheckout?
 
     /// Card collection configuration.
@@ -125,6 +141,11 @@ public struct PODynamicCheckoutConfiguration {
 
     /// PassKit payment button type.
     public let passKitPaymentButtonType: PKPaymentButtonType
+
+    /// Saving configuration for supported payment methods.
+    ///
+    /// When set to `nil` user won't be suggested to save payment method.
+    public let saving: Saving?
 
     /// Determines whether to enable skipping payment list step when there is only
     /// one non-instant payment method. Default value: `true`.
@@ -149,6 +170,7 @@ public struct PODynamicCheckoutConfiguration {
         card: PODynamicCheckoutCardConfiguration = .init(),
         alternativePayment: PODynamicCheckoutAlternativePaymentConfiguration = .init(),
         passKitPaymentButtonType: PKPaymentButtonType = .plain,
+        saving: Saving? = .init(),
         allowsSkippingPaymentList: Bool = true,
         submitButton: SubmitButton = .init(),
         cancelButton: CancelButton? = .init(),
@@ -160,6 +182,7 @@ public struct PODynamicCheckoutConfiguration {
         self.card = card
         self.alternativePayment = alternativePayment
         self.passKitPaymentButtonType = passKitPaymentButtonType
+        self.saving = saving
         self.allowsSkippingPaymentList = allowsSkippingPaymentList
         self.submitButton = submitButton
         self.cancelButton = cancelButton

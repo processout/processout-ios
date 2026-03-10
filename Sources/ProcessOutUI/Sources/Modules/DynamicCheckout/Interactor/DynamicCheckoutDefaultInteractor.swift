@@ -76,6 +76,9 @@ final class DynamicCheckoutDefaultInteractor:
     }
 
     func setShouldSaveSelectedPaymentMethod(_ shouldSave: Bool) {
+        guard let configuration = configuration.saving, !configuration.isRequired else {
+            return
+        }
         switch state {
         case .selected(let currentState) where currentState.shouldSavePaymentMethod != nil:
             logger.debug("Will change payment method saving selection to \(shouldSave)")
@@ -443,7 +446,9 @@ final class DynamicCheckoutDefaultInteractor:
         let newState = State.Selected(
             snapshot: newStartedState,
             paymentMethod: paymentMethod,
-            shouldSavePaymentMethod: canSave(paymentMethod: paymentMethod) ? false : nil
+            shouldSavePaymentMethod: canSave(paymentMethod: paymentMethod)
+                ? configuration.saving.map { $0.isRequired || $0.isOnByDefault } ?? false
+                : nil
         )
         state = .selected(newState)
         if shouldStart {
@@ -452,6 +457,9 @@ final class DynamicCheckoutDefaultInteractor:
     }
 
     private func canSave(paymentMethod: PODynamicCheckoutPaymentMethod) -> Bool {
+        guard configuration.saving != nil else {
+            return false
+        }
         if case .alternativePayment(let paymentMethod) = paymentMethod {
             return paymentMethod.configuration.savingAllowed
         }
