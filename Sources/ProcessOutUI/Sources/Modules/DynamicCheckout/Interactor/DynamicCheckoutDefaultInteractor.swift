@@ -994,7 +994,7 @@ extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegateV2
 
     func nativeAlternativePayment(didEmitEvent event: PONativeAlternativePaymentEventV2) {
         switch event {
-        case .willSubmitParameters, .willStartRedirect:
+        case .willStart:
             invalidateInvoiceIfPossible()
         default:
             break
