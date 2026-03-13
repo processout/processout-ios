@@ -25,6 +25,16 @@ public enum PONativeAlternativePaymentEventV2: Sendable {
         public let additionalParametersExpected: Bool
     }
 
+    /// Payload for the `willStartRedirect` event.
+    ///
+    /// Emitted immediately before the SDK initiates a redirect to an external context (web authentication session
+    /// or deep link).
+    public struct WillStartRedirect: Sendable {
+
+        /// Redirect details.
+        public let redirect: PONativeAlternativePaymentRedirectV2
+    }
+
     public struct WillWaitForPaymentConfirmation: Sendable { }
 
     public struct ParametersChanged: Sendable {
@@ -72,6 +82,12 @@ public enum PONativeAlternativePaymentEventV2: Sendable {
 
     /// Sent in case parameters submission failed and if error is retriable, otherwise expect `didFail` event.
     case didFailToSubmitParameters(failure: POFailure)
+
+    /// Sent just before a redirect is initiated to complete the next step (web auth session or deep link).
+    ///
+    /// Use this to log analytics or update UI (e.g., show a transition). The SDK performs the redirect.
+    /// May be emitted automatically during startup when headless redirect is enabled.
+    case willStartRedirect(WillStartRedirect)
 
     /// Event is sent after all information is collected, and implementation is waiting for a PSP to confirm payment.
     case willWaitForPaymentConfirmation(WillWaitForPaymentConfirmation)

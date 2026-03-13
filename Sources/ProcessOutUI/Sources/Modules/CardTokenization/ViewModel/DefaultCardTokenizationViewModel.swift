@@ -327,7 +327,7 @@ final class DefaultCardTokenizationViewModel: ViewModel {
     private func futurePaymentsSection(
         startedState: InteractorState.Started
     ) -> CardTokenizationViewModelState.Section? {
-        guard interactor.configuration.isSavingAllowed else {
+        guard interactor.configuration.saving != nil else {
             return nil
         }
         let toggleItem = CardTokenizationViewModelState.ToggleItem(

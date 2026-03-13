@@ -39,7 +39,7 @@ final class CardPaymentViewModel: ObservableObject {
     private func setCardTokenizationItem() {
         let configuration = POCardTokenizationConfiguration(
             cardholderName: nil,
-            isSavingAllowed: true,
+            saving: .init(),
             cancelButton: .init(icon: Image(systemName: "xmark"))
         )
         let cardTokenizationItem = CardPaymentViewModelState.CardTokenization(

@@ -76,6 +76,9 @@ final class DynamicCheckoutDefaultInteractor:
     }
 
     func setShouldSaveSelectedPaymentMethod(_ shouldSave: Bool) {
+        guard let configuration = configuration.saving, !configuration.isRequired else {
+            return
+        }
         switch state {
         case .selected(let currentState) where currentState.shouldSavePaymentMethod != nil:
             logger.debug("Will change payment method saving selection to \(shouldSave)")
@@ -443,7 +446,9 @@ final class DynamicCheckoutDefaultInteractor:
         let newState = State.Selected(
             snapshot: newStartedState,
             paymentMethod: paymentMethod,
-            shouldSavePaymentMethod: canSave(paymentMethod: paymentMethod) ? false : nil
+            shouldSavePaymentMethod: canSave(paymentMethod: paymentMethod)
+                ? configuration.saving.map { $0.isRequired || $0.isOnByDefault } ?? false
+                : nil
         )
         state = .selected(newState)
         if shouldStart {
@@ -452,6 +457,9 @@ final class DynamicCheckoutDefaultInteractor:
     }
 
     private func canSave(paymentMethod: PODynamicCheckoutPaymentMethod) -> Bool {
+        guard configuration.saving != nil else {
+            return false
+        }
         if case .alternativePayment(let paymentMethod) = paymentMethod {
             return paymentMethod.configuration.savingAllowed
         }
@@ -880,7 +888,13 @@ final class DynamicCheckoutDefaultInteractor:
             localeIdentifier: configuration.localization.localeOverride?.identifier
         )
         let threeDSService = await delegate.dynamicCheckout(willAuthorizeInvoiceWith: &request, using: paymentMethod)
-        try await invoicesService.authorizeInvoice(request: request, threeDSService: threeDSService)
+        let response = try await invoicesService.authorizeInvoice(request: request, threeDSService: threeDSService)
+        if let customerTokenId = response.customerTokenId {
+            let tokenizeEvent = PODynamicCheckoutEvent.DidTokenizePaymentMethod(
+                paymentMethod: paymentMethod, customerTokenId: customerTokenId
+            )
+            delegate.dynamicCheckout(didEmitEvent: .didTokenizePaymentMethod(tokenizeEvent))
+        }
     }
 
     private func paymentMethod(withId id: String, in state: State.Started) -> PODynamicCheckoutPaymentMethod? {
@@ -913,8 +927,55 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
         )
     }
 
+    func cardTokenization( // swiftlint:disable:this cyclomatic_complexity
+        evaluateEligibilityWith request: POCardTokenizationEligibilityRequest
+    ) async -> POCardTokenizationEligibilityEvaluation {
+        if let eligibility = await delegate?.dynamicCheckout(evaluateCardEligibilityWith: request) {
+            return eligibility
+        }
+        guard case .paymentProcessing(let currentState) = state,
+              case .card(let cardPaymentMethod) = currentState.paymentMethod else {
+            return .eligible()
+        }
+        if let restrictToIins = cardPaymentMethod.configuration.restrictToIins {
+            var hasEligibleIin = false
+            for eligibleIin in restrictToIins {
+                hasEligibleIin = hasEligibleIin || eligibleIin == request.iin.prefix(eligibleIin.count)
+            }
+            if !hasEligibleIin {
+                return .notEligible()
+            }
+        }
+        if let eligibleSchemes = cardPaymentMethod.configuration.restrictToSchemes {
+            let isSchemeEligible = eligibleSchemes.contains(request.issuerInformation.$scheme.typed)
+            if let coScheme = request.issuerInformation.$coScheme.typed {
+                let isCoSchemeEligible = eligibleSchemes.contains(coScheme)
+                if !isSchemeEligible, !isCoSchemeEligible {
+                    return .notEligible()
+                } else if isSchemeEligible, !isCoSchemeEligible {
+                    return .eligible(scheme: request.issuerInformation.$scheme.typed)
+                } else if isCoSchemeEligible, !isSchemeEligible {
+                    return .eligible(scheme: coScheme)
+                }
+            } else if !isSchemeEligible {
+                return .notEligible()
+            }
+        }
+        return .eligible()
+    }
+
     func cardTokenization(preferredSchemeWith issuerInformation: POCardIssuerInformation) -> POCardScheme? {
-        delegate?.dynamicCheckout(preferredSchemeWith: issuerInformation)
+        if let scheme = delegate?.dynamicCheckout(preferredSchemeWith: issuerInformation) {
+            return scheme
+        }
+        guard case .paymentProcessing(let currentState) = state,
+              case .card(let cardPaymentMethod) = currentState.paymentMethod else {
+            return nil
+        }
+        let preferredScheme = cardPaymentMethod.configuration.schemeSelectionDefaultOrder?.first { scheme in
+            scheme == issuerInformation.$scheme.typed || scheme == issuerInformation.$coScheme.typed
+        }
+        return preferredScheme
     }
 
     func shouldContinueTokenization(after failure: POFailure) -> Bool {
@@ -933,7 +994,7 @@ extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegateV2
 
     func nativeAlternativePayment(didEmitEvent event: PONativeAlternativePaymentEventV2) {
         switch event {
-        case .willSubmitParameters:
+        case .willStart:
             invalidateInvoiceIfPossible()
         default:
             break

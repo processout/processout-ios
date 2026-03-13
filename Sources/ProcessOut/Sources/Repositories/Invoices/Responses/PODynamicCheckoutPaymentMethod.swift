@@ -124,6 +124,16 @@ public enum PODynamicCheckoutPaymentMethod: Sendable {
         /// Defines whether user will be asked to select scheme if co-scheme is available.
         public let schemeSelectionAllowed: Bool
 
+        /// Schemes selection preferred order.
+        /// When cards with multiple supported schemes are detected, the first matching scheme is preselected.
+        public let schemeSelectionDefaultOrder: [POCardScheme]?
+
+        /// Restrict card schemes to IINs present in the list.
+        public let restrictToIins: Set<String>?
+
+        /// Restrict card schemes to schemes present in the list.
+        public let restrictToSchemes: Set<POCardScheme>?
+
         /// Indicates whether should collect card CVC.
         public let cvcRequired: Bool
 
