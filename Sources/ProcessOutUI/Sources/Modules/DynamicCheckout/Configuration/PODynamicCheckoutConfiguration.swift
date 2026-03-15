@@ -32,7 +32,7 @@ public struct PODynamicCheckoutConfiguration {
     @MainActor
     public struct ExpressCheckoutSettingsButton {
 
-        /// Button title, such as "Settings". Pass `nil` title to use default value.
+        /// Button title, such as "Settings". Set `nil` to use default value, or empty string `""` to remove title.
         public let title: String?
 
         /// Button icon. Pass `nil` to use default value.
@@ -86,7 +86,7 @@ public struct PODynamicCheckoutConfiguration {
     @MainActor
     public struct SubmitButton {
 
-        /// Button title, such as "Pay". Pass `nil` title to use default value.
+        /// Button title, such as "Pay". Set `nil` to use default value, or empty string `""` to remove title.
         public let title: String?
 
         /// Button icon. Pass `nil` to use default value.
@@ -102,7 +102,7 @@ public struct PODynamicCheckoutConfiguration {
     @MainActor
     public struct CancelButton {
 
-        /// Button title. Pass `nil` title to use default value.
+        /// Button title. Set `nil` to use default value, or empty string `""` to remove title.
         public let title: String?
 
         /// Button icon. Pass `nil` to use default value.

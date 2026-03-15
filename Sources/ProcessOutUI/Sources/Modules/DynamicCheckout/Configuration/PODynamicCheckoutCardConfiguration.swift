@@ -21,7 +21,7 @@ public struct PODynamicCheckoutCardConfiguration {
         @MainActor
         public struct ScanButton { // swiftlint:disable:this nesting
 
-            /// Button title, such as "Scan card". Pass `nil` title to use default value.
+            /// Button title, such as "Scan card". Set `nil` to use default value, or empty string `""` to remove title.
             public let title: String?
 
             /// Button icon. Pass `nil` title to use default value.

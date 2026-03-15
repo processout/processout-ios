@@ -34,5 +34,11 @@ extension POStringResource {
 
         /// Cancel button title.
         static let cancelButton = POStringResource("card-scanner.cancel-button", comment: "")
+
+        enum Accessibility { // swiftlint:disable:this nesting
+
+            /// Torch toggle label.
+            static let torch = POStringResource("card-scanner.torch", comment: "")
+        }
     }
 }

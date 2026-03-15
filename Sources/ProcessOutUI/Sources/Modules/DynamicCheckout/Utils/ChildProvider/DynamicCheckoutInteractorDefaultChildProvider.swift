@@ -126,12 +126,9 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
     private func submitButtonConfiguration(
         with configuration: PODynamicCheckoutConfiguration.SubmitButton
     ) -> POCardTokenizationConfiguration.SubmitButton {
-        .init(
-            title: configuration.title ?? String(
-                resource: .DynamicCheckout.Button.pay, configuration: self.configuration.localization
-            ),
-            icon: configuration.icon
-        )
+        let defaultTitle = String(resource: .DynamicCheckout.Button.pay, configuration: self.configuration.localization)
+        let resolvedConfiguration = configuration.resolved(defaultTitle: defaultTitle, icon: nil)
+        return .init(title: resolvedConfiguration.title, icon: resolvedConfiguration.icon)
     }
 
     // MARK: - Alternative Payment Configuration
@@ -141,16 +138,19 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
         gatewayConfigurationId: String,
         configuration: PODynamicCheckoutAlternativePaymentConfiguration
     ) -> PONativeAlternativePaymentConfiguration {
+        let resolvedSubmitButtonConfiguration = self.configuration.submitButton.resolved(
+            defaultTitle: String(
+                resource: .DynamicCheckout.Button.pay, configuration: self.configuration.localization
+            ),
+            icon: nil
+        )
         let childConfiguration = PONativeAlternativePaymentConfiguration(
             flow: .authorization(.init(invoiceId: invoiceId, gatewayConfigurationId: gatewayConfigurationId)),
             header: nil,
             inlineSingleSelectValuesLimit: configuration.inlineSingleSelectValuesLimit,
             barcodeInteraction: .init(configuration: configuration.barcodeInteraction),
             submitButton: .init(
-                title: self.configuration.submitButton.title ?? String(
-                    resource: .DynamicCheckout.Button.pay, configuration: self.configuration.localization
-                ),
-                icon: self.configuration.submitButton.icon
+                title: resolvedSubmitButtonConfiguration.title, icon: resolvedSubmitButtonConfiguration.icon
             ),
             cancelButton: self.configuration.cancelButton.map(
                 PONativeAlternativePaymentConfiguration.CancelButton.init

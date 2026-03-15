@@ -26,6 +26,7 @@ private struct ButtonWrapper: View {
     var body: some View {
         Button(action: action, label: { buttonLabel })
             .accessibility(identifier: viewModel.id)
+            .accessibilityLabel(Text(viewModel.accessibilityLabel ?? viewModel.title ?? ""))
             .disabled(!viewModel.isEnabled)
             .buttonLoading(viewModel.isLoading)
             .poButtonRole(viewModel.role)
