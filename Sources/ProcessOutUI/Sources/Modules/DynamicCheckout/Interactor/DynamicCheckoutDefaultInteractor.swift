@@ -62,7 +62,7 @@ final class DynamicCheckoutDefaultInteractor:
                         initiateDefaultPaymentIfNeeded()
                     }
                 case .authorized, .completed:
-                    setSuccessState()
+                    setSuccessState(authorizationOutcome: .success)
                 default:
                     let message = "Unsupported invoice state, please create new invoice and restart checkout."
                     throw POFailure(message: message, code: .Mobile.generic)
@@ -517,10 +517,10 @@ final class DynamicCheckoutDefaultInteractor:
                 let threeDSService = await delegate.dynamicCheckout(
                     willAuthorizeInvoiceWith: &authorizationRequest, using: .applePay(method)
                 )
-                try await invoicesService.authorizeInvoice(
+                let response: POInvoiceAuthorizationResponse? = try await invoicesService.authorizeInvoice(
                     request: authorizationRequest, threeDSService: threeDSService
                 )
-                setSuccessState()
+                setSuccessState(authorizationOutcome: response?.outcome)
             } catch {
                 restart(toRecoverPaymentProcessingError: error)
             }
@@ -589,7 +589,7 @@ final class DynamicCheckoutDefaultInteractor:
             currentState.isCancellable = false
             self.state = .paymentProcessing(currentState)
         case .tokenized:
-            setSuccessState()
+            setSuccessState(authorizationOutcome: currentState.invoiceAuthorizationResponse?.outcome)
         case .failure(let failure):
             restart(toRecoverPaymentProcessingError: failure)
         }
@@ -614,14 +614,14 @@ final class DynamicCheckoutDefaultInteractor:
                     )
                     source = try await alternativePaymentsService.authenticate(request: request).gatewayToken
                 }
-                try await authorizeInvoice(
+                let response = try await authorizeInvoice(
                     using: .alternativePayment(method),
                     source: source,
                     saveSource: saveSource,
                     prefersEphemeralWebAuthenticationSession: false,
                     startedState: startedState
                 )
-                setSuccessState()
+                setSuccessState(authorizationOutcome: response.outcome)
             } catch {
                 restart(toRecoverPaymentProcessingError: error)
             }
@@ -707,7 +707,7 @@ final class DynamicCheckoutDefaultInteractor:
             currentState.isAwaitingNativeAlternativePaymentCapture = true
             self.state = .paymentProcessing(currentState)
         case .completed:
-            setSuccessState()
+            setSuccessState(authorizationOutcome: .success)
         case .failure(let failure):
             restart(toRecoverPaymentProcessingError: failure)
         }
@@ -728,14 +728,14 @@ final class DynamicCheckoutDefaultInteractor:
                     )
                     source = try await alternativePaymentsService.authenticate(request: request).gatewayToken
                 }
-                try await authorizeInvoice(
+                let response = try await authorizeInvoice(
                     using: .customerToken(method),
                     source: source,
                     saveSource: false,
                     prefersEphemeralWebAuthenticationSession: method.type == .card,
                     startedState: startedState
                 )
-                setSuccessState()
+                setSuccessState(authorizationOutcome: response.outcome)
             } catch {
                 restart(toRecoverPaymentProcessingError: error)
             }
@@ -779,16 +779,20 @@ final class DynamicCheckoutDefaultInteractor:
 
     // MARK: - Success State
 
-    private func setSuccessState() {
+    private func setSuccessState(authorizationOutcome: POInvoiceAuthorizationOutcome?) {
         guard !state.isSink else {
             logger.debug("Already in a sink state, ignoring attempt to set success state.")
             return
         }
+        let isAuthorizationConfirmed = authorizationOutcome == .success
         let task = Task { @MainActor in
-            try? await Task.sleep(seconds: configuration.paymentSuccess?.duration ?? 0)
+            if isAuthorizationConfirmed {
+                // Only delay completion if authorization is confirmed.
+                try? await Task.sleep(seconds: configuration.paymentSuccess?.duration ?? 0)
+            }
             completion(.success(()))
         }
-        state = .success(.init(completionTask: task))
+        state = .success(.init(isAuthorizationConfirmed: isAuthorizationConfirmed, completionTask: task))
         send(event: .didCompletePayment)
     }
 
@@ -874,7 +878,7 @@ final class DynamicCheckoutDefaultInteractor:
         saveSource: Bool,
         prefersEphemeralWebAuthenticationSession: Bool,
         startedState: State.Started
-    ) async throws {
+    ) async throws -> POInvoiceAuthorizationResponse {
         guard let delegate else {
             throw POFailure(message: "Delegate must be set to authorize invoice.", code: .Mobile.generic)
         }
@@ -888,13 +892,17 @@ final class DynamicCheckoutDefaultInteractor:
             localeIdentifier: configuration.localization.localeOverride?.identifier
         )
         let threeDSService = await delegate.dynamicCheckout(willAuthorizeInvoiceWith: &request, using: paymentMethod)
-        let response = try await invoicesService.authorizeInvoice(request: request, threeDSService: threeDSService)
-        if let customerTokenId = response.customerTokenId {
-            let tokenizeEvent = PODynamicCheckoutEvent.DidTokenizePaymentMethod(
-                paymentMethod: paymentMethod, customerTokenId: customerTokenId
-            )
-            delegate.dynamicCheckout(didEmitEvent: .didTokenizePaymentMethod(tokenizeEvent))
+        let response: POInvoiceAuthorizationResponse = try await invoicesService.authorizeInvoice(
+            request: request, threeDSService: threeDSService
+        )
+        guard let customerTokenId = response.customerTokenId else {
+            return response
         }
+        let tokenizeEvent = PODynamicCheckoutEvent.DidTokenizePaymentMethod(
+            paymentMethod: paymentMethod, customerTokenId: customerTokenId
+        )
+        delegate.dynamicCheckout(didEmitEvent: .didTokenizePaymentMethod(tokenizeEvent))
+        return response
     }
 
     private func paymentMethod(withId id: String, in state: State.Started) -> PODynamicCheckoutPaymentMethod? {
@@ -918,13 +926,16 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
             logger.error("Unable to process card in unsupported state: \(state).")
             throw POFailure(message: "Something went wrong.", code: .Mobile.internal)
         }
-        try await authorizeInvoice(
+        let response = try await authorizeInvoice(
             using: currentState.paymentMethod,
             source: card.id,
             saveSource: save,
             prefersEphemeralWebAuthenticationSession: true,
             startedState: currentState.snapshot
         )
+        var newInteractorState = currentState
+        newInteractorState.invoiceAuthorizationResponse = response
+        state = .paymentProcessing(newInteractorState)
     }
 
     func cardTokenization( // swiftlint:disable:this cyclomatic_complexity

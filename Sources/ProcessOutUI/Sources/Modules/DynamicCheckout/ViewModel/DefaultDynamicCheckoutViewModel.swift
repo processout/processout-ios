@@ -78,8 +78,10 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
             updateWithPaymentProcessingState(state)
         case .restarting(let state):
             updateWithRestartingState(state)
-        case .success:
+        case .success(let state) where state.isAuthorizationConfirmed:
             updateWithSuccessState()
+        case .success:
+            break // Ignored
         }
     }
 

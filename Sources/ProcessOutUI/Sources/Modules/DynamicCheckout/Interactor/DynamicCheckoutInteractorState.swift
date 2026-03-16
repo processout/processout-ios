@@ -99,12 +99,19 @@ enum DynamicCheckoutInteractorState {
         /// currently possible because state update is perform on `willChange`.
         var isAwaitingNativeAlternativePaymentCapture = false // swiftlint:disable:this identifier_name
 
+        /// Invoices authorization response if any.
+        /// Currently could be set only during card payment.
+        var invoiceAuthorizationResponse: POInvoiceAuthorizationResponse?
+
         /// Boolean value indicating whether invoice should be invalidated when interactor transitions back
         /// to started from this state.
         var shouldInvalidateInvoice = false
     }
 
     struct Success {
+
+        /// Indicates whether backend explicitly confirmed authorization.
+        let isAuthorizationConfirmed: Bool
 
         /// Task that handles completion invocation.
         let completionTask: Task<Void, Never>
