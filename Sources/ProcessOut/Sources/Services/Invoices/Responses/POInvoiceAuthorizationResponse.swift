@@ -10,4 +10,7 @@ public struct POInvoiceAuthorizationResponse: Sendable {
     /// Optional customer token id, if invoice was authorized with `saveSource` flag set to `true`,
     /// and implementation was able to tokenize the source.
     public let customerTokenId: String?
+
+    /// Invoice authorization outcome.
+    public let outcome: POInvoiceAuthorizationOutcome
 }

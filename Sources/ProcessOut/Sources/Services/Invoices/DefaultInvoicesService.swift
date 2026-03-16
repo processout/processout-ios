@@ -110,7 +110,7 @@ final class DefaultInvoicesService: POInvoicesService {
         )
         let response = try await repository.authorizeInvoice(request: request)
         guard let customerAction = response.customerAction else {
-            return .init(customerTokenId: response.customerTokenId)
+            return .init(customerTokenId: response.customerTokenId, outcome: response.outcome)
         }
         let newRequest: POInvoiceAuthorizationRequest
         do {

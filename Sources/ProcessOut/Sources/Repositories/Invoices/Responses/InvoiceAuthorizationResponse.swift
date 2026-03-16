@@ -13,4 +13,7 @@ struct InvoiceAuthorizationResponse: Decodable, Sendable {
     /// Optional customer token id, if invoice was authorized with `saveSource` flag set to `true`,
     /// and implementation was able to tokenize authorization source.
     let customerTokenId: String?
+
+    /// Invoice authorization outcome.
+    let outcome: POInvoiceAuthorizationOutcome
 }
