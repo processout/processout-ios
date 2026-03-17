@@ -22,6 +22,7 @@ struct NativeAlternativePaymentTitleItemView: View {
                     .resizable()
                     .scaledToFit()
                     .frame(maxHeight: 24)
+                    .accessibilityHidden(true)
             }
             Text(item.text)
                 .textStyle(style.title)

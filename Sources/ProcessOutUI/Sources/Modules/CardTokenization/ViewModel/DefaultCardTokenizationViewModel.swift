@@ -134,6 +134,7 @@ final class DefaultCardTokenizationViewModel: ViewModel {
 
     // MARK: - Card Details
 
+    // swiftlint:disable:next function_body_length
     private func cardInformationInputItems(
         startedState: InteractorState.Started
     ) -> [CardTokenizationViewModelState.Item] {
@@ -144,6 +145,13 @@ final class DefaultCardTokenizationViewModel: ViewModel {
                     resource: .CardTokenization.CardDetails.expiration, configuration: configuration.localization
                 ),
                 icon: configuration.expirationDate.icon,
+                accessibilityLabel: String(
+                    resource: .CardTokenization.Accessibility.Card.expiration, configuration: configuration.localization
+                ),
+                accessibilityHint: String(
+                    resource: .CardTokenization.Accessibility.Card.expirationHint,
+                    configuration: configuration.localization
+                ),
                 keyboard: .asciiCapableNumberPad
             ),
             createItem(
@@ -163,6 +171,9 @@ final class DefaultCardTokenizationViewModel: ViewModel {
                     resource: .CardTokenization.CardDetails.number, configuration: configuration.localization
                 ),
                 icon: cardNumberIcon(startedState: startedState),
+                accessibilityLabel: String(
+                    resource: .CardTokenization.Accessibility.Card.number, configuration: configuration.localization
+                ),
                 keyboard: .asciiCapableNumberPad,
                 contentType: .creditCardNumber
             ),
@@ -211,15 +222,17 @@ final class DefaultCardTokenizationViewModel: ViewModel {
                 }
             )
         }
-        let defaultIcon = Image(poResource: .camera)
-            .renderingMode(.template)
-            .resizable()
+        let defaultTitle = String(
+            resource: .CardTokenization.Button.scanCard, configuration: configuration.localization
+        )
+        let buttonConfiguration = cardScanner.scanButton.resolved(
+            defaultTitle: defaultTitle, icon: Image(poResource: .camera).renderingMode(.template).resizable()
+        )
         let viewModel = POButtonViewModel(
             id: "scan-card-button",
-            title: cardScanner.scanButton.title ?? String(
-                resource: .CardTokenization.Button.scanCard, configuration: configuration.localization
-            ),
-            icon: cardScanner.scanButton.icon ?? AnyView(defaultIcon),
+            title: buttonConfiguration.title,
+            icon: buttonConfiguration.icon,
+            accessibilityLabel: buttonConfiguration.title ?? defaultTitle,
             action: openScanner
         )
         return .button(viewModel)
@@ -297,7 +310,7 @@ final class DefaultCardTokenizationViewModel: ViewModel {
                         resource: .CardTokenization.BillingAddress.street,
                         configuration: configuration.localization,
                         replacements: 1
-                    )
+                    ),
                 ),
                 createItem(
                     parameter: startedState.address.street2,
@@ -305,7 +318,7 @@ final class DefaultCardTokenizationViewModel: ViewModel {
                         resource: .CardTokenization.BillingAddress.street,
                         configuration: configuration.localization,
                         replacements: 2
-                    )
+                    ),
                 )
             ]
             items.append(contentsOf: streetItems)
@@ -327,7 +340,7 @@ final class DefaultCardTokenizationViewModel: ViewModel {
     private func futurePaymentsSection(
         startedState: InteractorState.Started
     ) -> CardTokenizationViewModelState.Section? {
-        guard interactor.configuration.isSavingAllowed else {
+        guard interactor.configuration.saving != nil else {
             return nil
         }
         let toggleItem = CardTokenizationViewModelState.ToggleItem(
@@ -352,6 +365,8 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         parameter: InteractorState.Parameter,
         placeholder: String,
         icon: AnyView? = nil,
+        accessibilityLabel: String? = nil,
+        accessibilityHint: String? = nil,
         keyboard: UIKeyboardType = .default,
         contentType: UITextContentType? = nil,
         submitLabel: POBackport<Any>.SubmitLabel = .default
@@ -364,6 +379,8 @@ final class DefaultCardTokenizationViewModel: ViewModel {
                 parameter: parameter,
                 placeholder: placeholder,
                 icon: icon,
+                accessibilityLabel: accessibilityLabel,
+                accessibilityHint: accessibilityHint,
                 keyboard: keyboard,
                 contentType: contentType,
                 submitLabel: submitLabel
@@ -376,6 +393,8 @@ final class DefaultCardTokenizationViewModel: ViewModel {
         parameter: InteractorState.Parameter,
         placeholder: String,
         icon: AnyView? = nil,
+        accessibilityLabel: String?,
+        accessibilityHint: String?,
         keyboard: UIKeyboardType = .default,
         contentType: UITextContentType? = nil,
         submitLabel: POBackport<Any>.SubmitLabel
@@ -392,6 +411,8 @@ final class DefaultCardTokenizationViewModel: ViewModel {
             isInvalid: !parameter.isValid,
             isEnabled: true,
             formatter: parameter.formatter,
+            accessibilityLabel: accessibilityLabel,
+            accessibilityHint: accessibilityHint,
             keyboard: keyboard,
             contentType: contentType,
             submitLabel: submitLabel,
@@ -436,18 +457,21 @@ final class DefaultCardTokenizationViewModel: ViewModel {
     private func submitAction(
         startedState: InteractorState.Started, isSubmitting: Bool
     ) -> POButtonViewModel? {
-        guard let buttonConfiguration = configuration._submitButton else {
+        let defaultTitle = String(
+            resource: .CardTokenization.Button.submit, configuration: configuration.localization
+        )
+        let buttonConfiguration = configuration._submitButton?.resolved(defaultTitle: defaultTitle, icon: nil)
+        guard let buttonConfiguration else {
             return nil
         }
         let action = POButtonViewModel(
             id: "primary-button",
-            title: buttonConfiguration.title ?? String(
-                resource: .CardTokenization.Button.submit, configuration: configuration.localization
-            ),
+            title: buttonConfiguration.title,
             icon: buttonConfiguration.icon,
             isEnabled: startedState.areParametersValid,
             isLoading: isSubmitting,
             role: .primary,
+            accessibilityLabel: buttonConfiguration.title ?? defaultTitle,
             action: { [weak self] in
                 self?.interactor.tokenize()
             }
@@ -456,18 +480,21 @@ final class DefaultCardTokenizationViewModel: ViewModel {
     }
 
     private func cancelAction(isEnabled: Bool) -> POButtonViewModel? {
-        guard let buttonConfiguration = configuration.cancelButton else {
+        let defaultTitle = String(
+            resource: .CardTokenization.Button.cancel, configuration: configuration.localization
+        )
+        let buttonConfiguration = configuration.cancelButton?.resolved(defaultTitle: defaultTitle, icon: nil)
+        guard let buttonConfiguration else {
             return nil
         }
         let localizationConfiguration = interactor.configuration.localization
         let action = POButtonViewModel(
             id: "cancel-button",
-            title: buttonConfiguration.title ?? String(
-                resource: .CardTokenization.Button.cancel, configuration: configuration.localization
-            ),
+            title: buttonConfiguration.title,
             icon: buttonConfiguration.icon,
             isEnabled: isEnabled,
             role: .cancel,
+            accessibilityLabel: buttonConfiguration.title ?? defaultTitle,
             confirmation: buttonConfiguration.confirmation.map { configuration in
                 .cancel(with: configuration, localization: localizationConfiguration)
             },

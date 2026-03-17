@@ -129,6 +129,7 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
             isInvalid: false,
             isEnabled: false,
             formatter: nil,
+            accessibilityLabel: nil,
             keyboard: .asciiCapableNumberPad,
             contentType: nil,
             submitLabel: .default,
@@ -151,6 +152,7 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
             isInvalid: !state.areParametersValid,
             isEnabled: true,
             formatter: state.formatter,
+            accessibilityLabel: nil,
             keyboard: .asciiCapableNumberPad,
             contentType: nil,
             submitLabel: .default,
@@ -216,14 +218,16 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
     }
 
     private func submitAction(isEnabled: Bool, isLoading: Bool) -> POButtonViewModel {
+        let defaultTitle = String(resource: .CardUpdate.Button.submit, configuration: configuration.localization)
+        let buttonConfiguration = configuration.submitButton.resolved(defaultTitle: defaultTitle, icon: nil)
         let action = POButtonViewModel(
             id: ActionId.submit,
-            title: configuration.submitButton.title ??
-                String(resource: .CardUpdate.Button.submit, configuration: configuration.localization),
-            icon: configuration.submitButton.icon,
+            title: buttonConfiguration.title,
+            icon: buttonConfiguration.icon,
             isEnabled: isEnabled,
             isLoading: isLoading,
             role: .primary,
+            accessibilityLabel: buttonConfiguration.title ?? defaultTitle,
             action: { [weak self] in
                 self?.interactor.submit()
             }
@@ -232,17 +236,19 @@ final class DefaultCardUpdateViewModel: CardUpdateViewModel {
     }
 
     private func cancelAction(isEnabled: Bool) -> POButtonViewModel? {
-        guard let buttonConfiguration = configuration.cancelButton else {
+        let defaultTitle = String(resource: .CardUpdate.Button.cancel, configuration: configuration.localization)
+        let buttonConfiguration = configuration.cancelButton?.resolved(defaultTitle: defaultTitle, icon: nil)
+        guard let buttonConfiguration else {
             return nil
         }
         let localizationConfiguration = configuration.localization
         let action = POButtonViewModel(
             id: ActionId.cancel,
-            title: buttonConfiguration.title
-                ?? String(resource: .CardUpdate.Button.cancel, configuration: configuration.localization),
+            title: buttonConfiguration.title,
             icon: buttonConfiguration.icon,
             isEnabled: isEnabled,
             role: .cancel,
+            accessibilityLabel: buttonConfiguration.title ?? defaultTitle,
             confirmation: buttonConfiguration.confirmation.map { configuration in
                 .cancel(with: configuration, localization: localizationConfiguration)
             },

@@ -22,6 +22,12 @@ public protocol POInvoicesService: POService { // sourcery: AutoCompletion
     /// Performs invoice authorization with given request.
     func authorizeInvoice(request: POInvoiceAuthorizationRequest, threeDSService: PO3DS2Service) async throws
 
+    /// Performs invoice authorization with given request.
+    @_disfavoredOverload
+    func authorizeInvoice(
+        request: POInvoiceAuthorizationRequest, threeDSService: PO3DS2Service
+    ) async throws -> POInvoiceAuthorizationResponse
+
     /// Performs invoice authorization using given alternative payment method details.
     func authorizeInvoice( // sourcery:completion: skip
         request: PONativeAlternativePaymentAuthorizationRequestV2
@@ -47,6 +53,13 @@ public protocol POInvoicesService: POService { // sourcery: AutoCompletion
 }
 
 extension POInvoicesService {
+
+    /// Performs invoice authorization with given request.
+    public func authorizeInvoice(request: POInvoiceAuthorizationRequest, threeDSService: PO3DS2Service) async throws {
+        _ = try await authorizeInvoice(
+            request: request, threeDSService: threeDSService
+        ) as POInvoiceAuthorizationResponse
+    }
 
     @_spi(PO)
     public func createInvoice(request: POInvoiceCreationRequest) async throws -> POInvoice {

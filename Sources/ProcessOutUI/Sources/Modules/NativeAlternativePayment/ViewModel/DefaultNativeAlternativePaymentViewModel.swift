@@ -235,17 +235,22 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         guard state.shouldConfirmPayment else {
             return nil
         }
-        guard let buttonConfiguration = interactor.configuration.paymentConfirmation.confirmButton else {
+        let defaultTitle = String(
+            resource: .NativeAlternativePayment.Button.confirmPayment, configuration: configuration.localization
+        )
+        let buttonConfiguration = interactor.configuration.paymentConfirmation.confirmButton?.resolved(
+            defaultTitle: defaultTitle, icon: nil
+        )
+        guard let buttonConfiguration else {
             assertionFailure("Unable to setup confirmation UI without confirm button configuration.")
             return nil
         }
         let action = POButtonViewModel(
             id: "primary-button",
-            title: buttonConfiguration.title ?? String(
-                resource: .NativeAlternativePayment.Button.confirmPayment, configuration: configuration.localization
-            ),
+            title: buttonConfiguration.title,
             icon: buttonConfiguration.icon,
             role: .primary,
+            accessibilityLabel: buttonConfiguration.title ?? defaultTitle,
             action: { [weak self] in
                 self?.interactor.confirmPayment()
             }
@@ -386,18 +391,23 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     }
 
     private func createDoneButton(state: InteractorState.Completed) -> NativeAlternativePaymentViewModelItem? {
-        guard let configuration = interactor.configuration.success?.doneButton else {
+        let defaultTitle = String(
+            resource: .NativeAlternativePayment.Button.done, configuration: self.configuration.localization
+        )
+        let configuration = interactor.configuration.success?.doneButton?.resolved(
+            defaultTitle: defaultTitle, icon: nil
+        )
+        guard let configuration else {
             return nil
         }
         let viewModel = POButtonViewModel(
             id: "complete-payment-button",
-            title: configuration.title ?? String(
-                resource: .NativeAlternativePayment.Button.done, configuration: self.configuration.localization
-            ),
+            title: configuration.title,
             icon: configuration.icon,
             isEnabled: true,
             isLoading: false,
             role: .primary,
+            accessibilityLabel: configuration.title ?? defaultTitle,
             confirmation: nil,
             action: { [weak self] in
                 self?.interactor.cancel()
@@ -451,7 +461,8 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     private func createItem(parameter: InteractorState.Parameter) -> NativeAlternativePaymentViewModelItem {
         switch parameter.specification {
-        case .otp(let specification):
+        case .otp(let specification) where !UIAccessibility.isVoiceOverRunning:
+            // Regular text field has better support for voice over
             if let item = createItem(for: parameter, with: specification) {
                 return item
             }
@@ -678,16 +689,19 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     private func createButton(
         for barcode: NativeAlternativePaymentResolvedElement.Instruction.Barcode
     ) -> POButtonViewModel {
-        let configuration = interactor.configuration.barcodeInteraction.saveButton
         let defaultTitle = String(
             resource: .NativeAlternativePayment.Button.saveBarcode,
             configuration: self.configuration.localization,
             replacements: barcode.type.rawValue.uppercased()
         )
+        let configuration = interactor.configuration.barcodeInteraction.saveButton.resolved(
+            defaultTitle: defaultTitle, icon: nil
+        )
         let viewModel = POButtonViewModel(
             id: "barcode-button",
-            title: configuration.title ?? defaultTitle,
+            title: configuration.title,
             icon: configuration.icon,
+            accessibilityLabel: configuration.title ?? defaultTitle,
             action: { [weak self] in
                 self?.saveImageToPhotoLibraryOrShowError(barcode.image)
             }
@@ -765,15 +779,18 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     // MARK: - Actions
 
     private func createSubmitButton(state: InteractorState.Started, isLoading: Bool) -> POButtonViewModel {
+        let defaultTitle = String(
+            resource: .NativeAlternativePayment.Button.continue, configuration: configuration.localization
+        )
+        let configuration = configuration.submitButton.resolved(defaultTitle: defaultTitle, icon: nil)
         let action = POButtonViewModel(
             id: "primary-button",
-            title: configuration.submitButton.title ?? String(
-                resource: .NativeAlternativePayment.Button.continue, configuration: configuration.localization
-            ),
-            icon: configuration.submitButton.icon,
+            title: configuration.title,
+            icon: configuration.icon,
             isEnabled: state.areParametersValid,
             isLoading: isLoading,
             role: .primary,
+            accessibilityLabel: configuration.title ?? defaultTitle,
             action: { [weak self] in
                 self?.interactor.submit()
             }
@@ -784,18 +801,21 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     private func createCancelButton(
         configuration: PONativeAlternativePaymentConfiguration.CancelButton?, isEnabled: Bool
     ) -> POButtonViewModel? {
-        guard let configuration, !configuration.isHidden else {
+        let defaultTitle = String(
+            resource: .NativeAlternativePayment.Button.cancel, configuration: self.configuration.localization
+        )
+        guard let configuration = configuration?.resolved(defaultTitle: defaultTitle, icon: nil),
+              !configuration.isHidden else {
             return nil
         }
         let localizationConfiguration = interactor.configuration.localization
         let action = POButtonViewModel(
             id: "native-alternative-payment.secondary-button",
-            title: configuration.title ?? String(
-                resource: .NativeAlternativePayment.Button.cancel, configuration: self.configuration.localization
-            ),
+            title: configuration.title,
             icon: configuration.icon,
             isEnabled: isEnabled,
             role: .cancel,
+            accessibilityLabel: configuration.title ?? defaultTitle,
             confirmation: configuration.confirmation.map { configuration in
                 .paymentCancel(with: configuration, localization: localizationConfiguration) { [weak self] in
                     self?.interactor.didRequestCancelConfirmation()
