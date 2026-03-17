@@ -48,6 +48,14 @@ extension POStringResource {
 
         /// Success message.
         static let successMessage = POStringResource("dynamic-checkout.success-message", comment: "")
+
+        enum Accessibility {
+
+            /// Express checkout settings button.
+            static let expressCheckoutSettings = POStringResource(
+                "dynamic-checkout.express-checkout-settings", comment: ""
+            )
+        }
     }
 }
 

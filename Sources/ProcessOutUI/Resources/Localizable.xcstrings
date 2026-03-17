@@ -2281,6 +2281,40 @@
         }
       }
     },
+    "dynamic-checkout.express-checkout-settings" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "طرق الدفع"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved payment methods"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moyens de paiement"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zapisane metody płatności"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pagamentos salvos"
+          }
+        }
+      }
+    },
     "dynamic-checkout.pay-button" : {
       "localizations" : {
         "ar" : {

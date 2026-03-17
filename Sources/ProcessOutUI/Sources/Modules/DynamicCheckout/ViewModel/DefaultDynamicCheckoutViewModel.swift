@@ -216,6 +216,10 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
             id: ButtonId.expressCheckoutSettings,
             title: resolvedConfiguration.title,
             icon: resolvedConfiguration.icon,
+            accessibilityLabel: resolvedConfiguration.title ?? String(
+                resource: .DynamicCheckout.Accessibility.expressCheckoutSettings,
+                configuration: interactor.configuration.localization
+            ),
             confirmation: nil,
             action: { [weak self] in
                 self?.openExpressCheckoutSettings()
