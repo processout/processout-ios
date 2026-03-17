@@ -32,6 +32,18 @@ extension PODynamicCheckoutConfiguration.ExpressCheckout {
     }
 }
 
+extension PODynamicCheckoutConfiguration.RegularCheckout {
+
+    func resolved(defaultTitle: @autoclosure () -> String?) -> Self {
+        let resolvedTitle: String? = if title?.isEmpty == true {
+            nil
+        } else {
+            title ?? defaultTitle()
+        }
+        return .init(title: resolvedTitle)
+    }
+}
+
 extension PODynamicCheckoutConfiguration.SubmitButton {
 
     func resolved(defaultTitle: @autoclosure () -> String?, icon defaultIcon: @autoclosure () -> Image?) -> Self {

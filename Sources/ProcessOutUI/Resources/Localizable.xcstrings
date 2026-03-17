@@ -2145,6 +2145,40 @@
         }
       }
     },
+    "dynamic-checkout.accessibility.express-checkout-settings" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "طرق الدفع"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved payment methods"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moyens de paiement"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zapisane metody płatności"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pagamentos salvos"
+          }
+        }
+      }
+    },
     "dynamic-checkout.cancel-button" : {
       "localizations" : {
         "ar" : {
@@ -2281,40 +2315,6 @@
         }
       }
     },
-    "dynamic-checkout.express-checkout-settings" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "طرق الدفع"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Saved payment methods"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Moyens de paiement"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zapisane metody płatności"
-          }
-        },
-        "pt-PT" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pagamentos salvos"
-          }
-        }
-      }
-    },
     "dynamic-checkout.pay-button" : {
       "localizations" : {
         "ar" : {
@@ -2379,6 +2379,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Será redireccionado para finalizar este pagamento."
+          }
+        }
+      }
+    },
+    "dynamic-checkout.regular-checkout" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "طرق دفع أخرى"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Other payment methods"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autres modes de paiement"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inne metody płatności"
+          }
+        },
+        "pt-PT" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Outras formas de pagamento"
           }
         }
       }

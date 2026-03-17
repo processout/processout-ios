@@ -17,7 +17,7 @@ public struct PODynamicCheckoutConfiguration {
     @MainActor
     public struct ExpressCheckout {
 
-        /// Express checkout section title.
+        /// Express checkout section title. Set `nil` to use default value, or empty string `""` to remove title.
         public let title: String?
 
         /// Settings button configuration.
@@ -41,6 +41,17 @@ public struct PODynamicCheckoutConfiguration {
         public init<Icon: View>(title: String? = nil, icon: Icon? = AnyView?.none) {
             self.title = title
             self.icon = icon.map(AnyView.init(erasing:))
+        }
+    }
+
+    @MainActor
+    public struct RegularCheckout {
+
+        /// Regular checkout section title. Set `nil` to use default value, or empty string `""` to remove title.
+        public let title: String?
+
+        public init(title: String? = "") {
+            self.title = title
         }
     }
 
@@ -133,6 +144,13 @@ public struct PODynamicCheckoutConfiguration {
     /// whether the user can save a payment method.
     public let expressCheckout: ExpressCheckout?
 
+    /// Controls the visibility and appearance of the regular payment methods section.
+    ///
+    /// Set this value to `nil` to hide the entire "Regular Checkout" section.
+    ///
+    /// This setting does not affect the availability of saved payment options.
+    public let regularCheckout: RegularCheckout?
+
     /// Card collection configuration.
     public let card: PODynamicCheckoutCardConfiguration
 
@@ -167,6 +185,7 @@ public struct PODynamicCheckoutConfiguration {
     public init(
         invoiceRequest: POInvoiceRequest,
         expressCheckout: ExpressCheckout? = .init(),
+        regularCheckout: RegularCheckout? = .init(),
         card: PODynamicCheckoutCardConfiguration = .init(),
         alternativePayment: PODynamicCheckoutAlternativePaymentConfiguration = .init(),
         passKitPaymentButtonType: PKPaymentButtonType = .plain,
@@ -179,6 +198,7 @@ public struct PODynamicCheckoutConfiguration {
     ) {
         self.invoiceRequest = invoiceRequest
         self.expressCheckout = expressCheckout
+        self.regularCheckout = regularCheckout
         self.card = card
         self.alternativePayment = alternativePayment
         self.passKitPaymentButtonType = passKitPaymentButtonType
