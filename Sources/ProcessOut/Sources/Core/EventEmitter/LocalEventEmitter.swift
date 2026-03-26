@@ -64,6 +64,14 @@ final class LocalEventEmitter: POEventEmitter, @unchecked Sendable {
         return cancellable
     }
 
+    func hasListeners<Event: POEventEmitterEvent>(of eventType: Event.Type) -> Bool {
+        lock.lock()
+        defer {
+            lock.unlock()
+        }
+        return subscriptions.keys.contains(Event.name) ?? false
+    }
+
     // MARK: - Private Nested Types
 
     private struct Subscription {

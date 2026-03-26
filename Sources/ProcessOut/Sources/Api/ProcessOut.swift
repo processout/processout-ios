@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 14.10.2024.
 //
 
-// swiftlint:disable force_unwrapping type_body_length
+// swiftlint:disable force_unwrapping type_body_length file_length
 
 import Foundation
 import UIKit
@@ -143,7 +143,10 @@ public final class ProcessOut: @unchecked Sendable {
         )
         gatewayConfigurations = HttpGatewayConfigurationsRepository(connector: httpConnector)
         invoices = Self.createInvoicesService(
-            httpConnector: httpConnector, customerActionsService: customerActionsService, logger: serviceLogger
+            httpConnector: httpConnector,
+            customerActionsService: customerActionsService,
+            eventEmitter: eventEmitter,
+            logger: serviceLogger
         )
         _alternativePayments = Self.createAlternativePaymentsService(
             configuration: configuration, webAuthenticationSession: webAuthenticationSession, logger: serviceLogger
@@ -170,11 +173,17 @@ public final class ProcessOut: @unchecked Sendable {
     // MARK: - Services
 
     private static func createInvoicesService(
-        httpConnector: HttpConnector, customerActionsService: CustomerActionsService, logger: POLogger
+        httpConnector: HttpConnector,
+        customerActionsService: CustomerActionsService,
+        eventEmitter: POEventEmitter,
+        logger: POLogger
     ) -> POInvoicesService {
         let repository = HttpInvoicesRepository(connector: httpConnector)
         return DefaultInvoicesService(
-            repository: repository, customerActionsService: customerActionsService, logger: logger
+            repository: repository,
+            customerActionsService: customerActionsService,
+            eventEmitter: eventEmitter,
+            logger: logger
         )
     }
 
@@ -393,4 +402,4 @@ extension ProcessOut {
     }
 }
 
-// swiftlint:enable force_unwrapping type_body_length
+// swiftlint:enable force_unwrapping type_body_length file_length

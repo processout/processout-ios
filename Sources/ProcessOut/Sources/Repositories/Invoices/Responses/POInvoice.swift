@@ -8,7 +8,7 @@
 import Foundation
 
 /// Invoice details.
-public struct POInvoice: Codable, Sendable {
+public struct POInvoice: Identifiable, Codable, Sendable {
 
     /// String value that uniquely identifies this invoice.
     public let id: String

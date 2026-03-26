@@ -9,10 +9,17 @@ import Foundation
 
 final class DefaultInvoicesService: POInvoicesService {
 
-    init(repository: InvoicesRepository, customerActionsService: CustomerActionsService, logger: POLogger) {
+    init(
+        repository: InvoicesRepository,
+        customerActionsService: CustomerActionsService,
+        eventEmitter: POEventEmitter,
+        logger: POLogger,
+    ) {
         self.repository = repository
         self.customerActionsService = customerActionsService
+        self.eventEmitter = eventEmitter
         self.logger = logger
+        commonInit()
     }
 
     // MARK: - POInvoicesService
@@ -95,9 +102,14 @@ final class DefaultInvoicesService: POInvoicesService {
 
     private let repository: InvoicesRepository
     private let customerActionsService: CustomerActionsService
+    private let eventEmitter: POEventEmitter
     private let logger: POLogger
 
     // MARK: - Private Methods
+
+    private func commonInit() {
+        observeEvents()
+    }
 
     private func _authorizeInvoice(request: POInvoiceAuthorizationRequest, threeDSService: PO3DS2Service) async throws {
         let request = request.replacing(
@@ -123,6 +135,38 @@ final class DefaultInvoicesService: POInvoicesService {
         }
         try await _authorizeInvoice(request: newRequest, threeDSService: threeDSService)
     }
+
+    // MARK: - Events
+
+    private func observeEvents() {
+        let deepLinkEventsListener = eventEmitter.on(PODeepLinkReceivedEvent.self) { [weak self] event in
+            self?.didReceive(deepLinkEvent: event) ?? false
+        }
+        eventListeners.append(deepLinkEventsListener)
+    }
+
+    private func didReceive(deepLinkEvent event: PODeepLinkReceivedEvent) -> Bool {
+        guard event.url.queryParameters?.keys.contains("po_token") ?? false else {
+            logger.debug("Deep link url \(event.url) is not supported, ignored.")
+            return false
+        }
+        let shouldResolveDeepLink = eventEmitter.hasListeners(of: POInvoiceDeepLinkResolvedEvent.self)
+            || eventEmitter.hasListeners(of: POInvoiceDeepLinkResolutionFailedEvent.self)
+        guard shouldResolveDeepLink else {
+            logger.debug("Deep link resolution is not requested, ignored.")
+            return false
+        }
+        Task {
+            do throws(POFailure) {
+                // TODO: Resolve deep link
+            } catch {
+                eventEmitter.emit(event: POInvoiceDeepLinkResolutionFailedEvent(url: event.url, error: error))
+            }
+        }
+        return true
+    }
+
+    private nonisolated(unsafe) var eventListeners: [AnyObject] = []
 }
 
 private extension POInvoiceAuthorizationRequest { // swiftlint:disable:this no_extension_access_modifier

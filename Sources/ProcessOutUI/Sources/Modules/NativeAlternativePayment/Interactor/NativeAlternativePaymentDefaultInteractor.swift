@@ -21,6 +21,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         alternativePaymentsService: POAlternativePaymentsService,
         imagesRepository: POImagesRepository,
         barcodeImageProvider: BarcodeImageProvider,
+        eventEmitter: POEventEmitter,
         logger: POLogger,
         completion: @escaping (Result<Void, POFailure>) -> Void
     ) {
@@ -29,6 +30,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         self.alternativePaymentsService = alternativePaymentsService
         self.imagesRepository = imagesRepository
         self.barcodeImageProvider = barcodeImageProvider
+        self.eventEmitter = eventEmitter
         self.logger = logger
         self.completion = completion
         super.init(state: .idle)
@@ -63,6 +65,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             }
         }
         state = .starting(.init(task: task))
+        observeEvents()
         _ = await task.result
     }
 
@@ -200,6 +203,7 @@ final class NativeAlternativePaymentDefaultInteractor:
     private let alternativePaymentsService: POAlternativePaymentsService
     private let imagesRepository: POImagesRepository
     private let barcodeImageProvider: BarcodeImageProvider
+    private let eventEmitter: POEventEmitter
     private let logger: POLogger
     private let completion: (Result<Void, POFailure>) -> Void
 
@@ -418,6 +422,30 @@ final class NativeAlternativePaymentDefaultInteractor:
         enableCancellationAfterDelay()
     }
 
+    /// Requests state change to redirecting while bypassing actual redirect assuming it was performed elsewhere.
+    private func setRedirectingState(didOpenUrl: Bool) {
+        guard case .awaitingRedirect(let currentState) = state else {
+            logger.debug("Ignoring redirect confirmation in unsupported state \(state).")
+            return
+        }
+        let task = Task {
+            do {
+                let response = try await serviceAdapter.continuePayment(
+                    with: .init(
+                        flow: configuration.flow,
+                        redirect: currentState.redirect.confirmationRequired ? .init(success: didOpenUrl) : nil,
+                        localeIdentifier: configuration.localization.localeOverride?.identifier
+                    )
+                )
+                try await setState(with: response)
+            } catch {
+                setFailureState(error: error)
+            }
+        }
+        let newState = State.Redirecting(task: task, snapshot: currentState)
+        state = .redirecting(newState)
+    }
+
     // MARK: - Completed State
 
     private func setCompletedState(response: NativeAlternativePaymentServiceAdapterResponse) async {
@@ -492,6 +520,10 @@ final class NativeAlternativePaymentDefaultInteractor:
     // MARK: - Failure State
 
     private func setFailureState(error: Error) {
+        guard !Task.isCancelled else {
+            logger.debug("Task is cancelled, ignoring attempt to set failure state with: \(error).")
+            return
+        }
         guard !state.isSink else {
             logger.debug("Already in a sink state, ignoring attempt to set failure state with: \(error).")
             return
@@ -914,6 +946,66 @@ final class NativeAlternativePaymentDefaultInteractor:
         }
         return await UIApplication.shared.open(url, options: options)
     }
+
+    // MARK: - External Events
+
+    private func observeEvents() {
+        let deepLinkResolvedEventsListener = eventEmitter.on(
+            POInvoiceDeepLinkResolvedEvent.self,
+            listener: { [weak self] event in
+                self?.didReceive(event: event) ?? false
+            }
+        )
+        eventListeners.append(deepLinkResolvedEventsListener)
+        let deepLinkResolutionFailedEventListener = eventEmitter.on(
+            POInvoiceDeepLinkResolutionFailedEvent.self,
+            listener: { [weak self] event in
+                self?.didReceive(event: event) ?? false
+            }
+        )
+        eventListeners.append(deepLinkResolutionFailedEventListener)
+    }
+
+    private nonisolated func didReceive(event: POInvoiceDeepLinkResolvedEvent) -> Bool {
+        switch configuration.flow {
+        case .authorization(let flow) where flow.invoiceId != event.invoiceId:
+            return false
+        case .tokenization(let flow) where flow.customerTokenId != event.customerTokenId:
+            return false
+        default:
+            break
+        }
+        Task { @MainActor in
+            switch state {
+            case .awaitingRedirect:
+                setRedirectingState(didOpenUrl: true)
+            case .awaitingCompletion:
+                confirmPayment()
+            default:
+                return
+            }
+        }
+        return true
+    }
+
+    private nonisolated func didReceive(event: POInvoiceDeepLinkResolutionFailedEvent) -> Bool {
+        Task { @MainActor in
+            switch state {
+            case .starting(let currentState):
+                currentState.task.cancel()
+            case .submitting(let currentState):
+                currentState.task.cancel()
+            case .redirecting(let currentState):
+                currentState.task.cancel()
+            default:
+                break
+            }
+            setFailureState(error: event.error)
+        }
+        return true
+    }
+
+    private var eventListeners: [AnyObject] = []
 }
 
 // swiftlint:enable file_length type_body_length
