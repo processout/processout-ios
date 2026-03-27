@@ -8,9 +8,6 @@
 @_spi(PO)
 public struct POInvoiceDeepLinkResolvedEvent: POEventEmitterEvent {
 
-    /// Resolved invoice ID.
-    public let invoiceId: POInvoice.ID
-
-    /// Customer token ID.
-    public let customerTokenId: POCustomerToken.ID?
+    /// Native alternative payment URL resolution response.
+    public let resolutionResponse: PONativeAlternativePaymentUrlResolutionResponseV2
 }

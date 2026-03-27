@@ -968,21 +968,31 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     private nonisolated func didReceive(event: POInvoiceDeepLinkResolvedEvent) -> Bool {
         switch configuration.flow {
-        case .authorization(let flow) where flow.invoiceId != event.invoiceId:
+        case .authorization(let flow) where flow.invoiceId != event.resolutionResponse.payment.invoiceId:
             return false
-        case .tokenization(let flow) where flow.customerTokenId != event.customerTokenId:
+        case .tokenization(let flow) where flow.customerTokenId != event.resolutionResponse.payment.customerTokenId:
             return false
         default:
             break
         }
         Task { @MainActor in
-            switch state {
-            case .awaitingRedirect:
-                setRedirectingState(didOpenUrl: true)
-            case .awaitingCompletion:
-                confirmPayment()
-            default:
-                return
+            let adapterResponse = NativeAlternativePaymentServiceAdapterResponse(
+                state: event.resolutionResponse.state,
+                paymentMethod: event.resolutionResponse.paymentMethod,
+                invoice: event.resolutionResponse.invoice,
+                elements: event.resolutionResponse.elements,
+                redirect: event.resolutionResponse.redirect
+            )
+            do {
+                switch state {
+                case .idle, .started, .awaitingRedirect, .awaitingCompletion:
+                    try await setState(with: adapterResponse)
+                default:
+                    logger.warn("Unable to apply resolve deep link to current state: \(state).")
+                    return
+                }
+            } catch {
+                setFailureState(error: error)
             }
         }
         return true

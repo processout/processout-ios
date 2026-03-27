@@ -157,9 +157,17 @@ final class DefaultInvoicesService: POInvoicesService {
             return false
         }
         Task {
-            do throws(POFailure) {
-                // TODO: Resolve deep link
+            do {
+                let response = try await repository.resolveUrl(
+                    request: .init(redirect: .init(result: .init(url: event.url)))
+                )
+                eventEmitter.emit(event: POInvoiceDeepLinkResolvedEvent(resolutionResponse: response))
+            } catch let error as POFailure {
+                eventEmitter.emit(event: POInvoiceDeepLinkResolutionFailedEvent(url: event.url, error: error))
             } catch {
+                let error = POFailure(
+                    message: "Unable to resolve deep link URL.", code: .Mobile.generic, underlyingError: error
+                )
                 eventEmitter.emit(event: POInvoiceDeepLinkResolutionFailedEvent(url: event.url, error: error))
             }
         }
