@@ -7,7 +7,7 @@
 
 import Foundation
 
-@_spi(PO)
+@_spi(PO) // swiftlint:disable:next type_name
 public struct PONativeAlternativePaymentDeepLinkResolutionFailedEvent: POEventEmitterEvent {
 
     /// Original deep link URL.

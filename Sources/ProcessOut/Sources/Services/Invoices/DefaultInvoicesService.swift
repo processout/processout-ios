@@ -163,12 +163,16 @@ final class DefaultInvoicesService: POInvoicesService {
                 )
                 eventEmitter.emit(event: PONativeAlternativePaymentDeepLinkResolvedEvent(resolutionResponse: response))
             } catch let error as POFailure {
-                eventEmitter.emit(event: PONativeAlternativePaymentDeepLinkResolutionFailedEvent(url: event.url, error: error))
+                eventEmitter.emit(
+                    event: PONativeAlternativePaymentDeepLinkResolutionFailedEvent(url: event.url, error: error)
+                )
             } catch {
                 let error = POFailure(
                     message: "Unable to resolve deep link URL.", code: .Mobile.generic, underlyingError: error
                 )
-                eventEmitter.emit(event: PONativeAlternativePaymentDeepLinkResolutionFailedEvent(url: event.url, error: error))
+                eventEmitter.emit(
+                    event: PONativeAlternativePaymentDeepLinkResolutionFailedEvent(url: event.url, error: error)
+                )
             }
         }
         return true
