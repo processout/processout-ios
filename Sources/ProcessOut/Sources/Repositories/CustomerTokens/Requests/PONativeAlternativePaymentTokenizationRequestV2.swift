@@ -16,6 +16,11 @@ public struct PONativeAlternativePaymentTokenizationRequestV2: Sendable, Encodab
     /// Gateway configuration identifier.
     public let gatewayConfigurationId: String
 
+    /// Alternative payment configuration.
+    ///
+    /// - WARNING: Only has effect when passed with first call.
+    public let configuration: PONativeAlternativePaymentConfigurationV2
+
     /// Payment request parameters.
     public let submitData: PONativeAlternativePaymentSubmitDataV2?
 
@@ -30,6 +35,7 @@ public struct PONativeAlternativePaymentTokenizationRequestV2: Sendable, Encodab
         customerId: String,
         customerTokenId: String,
         gatewayConfigurationId: String,
+        configuration: PONativeAlternativePaymentConfigurationV2 = .init(),
         submitData: PONativeAlternativePaymentSubmitDataV2? = nil,
         redirect: PONativeAlternativePaymentRedirectResultV2? = nil,
         localeIdentifier: String? = nil
@@ -37,6 +43,7 @@ public struct PONativeAlternativePaymentTokenizationRequestV2: Sendable, Encodab
         self.customerId = customerId
         self.customerTokenId = customerTokenId
         self.gatewayConfigurationId = gatewayConfigurationId
+        self.configuration = configuration
         self.submitData = submitData
         self.redirect = redirect
         self.localeIdentifier = localeIdentifier
