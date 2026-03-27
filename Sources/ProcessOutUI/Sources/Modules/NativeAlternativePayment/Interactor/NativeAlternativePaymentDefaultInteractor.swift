@@ -951,14 +951,14 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     private func observeEvents() {
         let deepLinkResolvedEventsListener = eventEmitter.on(
-            POInvoiceDeepLinkResolvedEvent.self,
+            PONativeAlternativePaymentDeepLinkResolvedEvent.self,
             listener: { [weak self] event in
                 self?.didReceive(event: event) ?? false
             }
         )
         eventListeners.append(deepLinkResolvedEventsListener)
         let deepLinkResolutionFailedEventListener = eventEmitter.on(
-            POInvoiceDeepLinkResolutionFailedEvent.self,
+            PONativeAlternativePaymentDeepLinkResolutionFailedEvent.self,
             listener: { [weak self] event in
                 self?.didReceive(event: event) ?? false
             }
@@ -966,7 +966,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         eventListeners.append(deepLinkResolutionFailedEventListener)
     }
 
-    private nonisolated func didReceive(event: POInvoiceDeepLinkResolvedEvent) -> Bool {
+    private nonisolated func didReceive(event: PONativeAlternativePaymentDeepLinkResolvedEvent) -> Bool {
         switch configuration.flow {
         case .authorization(let flow) where flow.invoiceId != event.resolutionResponse.payment.invoiceId:
             return false
@@ -998,7 +998,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         return true
     }
 
-    private nonisolated func didReceive(event: POInvoiceDeepLinkResolutionFailedEvent) -> Bool {
+    private nonisolated func didReceive(event: PONativeAlternativePaymentDeepLinkResolutionFailedEvent) -> Bool {
         Task { @MainActor in
             switch state {
             case .starting(let currentState):

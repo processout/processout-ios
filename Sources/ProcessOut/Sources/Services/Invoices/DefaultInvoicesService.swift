@@ -150,8 +150,8 @@ final class DefaultInvoicesService: POInvoicesService {
             logger.debug("Deep link url \(event.url) is not supported, ignored.")
             return false
         }
-        let shouldResolveDeepLink = eventEmitter.hasListeners(of: POInvoiceDeepLinkResolvedEvent.self)
-            || eventEmitter.hasListeners(of: POInvoiceDeepLinkResolutionFailedEvent.self)
+        let shouldResolveDeepLink = eventEmitter.hasListeners(of: PONativeAlternativePaymentDeepLinkResolvedEvent.self)
+            || eventEmitter.hasListeners(of: PONativeAlternativePaymentDeepLinkResolutionFailedEvent.self)
         guard shouldResolveDeepLink else {
             logger.debug("Deep link resolution is not requested, ignored.")
             return false
@@ -161,14 +161,14 @@ final class DefaultInvoicesService: POInvoicesService {
                 let response = try await repository.resolveUrl(
                     request: .init(redirect: .init(result: .init(url: event.url)))
                 )
-                eventEmitter.emit(event: POInvoiceDeepLinkResolvedEvent(resolutionResponse: response))
+                eventEmitter.emit(event: PONativeAlternativePaymentDeepLinkResolvedEvent(resolutionResponse: response))
             } catch let error as POFailure {
-                eventEmitter.emit(event: POInvoiceDeepLinkResolutionFailedEvent(url: event.url, error: error))
+                eventEmitter.emit(event: PONativeAlternativePaymentDeepLinkResolutionFailedEvent(url: event.url, error: error))
             } catch {
                 let error = POFailure(
                     message: "Unable to resolve deep link URL.", code: .Mobile.generic, underlyingError: error
                 )
-                eventEmitter.emit(event: POInvoiceDeepLinkResolutionFailedEvent(url: event.url, error: error))
+                eventEmitter.emit(event: PONativeAlternativePaymentDeepLinkResolutionFailedEvent(url: event.url, error: error))
             }
         }
         return true
