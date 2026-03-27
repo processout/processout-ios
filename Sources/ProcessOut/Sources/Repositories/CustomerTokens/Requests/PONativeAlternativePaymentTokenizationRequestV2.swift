@@ -18,7 +18,8 @@ public struct PONativeAlternativePaymentTokenizationRequestV2: Sendable, Encodab
 
     /// Alternative payment configuration.
     ///
-    /// - WARNING: Only has effect when passed with first call.
+    /// - WARNING: Configuration is respected only with the **FIRST** request for the payment, ignored for
+    /// subsequent ones.
     public let configuration: PONativeAlternativePaymentConfigurationV2
 
     /// Payment request parameters.
