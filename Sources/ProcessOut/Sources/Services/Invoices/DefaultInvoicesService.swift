@@ -146,7 +146,7 @@ final class DefaultInvoicesService: POInvoicesService {
     }
 
     private func didReceive(deepLinkEvent event: PODeepLinkReceivedEvent) -> Bool {
-        guard event.url.queryParameters?.keys.contains("po_token") ?? false else {
+        guard event.url.queryParameters?.keys.contains(where: { $0.starts(with: "processout") }) ?? false else {
             logger.debug("Deep link url \(event.url) is not supported, ignored.")
             return false
         }
