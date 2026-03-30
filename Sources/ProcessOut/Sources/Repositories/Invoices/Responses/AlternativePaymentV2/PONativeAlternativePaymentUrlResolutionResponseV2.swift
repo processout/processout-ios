@@ -10,13 +10,10 @@ import Foundation
 @_spi(PO)
 public struct PONativeAlternativePaymentUrlResolutionResponseV2: Sendable, Decodable {
 
-    public struct Payment: Sendable, Decodable {
+    public struct CustomerToken: Sendable, Decodable {
 
-        /// Invoice ID.
-        public let invoiceId: POInvoice.ID
-
-        /// Customer token ID if any.
-        public let customerTokenId: POCustomerToken.ID?
+        /// Customer token ID.
+        public let id: POCustomerToken.ID
     }
 
     /// Payment state.
@@ -28,12 +25,12 @@ public struct PONativeAlternativePaymentUrlResolutionResponseV2: Sendable, Decod
     /// Invoice information if available.
     public let invoice: PONativeAlternativePaymentInvoiceV2?
 
+    /// Customer token information if any.
+    public let customerToken: CustomerToken?
+
     /// UI elements to display to user.
     public let elements: [PONativeAlternativePaymentElementV2]?
 
     /// Redirect details.
     public let redirect: PONativeAlternativePaymentRedirectV2?
-
-    /// Payment information.
-    public let payment: Payment
 }

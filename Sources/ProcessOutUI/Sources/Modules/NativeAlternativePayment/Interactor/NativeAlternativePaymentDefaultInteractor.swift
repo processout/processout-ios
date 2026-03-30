@@ -968,9 +968,9 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     private nonisolated func didReceive(event: PONativeAlternativePaymentDeepLinkResolvedEvent) -> Bool {
         switch configuration.flow {
-        case .authorization(let flow) where flow.invoiceId != event.resolutionResponse.payment.invoiceId:
+        case .authorization(let flow) where flow.invoiceId != event.resolutionResponse.invoice?.id:
             return false
-        case .tokenization(let flow) where flow.customerTokenId != event.resolutionResponse.payment.customerTokenId:
+        case .tokenization(let flow) where flow.customerTokenId != event.resolutionResponse.customerToken?.id:
             return false
         default:
             break
