@@ -988,7 +988,7 @@ final class NativeAlternativePaymentDefaultInteractor:
                 case .idle, .started, .awaitingRedirect, .awaitingCompletion:
                     try await setState(with: adapterResponse)
                 default:
-                    logger.warn("Unable to apply resolve deep link to current state: \(state).")
+                    logger.info("Unable to apply resolve deep link to current state: \(state).")
                     return
                 }
             } catch {
