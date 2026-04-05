@@ -985,7 +985,10 @@ final class NativeAlternativePaymentDefaultInteractor:
             )
             do {
                 switch state {
-                case .idle, .started, .awaitingRedirect, .awaitingCompletion:
+                case .idle, .started, .awaitingRedirect:
+                    try await setState(with: adapterResponse)
+                case .awaitingCompletion(let currentState) where adapterResponse.state != .pending:
+                    currentState.task?.cancel()
                     try await setState(with: adapterResponse)
                 default:
                     logger.info("Unable to apply resolve deep link to current state: \(state).")
@@ -1007,6 +1010,10 @@ final class NativeAlternativePaymentDefaultInteractor:
                 currentState.task.cancel()
             case .redirecting(let currentState):
                 currentState.task.cancel()
+            case .awaitingCompletion(let currentState):
+                currentState.task?.cancel()
+            case .failure, .completed:
+                return
             default:
                 break
             }
