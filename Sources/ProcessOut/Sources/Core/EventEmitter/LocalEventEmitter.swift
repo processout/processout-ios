@@ -69,7 +69,7 @@ final class LocalEventEmitter: POEventEmitter, @unchecked Sendable {
         defer {
             lock.unlock()
         }
-        return subscriptions.keys.contains(Event.name) ?? false
+        return subscriptions.keys.contains(Event.name)
     }
 
     // MARK: - Private Nested Types
