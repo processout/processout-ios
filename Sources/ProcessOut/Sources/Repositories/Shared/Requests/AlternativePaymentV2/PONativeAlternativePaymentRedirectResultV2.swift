@@ -11,6 +11,6 @@ public struct PONativeAlternativePaymentRedirectResultV2: Sendable, Encodable {
         self.success = success
     }
 
-    /// indicates whether customer was redirected successfully.
+    /// Indicates whether customer was redirected successfully.
     public let success: Bool
 }

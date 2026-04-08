@@ -37,6 +37,7 @@ public final class PONativeAlternativePaymentComponent {
             alternativePaymentsService: ProcessOut.shared.alternativePayments,
             imagesRepository: ProcessOut.shared.images,
             barcodeImageProvider: DefaultBarcodeImageProvider(logger: logger),
+            eventEmitter: ProcessOut.shared.eventEmitter,
             logger: logger,
             completion: completion
         )

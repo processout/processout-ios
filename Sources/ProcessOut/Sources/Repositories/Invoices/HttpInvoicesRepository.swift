@@ -76,6 +76,15 @@ final class HttpInvoicesRepository: InvoicesRepository {
         return try await connector.execute(request: httpRequest)
     }
 
+    func resolveUrl(
+        request: PONativeAlternativePaymentUrlResolutionRequestV2
+    ) async throws -> PONativeAlternativePaymentUrlResolutionResponseV2 {
+        let httpRequest = HttpConnectorRequest<PONativeAlternativePaymentUrlResolutionResponseV2>.post(
+            path: "/apm-payments", body: request
+        )
+        return try await connector.execute(request: httpRequest)
+    }
+
     // MARK: - Deprecated
 
     func nativeAlternativePaymentMethodTransactionDetails(

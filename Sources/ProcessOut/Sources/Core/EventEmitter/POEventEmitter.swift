@@ -18,4 +18,8 @@ public protocol POEventEmitter: Sendable {
     func on<Event: POEventEmitterEvent>(
         _ eventType: Event.Type, listener: @escaping @Sendable (Event) -> Bool
     ) -> AnyObject
+
+    /// Returns boolean value indicating whether there are currently any listeners
+    /// of event with given type.
+    func hasListeners<Event: POEventEmitterEvent>(of eventType: Event.Type) -> Bool
 }

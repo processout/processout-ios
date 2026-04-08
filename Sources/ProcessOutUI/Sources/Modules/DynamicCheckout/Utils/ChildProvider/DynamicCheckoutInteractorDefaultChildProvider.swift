@@ -63,6 +63,7 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
             alternativePaymentsService: ProcessOut.shared.alternativePayments,
             imagesRepository: imagesRepository,
             barcodeImageProvider: DefaultBarcodeImageProvider(logger: logger),
+            eventEmitter: ProcessOut.shared.eventEmitter,
             logger: logger,
             completion: { _ in }
         )
