@@ -1002,6 +1002,9 @@ final class NativeAlternativePaymentDefaultInteractor:
     }
 
     private nonisolated func didReceive(event: PONativeAlternativePaymentDeepLinkResolutionFailedEvent) -> Bool {
+        guard event.error.failureCode != .RequestValidation.redirectResultInvalid else {
+            return false
+        }
         Task { @MainActor in
             switch state {
             case .starting(let currentState):
