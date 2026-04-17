@@ -30,7 +30,7 @@ final class DefaultNativeAlternativePaymentServiceAdapter: NativeAlternativePaym
             let authorizationRequest = PONativeAlternativePaymentAuthorizationRequestV2(
                 invoiceId: flow.invoiceId,
                 gatewayConfigurationId: flow.gatewayConfigurationId,
-                configuration: .init(returnRedirectType: .manual),
+                configuration: flow.configuration,
                 source: flow.customerTokenId,
                 submitData: request.submitData,
                 redirect: request.redirect,
@@ -43,7 +43,7 @@ final class DefaultNativeAlternativePaymentServiceAdapter: NativeAlternativePaym
                 customerId: flow.customerId,
                 customerTokenId: flow.customerTokenId,
                 gatewayConfigurationId: flow.gatewayConfigurationId,
-                configuration: .init(returnRedirectType: .manual),
+                configuration: flow.configuration,
                 submitData: request.submitData,
                 redirect: request.redirect,
                 localeIdentifier: request.localeIdentifier
