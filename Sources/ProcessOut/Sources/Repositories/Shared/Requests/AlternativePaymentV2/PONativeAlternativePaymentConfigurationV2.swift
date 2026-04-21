@@ -28,7 +28,6 @@ extension PONativeAlternativePaymentConfigurationV2.ReturnRedirectType {
     public static let automatic = Self(rawValue: "automatic")
 
     /// Redirect result is not processed automatically and should be resolved explicitly.
-    @_spi(PO)
     public static let manual = Self(rawValue: "manual")
 }
 
