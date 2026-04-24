@@ -9,7 +9,7 @@ import AuthenticationServices
 
 @MainActor
 final class DefaultWebAuthenticationSession:
-    NSObject, WebAuthenticationSession, ASWebAuthenticationPresentationContextProviding {
+    NSObject, POWebAuthenticationSession, ASWebAuthenticationPresentationContextProviding {
 
     nonisolated init(eventEmitter: POEventEmitter) {
         self.eventEmitter = eventEmitter
@@ -18,7 +18,7 @@ final class DefaultWebAuthenticationSession:
 
     // MARK: - WebAuthenticationSession
 
-    func authenticate(using request: WebAuthenticationRequest) async throws -> URL {
+    func authenticate(using request: POWebAuthenticationRequest) async throws -> URL {
         let operationProxy = WebAuthenticationOperationProxy(
             callback: request.callback, eventEmitter: eventEmitter
         )
@@ -75,7 +75,9 @@ final class DefaultWebAuthenticationSession:
     // MARK: - Private Methods
 
     private static func createAuthenticationSession(
-        with request: WebAuthenticationRequest, redirectUrl: URL, completion: @escaping (Result<URL, POFailure>) -> Void
+        with request: POWebAuthenticationRequest,
+        redirectUrl: URL,
+        completion: @escaping (Result<URL, POFailure>) -> Void
     ) -> ASWebAuthenticationSession {
         let completionHandler = { (url: URL?, error: Error?) in
             if let url {

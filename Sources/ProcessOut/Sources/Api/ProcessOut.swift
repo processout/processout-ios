@@ -66,6 +66,10 @@ public final class ProcessOut: @unchecked Sendable {
     @_spi(PO)
     public let eventEmitter: POEventEmitter
 
+    /// Web authentication session.
+    @_spi(PO)
+    public let webAuthenticationSession: POWebAuthenticationSession
+
     @_spi(PO)
     public func replace(configuration newConfiguration: ProcessOutConfiguration) {
         _configuration.withLock { configuration in
@@ -135,7 +139,7 @@ public final class ProcessOut: @unchecked Sendable {
             logger: connectorLogger
         )
         eventEmitter = LocalEventEmitter(logger: serviceLogger)
-        let webAuthenticationSession = ThrottledWebAuthenticationSessionDecorator(
+        webAuthenticationSession = ThrottledWebAuthenticationSessionDecorator(
             session: DefaultWebAuthenticationSession(eventEmitter: eventEmitter)
         )
         let customerActionsService = Self.createCustomerActionsService(
@@ -189,7 +193,7 @@ public final class ProcessOut: @unchecked Sendable {
 
     private static func createAlternativePaymentsService(
         configuration: ProcessOutConfiguration,
-        webAuthenticationSession webSession: WebAuthenticationSession,
+        webAuthenticationSession webSession: POWebAuthenticationSession,
         logger: POLogger
     ) -> DefaultAlternativePaymentsService {
         let serviceConfiguration = Self.alternativePaymentsConfiguration(with: configuration)
@@ -234,7 +238,7 @@ public final class ProcessOut: @unchecked Sendable {
     }
 
     private static func createCustomerActionsService(
-        webAuthenticationSession webSession: WebAuthenticationSession,
+        webAuthenticationSession webSession: POWebAuthenticationSession,
         logger: POLogger
     ) -> CustomerActionsService {
         let decoder = JSONDecoder(), encoder = JSONEncoder()

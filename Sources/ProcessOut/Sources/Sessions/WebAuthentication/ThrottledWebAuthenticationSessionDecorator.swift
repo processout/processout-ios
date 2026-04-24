@@ -7,16 +7,16 @@
 
 import Foundation
 
-actor ThrottledWebAuthenticationSessionDecorator: WebAuthenticationSession {
+actor ThrottledWebAuthenticationSessionDecorator: POWebAuthenticationSession {
 
-    init(session: WebAuthenticationSession) {
+    init(session: POWebAuthenticationSession) {
         self.session = session
         semaphore = AsyncSemaphore(value: 1)
     }
 
     // MARK: - WebAuthenticationSession
 
-    func authenticate(using request: WebAuthenticationRequest) async throws -> URL {
+    func authenticate(using request: POWebAuthenticationRequest) async throws -> URL {
         try await semaphore.waitUnlessCancelled(
             cancellationError: POFailure(message: "Authentication session was cancelled.", code: .Mobile.cancelled)
         )
@@ -30,7 +30,7 @@ actor ThrottledWebAuthenticationSessionDecorator: WebAuthenticationSession {
 
     // MARK: - Private Properties
 
-    private let session: WebAuthenticationSession
+    private let session: POWebAuthenticationSession
     private let semaphore: AsyncSemaphore
 
     private var lastAuthenticationTime: DispatchTime?
