@@ -18,7 +18,7 @@ final class NativeAlternativePaymentDefaultInteractor:
     init(
         configuration: PONativeAlternativePaymentConfiguration,
         serviceAdapter: NativeAlternativePaymentServiceAdapter,
-        alternativePaymentsService: POAlternativePaymentsService,
+        webAuthenticationSession: ProcessOut::POWebAuthenticationSession,
         imagesRepository: POImagesRepository,
         barcodeImageProvider: BarcodeImageProvider,
         eventEmitter: POEventEmitter,
@@ -27,7 +27,7 @@ final class NativeAlternativePaymentDefaultInteractor:
     ) {
         self.configuration = configuration
         self.serviceAdapter = serviceAdapter
-        self.alternativePaymentsService = alternativePaymentsService
+        self.webAuthenticationSession = webAuthenticationSession
         self.imagesRepository = imagesRepository
         self.barcodeImageProvider = barcodeImageProvider
         self.eventEmitter = eventEmitter
@@ -178,7 +178,7 @@ final class NativeAlternativePaymentDefaultInteractor:
     // MARK: - Private Properties
 
     private let serviceAdapter: NativeAlternativePaymentServiceAdapter
-    private let alternativePaymentsService: POAlternativePaymentsService
+    private let webAuthenticationSession: ProcessOut::POWebAuthenticationSession
     private let imagesRepository: POImagesRepository
     private let barcodeImageProvider: BarcodeImageProvider
     private let eventEmitter: POEventEmitter
@@ -285,25 +285,26 @@ final class NativeAlternativePaymentDefaultInteractor:
     // MARK: - Redirecting State
 
     private func uncheckedRedirect(to redirect: PONativeAlternativePaymentRedirectV2) async throws {
-        let didOpenUrl: Bool
+        let redirectResult: PONativeAlternativePaymentRedirectResultV2
         switch redirect.type {
         case .deepLink:
-            didOpenUrl = await openDeepLink(url: redirect.url)
+            let didOpenUrl = await openDeepLink(url: redirect.url)
+            redirectResult = .init(success: didOpenUrl)
         case .web:
-            let authenticationRequest = POAlternativePaymentAuthenticationRequest(
+            let authenticationRequest = POWebAuthenticationRequest(
                 url: redirect.url,
                 callback: configuration.redirect.callback,
                 prefersEphemeralSession: configuration.redirect.prefersEphemeralSession
             )
-            _ = try await alternativePaymentsService.authenticate(request: authenticationRequest)
-            didOpenUrl = true
+            let returnUrl = try await webAuthenticationSession.authenticate(using: authenticationRequest)
+            redirectResult = .init(success: true, result: .init(url: returnUrl))
         default:
             throw POFailure(errorDescription: "Unknown redirect type.", code: .Mobile.internal)
         }
         let response = try await serviceAdapter.continuePayment(
             with: .init(
                 flow: configuration.flow,
-                redirect: redirect.confirmationRequired ? .init(success: didOpenUrl) : nil,
+                redirect: redirect.confirmationRequired ? redirectResult : nil,
                 localeIdentifier: configuration.localization.localeOverride?.identifier
             )
         )

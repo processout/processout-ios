@@ -34,7 +34,7 @@ public final class PONativeAlternativePaymentComponent {
                 tokensService: ProcessOut.shared.customerTokens,
                 paymentConfirmationTimeout: configuration.paymentConfirmation.timeout
             ),
-            alternativePaymentsService: ProcessOut.shared.alternativePayments,
+            webAuthenticationSession: ProcessOut.shared.webAuthenticationSession,
             imagesRepository: ProcessOut.shared.images,
             barcodeImageProvider: DefaultBarcodeImageProvider(logger: logger),
             eventEmitter: ProcessOut.shared.eventEmitter,

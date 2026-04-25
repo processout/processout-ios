@@ -19,4 +19,10 @@ public struct POWebAuthenticationRequest: Sendable {
     /// A boolean value that indicates whether the session should ask the browser for
     /// a private authentication session.
     public let prefersEphemeralSession: Bool
+
+    public init(url: URL, callback: POWebAuthenticationCallback?, prefersEphemeralSession: Bool) {
+        self.url = url
+        self.callback = callback
+        self.prefersEphemeralSession = prefersEphemeralSession
+    }
 }
