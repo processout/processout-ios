@@ -16,10 +16,18 @@ public struct PONativeAlternativePaymentUrlResolutionRequestV2: Sendable, Encoda
 
             /// Result URL.
             public let url: URL
+
+            public init(url: URL) {
+                self.url = url
+            }
         }
 
         /// Redirect result.
         public let result: Result
+
+        public init(result: Result) {
+            self.result = result
+        }
     }
 
     /// Redirect information.

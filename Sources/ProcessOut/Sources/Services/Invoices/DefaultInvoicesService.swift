@@ -19,7 +19,6 @@ final class DefaultInvoicesService: POInvoicesService {
         self.customerActionsService = customerActionsService
         self.eventEmitter = eventEmitter
         self.logger = logger
-        commonInit()
     }
 
     // MARK: - POInvoicesService
@@ -46,6 +45,12 @@ final class DefaultInvoicesService: POInvoicesService {
         request: PONativeAlternativePaymentAuthorizationRequestV2
     ) async throws -> PONativeAlternativePaymentAuthorizationResponseV2 {
         try await repository.authorizeInvoice(request: request)
+    }
+
+    func resolveUrl(
+        request: PONativeAlternativePaymentUrlResolutionRequestV2
+    ) async throws -> PONativeAlternativePaymentUrlResolutionResponseV2 {
+        try await repository.resolveUrl(request: request)
     }
 
     // MARK: - Deprecated
@@ -107,10 +112,6 @@ final class DefaultInvoicesService: POInvoicesService {
 
     // MARK: - Private Methods
 
-    private func commonInit() {
-        observeEvents()
-    }
-
     private func _authorizeInvoice(request: POInvoiceAuthorizationRequest, threeDSService: PO3DS2Service) async throws {
         let request = request.replacing(
             thirdPartySdkVersion: request.thirdPartySdkVersion ?? threeDSService.version
@@ -135,46 +136,6 @@ final class DefaultInvoicesService: POInvoicesService {
         }
         try await _authorizeInvoice(request: newRequest, threeDSService: threeDSService)
     }
-
-    // MARK: - Events
-
-    private func observeEvents() {
-        let deepLinkEventsListener = eventEmitter.on(PODeepLinkReceivedEvent.self) { [weak self] event in
-            self?.didReceive(deepLinkEvent: event) ?? false
-        }
-        eventListeners.append(deepLinkEventsListener)
-    }
-
-    private func didReceive(deepLinkEvent event: PODeepLinkReceivedEvent) -> Bool {
-        let shouldResolveDeepLink = eventEmitter.hasListeners(of: PONativeAlternativePaymentDeepLinkResolvedEvent.self)
-            || eventEmitter.hasListeners(of: PONativeAlternativePaymentDeepLinkResolutionFailedEvent.self)
-        guard shouldResolveDeepLink else {
-            logger.debug("Deep link resolution is not requested, ignored.")
-            return false
-        }
-        Task {
-            do {
-                let response = try await repository.resolveUrl(
-                    request: .init(redirect: .init(result: .init(url: event.url)))
-                )
-                eventEmitter.emit(event: PONativeAlternativePaymentDeepLinkResolvedEvent(resolutionResponse: response))
-            } catch let error as POFailure {
-                eventEmitter.emit(
-                    event: PONativeAlternativePaymentDeepLinkResolutionFailedEvent(url: event.url, error: error)
-                )
-            } catch {
-                let error = POFailure(
-                    message: "Unable to resolve deep link URL.", code: .Mobile.generic, underlyingError: error
-                )
-                eventEmitter.emit(
-                    event: PONativeAlternativePaymentDeepLinkResolutionFailedEvent(url: event.url, error: error)
-                )
-            }
-        }
-        return true
-    }
-
-    private nonisolated(unsafe) var eventListeners: [AnyObject] = []
 }
 
 private extension POInvoiceAuthorizationRequest { // swiftlint:disable:this no_extension_access_modifier

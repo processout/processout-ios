@@ -27,6 +27,12 @@ public protocol POInvoicesService: POService { // sourcery: AutoCompletion
         request: PONativeAlternativePaymentAuthorizationRequestV2
     ) async throws -> PONativeAlternativePaymentAuthorizationResponseV2
 
+    /// Resolves native alternative payment return URL.
+    @_spi(PO)
+    func resolveUrl(
+        request: PONativeAlternativePaymentUrlResolutionRequestV2
+    ) async throws -> PONativeAlternativePaymentUrlResolutionResponseV2
+
     // MARK: - Alternative Payment (Deprecated)
 
     /// Requests information needed to continue existing payment or start new one.
@@ -50,6 +56,13 @@ extension POInvoicesService {
 
     @_spi(PO)
     public func createInvoice(request: POInvoiceCreationRequest) async throws -> POInvoice {
+        throw POFailure(code: .Mobile.generic)
+    }
+
+    @_spi(PO)
+    public func resolveUrl(
+        request: PONativeAlternativePaymentUrlResolutionRequestV2
+    ) async throws -> PONativeAlternativePaymentUrlResolutionResponseV2 {
         throw POFailure(code: .Mobile.generic)
     }
 }
