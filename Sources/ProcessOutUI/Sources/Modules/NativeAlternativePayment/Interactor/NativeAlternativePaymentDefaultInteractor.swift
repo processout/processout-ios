@@ -417,30 +417,6 @@ final class NativeAlternativePaymentDefaultInteractor:
         enableCancellationAfterDelay()
     }
 
-    /// Requests state change to redirecting while bypassing actual redirect assuming it was performed elsewhere.
-    private func setRedirectingState(didOpenUrl: Bool) {
-        guard case .awaitingRedirect(let currentState) = state else {
-            logger.debug("Ignoring redirect confirmation in unsupported state \(state).")
-            return
-        }
-        let task = Task {
-            do {
-                let response = try await serviceAdapter.continuePayment(
-                    with: .init(
-                        flow: configuration.flow,
-                        redirect: currentState.redirect.confirmationRequired ? .init(success: didOpenUrl) : nil,
-                        localeIdentifier: configuration.localization.localeOverride?.identifier
-                    )
-                )
-                try await setState(with: response)
-            } catch {
-                setFailureState(error: error)
-            }
-        }
-        let newState = State.Redirecting(task: task, snapshot: currentState)
-        state = .redirecting(newState)
-    }
-
     // MARK: - Completed State
 
     private func setCompletedState(response: NativeAlternativePaymentServiceAdapterResponse) async {
