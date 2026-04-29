@@ -916,7 +916,15 @@ final class NativeAlternativePaymentDefaultInteractor:
     }
 
     private nonisolated func didReceive(deepLinkEvent event: PODeepLinkReceivedEvent) -> Bool {
-        // TODO: Disregard deep link in state other than pending or starting
+        let stateSnapshot = MainActor.assumeIsolated {
+            state
+        }
+        switch stateSnapshot {
+        case .starting, .redirecting:
+            return false
+        default:
+            break
+        }
         Task { @MainActor in
             do {
                 let response = try await serviceAdapter.resolveUrl(
