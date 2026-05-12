@@ -305,7 +305,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     ) -> NativeAlternativePaymentViewModelControlGroup? {
         var buttons: [POButtonViewModel] = [
             createRedirectButton(state: state, isRedirecting: isRedirecting)
-        ]
+        ].compactMap(\.self)
         let cancelButton = createCancelButton(
             configuration: interactor.configuration.cancelButton, isEnabled: state.isCancellable
         )
@@ -324,11 +324,14 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     private func createRedirectButton(
         state: InteractorState.AwaitingRedirect, isRedirecting: Bool
-    ) -> POButtonViewModel {
-        // todo(andrii-vysotskyi): decide whether button should be customizable
+    ) -> POButtonViewModel? {
+        guard let buttonConfiguration = interactor.configuration.redirect.redirectButton else {
+            return nil
+        }
         let viewModel = POButtonViewModel(
             id: "redirect-button",
-            title: state.redirect.hint,
+            title: buttonConfiguration.title ?? state.redirect.hint,
+            icon: buttonConfiguration.icon,
             isEnabled: true,
             isLoading: isRedirecting,
             role: .primary,
