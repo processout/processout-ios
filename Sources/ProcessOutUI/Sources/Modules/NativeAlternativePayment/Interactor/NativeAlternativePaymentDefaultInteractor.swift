@@ -345,7 +345,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         response: NativeAlternativePaymentServiceAdapterResponse,
         redirect: PONativeAlternativePaymentRedirectV2
     ) async throws {
-        if shouldConfirmRedirect(redirect: redirect, in: state) {
+        if shouldConfirmRedirect(redirect, in: state) {
             let paymentMethod = await resolve(paymentMethod: response.paymentMethod)
             let elements = try await resolve(elements: response.elements ?? [])
             switch state {
@@ -371,7 +371,7 @@ final class NativeAlternativePaymentDefaultInteractor:
     }
 
     private func shouldConfirmRedirect(
-        redirect: PONativeAlternativePaymentRedirectV2, in state: NativeAlternativePaymentInteractorState
+        _ redirect: PONativeAlternativePaymentRedirectV2, in state: NativeAlternativePaymentInteractorState
     ) -> Bool {
         switch state {
         case .redirecting:
