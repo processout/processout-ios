@@ -395,25 +395,29 @@ final class NativeAlternativePaymentDefaultInteractor:
         response: NativeAlternativePaymentServiceAdapterResponse,
         redirect: PONativeAlternativePaymentRedirectV2
     ) async throws {
-        let paymentMethod = await resolve(paymentMethod: response.paymentMethod)
-        let elements = try await resolve(elements: response.elements ?? [])
-        switch state {
-        case .starting, .submitting, .redirecting:
-            break // todo(andrii-vysotskyi): check if more states should be supported
-        default:
-            logger.debug("Ignoring attempt to set started state in unsupported state: \(state).")
-            return
+        if configuration.redirect.redirectButton != nil {
+            let paymentMethod = await resolve(paymentMethod: response.paymentMethod)
+            let elements = try await resolve(elements: response.elements ?? [])
+            switch state {
+            case .starting, .submitting, .redirecting:
+                break // todo(andrii-vysotskyi): check if more states should be supported
+            default:
+                logger.debug("Ignoring attempt to set started state in unsupported state: \(state).")
+                return
+            }
+            let newState = State.AwaitingRedirect(
+                paymentMethod: paymentMethod,
+                invoice: response.invoice,
+                elements: elements,
+                redirect: redirect,
+                isCancellable: configuration.cancelButton?.disabledFor.isZero ?? true
+            )
+            sendDidStartEventIfNeeded()
+            state = .awaitingRedirect(newState)
+            enableCancellationAfterDelay()
+        } else {
+            try await uncheckedRedirect(to: redirect)
         }
-        let newState = State.AwaitingRedirect(
-            paymentMethod: paymentMethod,
-            invoice: response.invoice,
-            elements: elements,
-            redirect: redirect,
-            isCancellable: configuration.cancelButton?.disabledFor.isZero ?? true
-        )
-        sendDidStartEventIfNeeded()
-        state = .awaitingRedirect(newState)
-        enableCancellationAfterDelay()
     }
 
     /// Requests state change to redirecting while bypassing actual redirect assuming it was performed elsewhere.
