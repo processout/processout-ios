@@ -373,10 +373,14 @@ final class NativeAlternativePaymentDefaultInteractor:
     private func shouldConfirmRedirect(
         redirect: PONativeAlternativePaymentRedirectV2, in state: NativeAlternativePaymentInteractorState
     ) -> Bool {
-        if case .starting = state, configuration.redirect.enableHeadlessMode {
+        switch state {
+        case .redirecting:
             return false
+        case .starting where configuration.redirect.enableHeadlessMode:
+            return false
+        default:
+            return configuration.redirect.redirectButton != nil
         }
-        return configuration.redirect.redirectButton != nil
     }
 
     // MARK: - Redirecting State
