@@ -149,14 +149,22 @@ public struct PONativeAlternativePaymentConfiguration {
         /// and if it's the only required step, it will complete the flow without starting the bottom sheet.
         public let enableHeadlessMode: Bool
 
+        /// Redirect confirmation button configuration. To remove button use `nil`, this is default behaviour.
+        ///
+        /// Displays a confirmation button when the user needs to perform a redirect. The user
+        /// must press this button to continue.
+        public let redirectButton: SubmitButton?
+
         public init(
             callback: POWebAuthenticationCallback? = nil,
             prefersEphemeralSession: Bool = true,
-            enableHeadlessMode: Bool = false
+            enableHeadlessMode: Bool = false,
+            redirectButton: SubmitButton? = nil
         ) {
             self.callback = callback
             self.prefersEphemeralSession = prefersEphemeralSession
             self.enableHeadlessMode = enableHeadlessMode
+            self.redirectButton = redirectButton
         }
     }
 
