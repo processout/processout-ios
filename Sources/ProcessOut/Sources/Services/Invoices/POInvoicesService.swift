@@ -29,7 +29,7 @@ public protocol POInvoicesService: POService { // sourcery: AutoCompletion
 
     /// Resolves native alternative payment return URL.
     @_spi(PO)
-    func resolveUrl(
+    func resolveUrl( // sourcery:completion: skip
         request: PONativeAlternativePaymentUrlResolutionRequestV2
     ) async throws -> PONativeAlternativePaymentUrlResolutionResponseV2
 
