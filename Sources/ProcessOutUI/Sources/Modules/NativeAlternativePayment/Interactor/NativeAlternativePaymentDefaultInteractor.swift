@@ -18,7 +18,7 @@ final class NativeAlternativePaymentDefaultInteractor:
     init(
         configuration: PONativeAlternativePaymentConfiguration,
         serviceAdapter: NativeAlternativePaymentServiceAdapter,
-        webAuthenticationSession: ProcessOut::POWebAuthenticationSession,
+        webAuthenticationSession: WebAuthenticationSessionShim,
         imagesRepository: POImagesRepository,
         barcodeImageProvider: BarcodeImageProvider,
         eventEmitter: POEventEmitter,
@@ -178,7 +178,7 @@ final class NativeAlternativePaymentDefaultInteractor:
     // MARK: - Private Properties
 
     private let serviceAdapter: NativeAlternativePaymentServiceAdapter
-    private let webAuthenticationSession: ProcessOut::POWebAuthenticationSession
+    private let webAuthenticationSession: WebAuthenticationSessionShim
     private let imagesRepository: POImagesRepository
     private let barcodeImageProvider: BarcodeImageProvider
     private let eventEmitter: POEventEmitter
