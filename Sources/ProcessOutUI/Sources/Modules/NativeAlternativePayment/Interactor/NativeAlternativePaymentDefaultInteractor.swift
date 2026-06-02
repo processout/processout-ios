@@ -384,11 +384,11 @@ final class NativeAlternativePaymentDefaultInteractor:
     }
 
     private func uncheckedRedirect(to redirect: PONativeAlternativePaymentRedirectV2) async throws {
-        let redirectResult: PONativeAlternativePaymentRedirectResultV2
+        let redirectResult: PONativeAlternativePaymentRedirectResultV2?
         switch redirect.type {
         case .deepLink:
             let didOpenUrl = await openDeepLink(url: redirect.url)
-            redirectResult = .init(success: didOpenUrl)
+            redirectResult = redirect.confirmationRequired ? .init(success: didOpenUrl) : nil
         case .web:
             let authenticationRequest = POWebAuthenticationRequest(
                 url: redirect.url,
@@ -403,7 +403,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         let response = try await serviceAdapter.continuePayment(
             with: .init(
                 flow: configuration.flow,
-                redirect: redirect.confirmationRequired ? redirectResult : nil,
+                redirect: redirectResult,
                 localeIdentifier: configuration.localization.localeOverride?.identifier
             )
         )
@@ -923,10 +923,10 @@ final class NativeAlternativePaymentDefaultInteractor:
             state
         }
         switch stateSnapshot {
-        case .starting, .redirecting:
-            return false
-        default:
+        case .awaitingCompletion:
             break
+        default:
+            return false
         }
         Task { @MainActor in
             do {
