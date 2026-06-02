@@ -18,7 +18,7 @@ final class NativeAlternativePaymentDefaultInteractor:
     init(
         configuration: PONativeAlternativePaymentConfiguration,
         serviceAdapter: NativeAlternativePaymentServiceAdapter,
-        alternativePaymentsService: POAlternativePaymentsService,
+        webAuthenticationSession: WebAuthenticationSessionShim,
         imagesRepository: POImagesRepository,
         barcodeImageProvider: BarcodeImageProvider,
         eventEmitter: POEventEmitter,
@@ -27,7 +27,7 @@ final class NativeAlternativePaymentDefaultInteractor:
     ) {
         self.configuration = configuration
         self.serviceAdapter = serviceAdapter
-        self.alternativePaymentsService = alternativePaymentsService
+        self.webAuthenticationSession = webAuthenticationSession
         self.imagesRepository = imagesRepository
         self.barcodeImageProvider = barcodeImageProvider
         self.eventEmitter = eventEmitter
@@ -178,7 +178,7 @@ final class NativeAlternativePaymentDefaultInteractor:
     // MARK: - Private Properties
 
     private let serviceAdapter: NativeAlternativePaymentServiceAdapter
-    private let alternativePaymentsService: POAlternativePaymentsService
+    private let webAuthenticationSession: WebAuthenticationSessionShim
     private let imagesRepository: POImagesRepository
     private let barcodeImageProvider: BarcodeImageProvider
     private let eventEmitter: POEventEmitter
@@ -383,28 +383,27 @@ final class NativeAlternativePaymentDefaultInteractor:
         }
     }
 
-    // MARK: - Redirecting State
-
     private func uncheckedRedirect(to redirect: PONativeAlternativePaymentRedirectV2) async throws {
-        let didOpenUrl: Bool
+        let redirectResult: PONativeAlternativePaymentRedirectResultV2?
         switch redirect.type {
         case .deepLink:
-            didOpenUrl = await openDeepLink(url: redirect.url)
+            let didOpenUrl = await openDeepLink(url: redirect.url)
+            redirectResult = redirect.confirmationRequired ? .init(success: didOpenUrl) : nil
         case .web:
-            let authenticationRequest = POAlternativePaymentAuthenticationRequest(
+            let authenticationRequest = POWebAuthenticationRequest(
                 url: redirect.url,
                 callback: configuration.redirect.callback,
                 prefersEphemeralSession: configuration.redirect.prefersEphemeralSession
             )
-            _ = try await alternativePaymentsService.authenticate(request: authenticationRequest)
-            didOpenUrl = true
+            let returnUrl = try await webAuthenticationSession.authenticate(using: authenticationRequest)
+            redirectResult = .init(success: true, result: .init(url: returnUrl))
         default:
             throw POFailure(errorDescription: "Unknown redirect type.", code: .Mobile.internal)
         }
         let response = try await serviceAdapter.continuePayment(
             with: .init(
                 flow: configuration.flow,
-                redirect: redirect.confirmationRequired ? .init(success: didOpenUrl) : nil,
+                redirect: redirectResult,
                 localeIdentifier: configuration.localization.localeOverride?.identifier
             )
         )
@@ -913,39 +912,54 @@ final class NativeAlternativePaymentDefaultInteractor:
     // MARK: - External Events
 
     private func observeEvents() {
-        let deepLinkResolvedEventsListener = eventEmitter.on(
-            PONativeAlternativePaymentDeepLinkResolvedEvent.self,
-            listener: { [weak self] event in
-                self?.didReceive(event: event) ?? false
-            }
-        )
-        eventListeners.append(deepLinkResolvedEventsListener)
-        let deepLinkResolutionFailedEventListener = eventEmitter.on(
-            PONativeAlternativePaymentDeepLinkResolutionFailedEvent.self,
-            listener: { [weak self] event in
-                self?.didReceive(event: event) ?? false
-            }
-        )
-        eventListeners.append(deepLinkResolutionFailedEventListener)
+        let deepLinkEventsListener = eventEmitter.on(PODeepLinkReceivedEvent.self) { [weak self] event in
+            self?.didReceive(deepLinkEvent: event) ?? false
+        }
+        eventListeners.append(deepLinkEventsListener)
     }
 
-    private nonisolated func didReceive(event: PONativeAlternativePaymentDeepLinkResolvedEvent) -> Bool {
+    private nonisolated func didReceive(deepLinkEvent event: PODeepLinkReceivedEvent) -> Bool {
+        let stateSnapshot = MainActor.assumeIsolated {
+            state
+        }
+        switch stateSnapshot {
+        case .awaitingCompletion:
+            break
+        default:
+            return false
+        }
+        Task { @MainActor in
+            do {
+                let response = try await serviceAdapter.resolveUrl(
+                    with: .init(redirect: .init(result: .init(url: event.url)))
+                )
+                didResolveDeepLinkReturnUrl(response: response)
+            } catch {
+                didFailToResolveDeepLinkReturnUrl(error: error)
+            }
+        }
+        return true
+    }
+
+    private func didResolveDeepLinkReturnUrl(response: PONativeAlternativePaymentUrlResolutionResponseV2) {
         switch configuration.flow {
-        case .authorization(let flow) where flow.invoiceId != event.resolutionResponse.invoice?.id:
-            return false
-        case .tokenization(let flow) where flow.customerTokenId != event.resolutionResponse.customerToken?.id:
-            return false
+        case .authorization(let flow) where flow.invoiceId != response.invoice?.id:
+            logger.debug("Ignoring unrelated deep link resolution.")
+            return
+        case .tokenization(let flow) where flow.customerTokenId != response.customerToken?.id:
+            logger.debug("Ignoring unrelated deep link resolution.")
+            return
         default:
             break
         }
+        let adapterResponse = NativeAlternativePaymentServiceAdapterResponse(
+            state: response.state,
+            paymentMethod: response.paymentMethod,
+            invoice: response.invoice,
+            elements: response.elements,
+            redirect: response.redirect
+        )
         Task { @MainActor in
-            let adapterResponse = NativeAlternativePaymentServiceAdapterResponse(
-                state: event.resolutionResponse.state,
-                paymentMethod: event.resolutionResponse.paymentMethod,
-                invoice: event.resolutionResponse.invoice,
-                elements: event.resolutionResponse.elements,
-                redirect: event.resolutionResponse.redirect
-            )
             do {
                 switch state {
                 case .idle, .started, .awaitingRedirect:
@@ -961,31 +975,34 @@ final class NativeAlternativePaymentDefaultInteractor:
                 setFailureState(error: error)
             }
         }
-        return true
     }
 
-    private nonisolated func didReceive(event: PONativeAlternativePaymentDeepLinkResolutionFailedEvent) -> Bool {
-        guard event.error.failureCode != .RequestValidation.redirectResultInvalid else {
-            return false
+    private func didFailToResolveDeepLinkReturnUrl(error: Error) {
+        let failure: POFailure
+        if let error = error as? POFailure {
+            failure = error
+        } else {
+            logger.error("Unexpected error type: \(error)")
+            failure = .init(message: "Unable to resolve deep link URL.", code: .Mobile.generic, underlyingError: error)
         }
-        Task { @MainActor in
-            switch state {
-            case .starting(let currentState):
-                currentState.task.cancel()
-            case .submitting(let currentState):
-                currentState.task.cancel()
-            case .redirecting(let currentState):
-                currentState.task.cancel()
-            case .awaitingCompletion(let currentState):
-                currentState.task?.cancel()
-            case .failure, .completed:
-                return
-            default:
-                break
-            }
-            setFailureState(error: event.error)
+        guard failure.failureCode != .RequestValidation.redirectResultInvalid else {
+            return
         }
-        return true
+        switch state {
+        case .starting(let currentState):
+            currentState.task.cancel()
+        case .submitting(let currentState):
+            currentState.task.cancel()
+        case .redirecting(let currentState):
+            currentState.task.cancel()
+        case .awaitingCompletion(let currentState):
+            currentState.task?.cancel()
+        case .failure, .completed:
+            return
+        default:
+            break
+        }
+        setFailureState(error: failure)
     }
 
     private var eventListeners: [AnyObject] = []

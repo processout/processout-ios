@@ -81,6 +81,12 @@ final class DefaultNativeAlternativePaymentServiceAdapter: NativeAlternativePaym
         )
     }
 
+    func resolveUrl(
+        with request: PONativeAlternativePaymentUrlResolutionRequestV2
+    ) async throws -> PONativeAlternativePaymentUrlResolutionResponseV2 {
+        try await invoicesService.resolveUrl(request: request)
+    }
+
     // MARK: - Private Properties
 
     private let invoicesService: POInvoicesService
