@@ -129,8 +129,6 @@ extension ProcessOutConfiguration {
     }
 }
 
-// swiftlint:disable force_unwrapping
-
 extension ProcessOutConfiguration.Environment {
 
     /// Production environment.
@@ -145,5 +143,3 @@ extension ProcessOutConfiguration.Environment {
         checkoutBaseUrl: URL(string: "https://checkout.processout.ninja")!
     )
 }
-
-// swiftlint:enable force_unwrapping
