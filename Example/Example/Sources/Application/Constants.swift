@@ -24,5 +24,5 @@ enum Constants {
     static var merchantId: String?
 
     /// Return URL.
-    static let returnUrl = URL(string: "processout-example://return")! // swiftlint:disable:this force_unwrapping
+    static let returnUrl = URL(string: "processout-example://return")!
 }
