@@ -365,6 +365,9 @@ extension POFailureCode {
 
         /// The type field is missing.
         public static let missingType = POFailureCode(rawValue: "request.validation.missing-type")
+
+        /// The redirect result is not support and can't be handled.
+        public static let redirectResultInvalid = POFailureCode(rawValue: "request.validation.redirect-result-invalid")
     }
 
     public enum Request {

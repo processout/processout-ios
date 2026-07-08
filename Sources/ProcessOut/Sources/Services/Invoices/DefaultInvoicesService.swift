@@ -9,9 +9,15 @@ import Foundation
 
 final class DefaultInvoicesService: POInvoicesService {
 
-    init(repository: InvoicesRepository, customerActionsService: CustomerActionsService, logger: POLogger) {
+    init(
+        repository: InvoicesRepository,
+        customerActionsService: CustomerActionsService,
+        eventEmitter: POEventEmitter,
+        logger: POLogger,
+    ) {
         self.repository = repository
         self.customerActionsService = customerActionsService
+        self.eventEmitter = eventEmitter
         self.logger = logger
     }
 
@@ -42,6 +48,12 @@ final class DefaultInvoicesService: POInvoicesService {
         request: PONativeAlternativePaymentAuthorizationRequestV2
     ) async throws -> PONativeAlternativePaymentAuthorizationResponseV2 {
         try await repository.authorizeInvoice(request: request)
+    }
+
+    func resolveUrl(
+        request: PONativeAlternativePaymentUrlResolutionRequestV2
+    ) async throws -> PONativeAlternativePaymentUrlResolutionResponseV2 {
+        try await repository.resolveUrl(request: request)
     }
 
     // MARK: - Deprecated
@@ -98,6 +110,7 @@ final class DefaultInvoicesService: POInvoicesService {
 
     private let repository: InvoicesRepository
     private let customerActionsService: CustomerActionsService
+    private let eventEmitter: POEventEmitter
     private let logger: POLogger
 
     // MARK: - Private Methods

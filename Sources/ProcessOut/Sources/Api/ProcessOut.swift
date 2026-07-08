@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 14.10.2024.
 //
 
-// swiftlint:disable force_unwrapping type_body_length
+// swiftlint:disable force_unwrapping type_body_length file_length
 
 import Foundation
 import UIKit
@@ -65,6 +65,10 @@ public final class ProcessOut: @unchecked Sendable {
     /// Event emitter to use for events exchange.
     @_spi(PO)
     public let eventEmitter: POEventEmitter
+
+    /// Web authentication session.
+    @_spi(PO)
+    public let webAuthenticationSession: POWebAuthenticationSession
 
     @_spi(PO)
     public func replace(configuration newConfiguration: ProcessOutConfiguration) {
@@ -135,7 +139,7 @@ public final class ProcessOut: @unchecked Sendable {
             logger: connectorLogger
         )
         eventEmitter = LocalEventEmitter(logger: serviceLogger)
-        let webAuthenticationSession = ThrottledWebAuthenticationSessionDecorator(
+        webAuthenticationSession = ThrottledWebAuthenticationSessionDecorator(
             session: DefaultWebAuthenticationSession(eventEmitter: eventEmitter)
         )
         let customerActionsService = Self.createCustomerActionsService(
@@ -143,7 +147,10 @@ public final class ProcessOut: @unchecked Sendable {
         )
         gatewayConfigurations = HttpGatewayConfigurationsRepository(connector: httpConnector)
         invoices = Self.createInvoicesService(
-            httpConnector: httpConnector, customerActionsService: customerActionsService, logger: serviceLogger
+            httpConnector: httpConnector,
+            customerActionsService: customerActionsService,
+            eventEmitter: eventEmitter,
+            logger: serviceLogger
         )
         _alternativePayments = Self.createAlternativePaymentsService(
             configuration: configuration, webAuthenticationSession: webAuthenticationSession, logger: serviceLogger
@@ -170,17 +177,23 @@ public final class ProcessOut: @unchecked Sendable {
     // MARK: - Services
 
     private static func createInvoicesService(
-        httpConnector: HttpConnector, customerActionsService: CustomerActionsService, logger: POLogger
+        httpConnector: HttpConnector,
+        customerActionsService: CustomerActionsService,
+        eventEmitter: POEventEmitter,
+        logger: POLogger
     ) -> POInvoicesService {
         let repository = HttpInvoicesRepository(connector: httpConnector)
         return DefaultInvoicesService(
-            repository: repository, customerActionsService: customerActionsService, logger: logger
+            repository: repository,
+            customerActionsService: customerActionsService,
+            eventEmitter: eventEmitter,
+            logger: logger
         )
     }
 
     private static func createAlternativePaymentsService(
         configuration: ProcessOutConfiguration,
-        webAuthenticationSession webSession: WebAuthenticationSession,
+        webAuthenticationSession webSession: POWebAuthenticationSession,
         logger: POLogger
     ) -> DefaultAlternativePaymentsService {
         let serviceConfiguration = Self.alternativePaymentsConfiguration(with: configuration)
@@ -225,7 +238,7 @@ public final class ProcessOut: @unchecked Sendable {
     }
 
     private static func createCustomerActionsService(
-        webAuthenticationSession webSession: WebAuthenticationSession,
+        webAuthenticationSession webSession: POWebAuthenticationSession,
         logger: POLogger
     ) -> CustomerActionsService {
         let decoder = JSONDecoder(), encoder = JSONEncoder()
@@ -393,4 +406,4 @@ extension ProcessOut {
     }
 }
 
-// swiftlint:enable force_unwrapping type_body_length
+// swiftlint:enable force_unwrapping type_body_length file_length

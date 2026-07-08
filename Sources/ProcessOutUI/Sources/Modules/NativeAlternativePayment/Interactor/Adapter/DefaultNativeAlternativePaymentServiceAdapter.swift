@@ -30,6 +30,7 @@ final class DefaultNativeAlternativePaymentServiceAdapter: NativeAlternativePaym
             let authorizationRequest = PONativeAlternativePaymentAuthorizationRequestV2(
                 invoiceId: flow.invoiceId,
                 gatewayConfigurationId: flow.gatewayConfigurationId,
+                configuration: flow.configuration,
                 source: flow.customerTokenId,
                 submitData: request.submitData,
                 redirect: request.redirect,
@@ -42,6 +43,7 @@ final class DefaultNativeAlternativePaymentServiceAdapter: NativeAlternativePaym
                 customerId: flow.customerId,
                 customerTokenId: flow.customerTokenId,
                 gatewayConfigurationId: flow.gatewayConfigurationId,
+                configuration: flow.configuration,
                 submitData: request.submitData,
                 redirect: request.redirect,
                 localeIdentifier: request.localeIdentifier
@@ -77,6 +79,12 @@ final class DefaultNativeAlternativePaymentServiceAdapter: NativeAlternativePaym
             ),
             retryStrategy: .init(function: .exponential(interval: 0.15, rate: 1.45), minimum: 3, maximum: 90)
         )
+    }
+
+    func resolveUrl(
+        with request: PONativeAlternativePaymentUrlResolutionRequestV2
+    ) async throws -> PONativeAlternativePaymentUrlResolutionResponseV2 {
+        try await invoicesService.resolveUrl(request: request)
     }
 
     // MARK: - Private Properties

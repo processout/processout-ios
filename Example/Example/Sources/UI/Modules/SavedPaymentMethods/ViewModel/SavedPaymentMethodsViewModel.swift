@@ -65,8 +65,6 @@ final class SavedPaymentMethodsViewModel: ObservableObject {
     private func setMessage(with error: Error) {
         let errorMessage: String
         switch error {
-        case .Mobile.cancelled, .Customer.cancelled:
-            return
         case let failure as POFailure:
             errorMessage = failure.message ?? String(localized: .SavedPaymentMethods.errorMessage)
         default:

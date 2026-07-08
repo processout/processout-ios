@@ -13,7 +13,7 @@ final class DefaultCustomerActionsService: CustomerActionsService {
         decoder: JSONDecoder,
         encoder: JSONEncoder,
         jsonWritingOptions: JSONSerialization.WritingOptions = [],
-        webSession: WebAuthenticationSession,
+        webSession: POWebAuthenticationSession,
         logger: POLogger
     ) {
         self.decoder = decoder
@@ -80,7 +80,7 @@ final class DefaultCustomerActionsService: CustomerActionsService {
     private let decoder: JSONDecoder
     private let encoder: JSONEncoder
     private let jsonWritingOptions: JSONSerialization.WritingOptions
-    private let webSession: WebAuthenticationSession
+    private let webSession: POWebAuthenticationSession
     private let logger: POLogger
     private let semaphore: AsyncSemaphore
 

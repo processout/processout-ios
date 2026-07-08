@@ -18,17 +18,19 @@ final class NativeAlternativePaymentDefaultInteractor:
     init(
         configuration: PONativeAlternativePaymentConfiguration,
         serviceAdapter: NativeAlternativePaymentServiceAdapter,
-        alternativePaymentsService: POAlternativePaymentsService,
+        webAuthenticationSession: WebAuthenticationSessionShim,
         imagesRepository: POImagesRepository,
         barcodeImageProvider: BarcodeImageProvider,
+        eventEmitter: POEventEmitter,
         logger: POLogger,
         completion: @escaping (Result<Void, POFailure>) -> Void
     ) {
         self.configuration = configuration
         self.serviceAdapter = serviceAdapter
-        self.alternativePaymentsService = alternativePaymentsService
+        self.webAuthenticationSession = webAuthenticationSession
         self.imagesRepository = imagesRepository
         self.barcodeImageProvider = barcodeImageProvider
+        self.eventEmitter = eventEmitter
         self.logger = logger
         self.completion = completion
         super.init(state: .idle)
@@ -63,6 +65,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             }
         }
         state = .starting(.init(task: task))
+        observeEvents()
         _ = await task.result
     }
 
@@ -175,9 +178,10 @@ final class NativeAlternativePaymentDefaultInteractor:
     // MARK: - Private Properties
 
     private let serviceAdapter: NativeAlternativePaymentServiceAdapter
-    private let alternativePaymentsService: POAlternativePaymentsService
+    private let webAuthenticationSession: WebAuthenticationSessionShim
     private let imagesRepository: POImagesRepository
     private let barcodeImageProvider: BarcodeImageProvider
+    private let eventEmitter: POEventEmitter
     private let logger: POLogger
     private let completion: (Result<Void, POFailure>) -> Void
 
@@ -186,9 +190,7 @@ final class NativeAlternativePaymentDefaultInteractor:
     private func setState(with response: NativeAlternativePaymentServiceAdapterResponse) async throws {
         switch response.state {
         case .nextStepRequired:
-            if case .starting = state, let redirect = response.redirect, configuration.redirect.enableHeadlessMode {
-                try await continueStart(withHeadlessRedirect: redirect)
-            } else if let redirect = response.redirect {
+            if let redirect = response.redirect {
                 try await setAwaitingRedirectState(response: response, redirect: redirect)
             } else {
                 try await setStartedState(response: response)
@@ -202,16 +204,6 @@ final class NativeAlternativePaymentDefaultInteractor:
             let failure = POFailure(message: "Something went wrong.", code: .Mobile.generic)
             setFailureState(error: failure)
         }
-    }
-
-    // MARK: - Starting State
-
-    private func continueStart(withHeadlessRedirect redirect: PONativeAlternativePaymentRedirectV2) async throws {
-        guard case .starting = state else {
-            logger.error("Attempted to handle headless redirect while not in starting state. Ignoring.")
-            return
-        }
-        try await uncheckedRedirect(to: redirect)
     }
 
     // MARK: - Started State
@@ -277,47 +269,6 @@ final class NativeAlternativePaymentDefaultInteractor:
     }
 
     private var cancelationEnablingTask: Task<Void, Never>?
-
-    // MARK: - Redirecting State
-
-    private func uncheckedRedirect(to redirect: PONativeAlternativePaymentRedirectV2) async throws {
-        delegate?.nativeAlternativePayment(
-            didEmitEvent: .willStartRedirect(.init(redirect: redirect))
-        )
-        let didOpenUrl: Bool
-        switch redirect.type {
-        case .deepLink:
-            didOpenUrl = await openDeepLink(url: redirect.url)
-        case .web:
-            let authenticationRequest = POAlternativePaymentAuthenticationRequest(
-                url: redirect.url,
-                callback: configuration.redirect.callback,
-                prefersEphemeralSession: configuration.redirect.prefersEphemeralSession
-            )
-            _ = try await alternativePaymentsService.authenticate(request: authenticationRequest)
-            didOpenUrl = true
-        default:
-            throw POFailure(errorDescription: "Unknown redirect type.", code: .Mobile.internal)
-        }
-        let response = try await serviceAdapter.continuePayment(
-            with: .init(
-                flow: configuration.flow,
-                redirect: redirect.confirmationRequired ? .init(success: didOpenUrl) : nil,
-                localeIdentifier: configuration.localization.localeOverride?.identifier
-            )
-        )
-        try await setState(with: response)
-    }
-
-    private func openDeepLink(url: URL) async -> Bool {
-        let options: [UIApplication.OpenExternalURLOptionsKey: Any]
-        if url.scheme == "https" || url.scheme == "http" { // Determines whether link could be universal
-            options = [.universalLinksOnly: true]
-        } else {
-            options = [:]
-        }
-        return await UIApplication.shared.open(url, options: options)
-    }
 
     // MARK: - Awaiting Completion State
 
@@ -394,25 +345,82 @@ final class NativeAlternativePaymentDefaultInteractor:
         response: NativeAlternativePaymentServiceAdapterResponse,
         redirect: PONativeAlternativePaymentRedirectV2
     ) async throws {
-        let paymentMethod = await resolve(paymentMethod: response.paymentMethod)
-        let elements = try await resolve(elements: response.elements ?? [])
-        switch state {
-        case .starting, .submitting, .redirecting:
-            break // todo(andrii-vysotskyi): check if more states should be supported
-        default:
-            logger.debug("Ignoring attempt to set started state in unsupported state: \(state).")
-            return
+        if shouldConfirmRedirect(redirect, in: state) {
+            let paymentMethod = await resolve(paymentMethod: response.paymentMethod)
+            let elements = try await resolve(elements: response.elements ?? [])
+            switch state {
+            case .starting, .submitting, .redirecting:
+                break // todo(andrii-vysotskyi): check if more states should be supported
+            default:
+                logger.debug("Ignoring attempt to set started state in unsupported state: \(state).")
+                return
+            }
+            let newState = State.AwaitingRedirect(
+                paymentMethod: paymentMethod,
+                invoice: response.invoice,
+                elements: elements,
+                redirect: redirect,
+                isCancellable: configuration.cancelButton?.disabledFor.isZero ?? true
+            )
+            sendDidStartEventIfNeeded()
+            state = .awaitingRedirect(newState)
+            enableCancellationAfterDelay()
+        } else {
+            try await uncheckedRedirect(to: redirect)
         }
-        let newState = State.AwaitingRedirect(
-            paymentMethod: paymentMethod,
-            invoice: response.invoice,
-            elements: elements,
-            redirect: redirect,
-            isCancellable: configuration.cancelButton?.disabledFor.isZero ?? true
+    }
+
+    private func shouldConfirmRedirect(
+        _ redirect: PONativeAlternativePaymentRedirectV2, in state: NativeAlternativePaymentInteractorState
+    ) -> Bool {
+        switch state {
+        case .redirecting:
+            return false
+        case .starting where configuration.redirect.enableHeadlessMode:
+            return false
+        default:
+            return configuration.redirect.redirectButton != nil
+        }
+    }
+
+    private func uncheckedRedirect(to redirect: PONativeAlternativePaymentRedirectV2) async throws {
+        delegate?.nativeAlternativePayment(
+            didEmitEvent: .willStartRedirect(.init(redirect: redirect))
         )
-        sendDidStartEventIfNeeded()
-        state = .awaitingRedirect(newState)
-        enableCancellationAfterDelay()
+        let redirectResult: PONativeAlternativePaymentRedirectResultV2?
+        switch redirect.type {
+        case .deepLink:
+            let didOpenUrl = await openDeepLink(url: redirect.url)
+            redirectResult = redirect.confirmationRequired ? .init(success: didOpenUrl) : nil
+        case .web:
+            let authenticationRequest = POWebAuthenticationRequest(
+                url: redirect.url,
+                callback: configuration.redirect.callback,
+                prefersEphemeralSession: configuration.redirect.prefersEphemeralSession
+            )
+            let returnUrl = try await webAuthenticationSession.authenticate(using: authenticationRequest)
+            redirectResult = .init(success: true, result: .init(url: returnUrl))
+        default:
+            throw POFailure(errorDescription: "Unknown redirect type.", code: .Mobile.internal)
+        }
+        let response = try await serviceAdapter.continuePayment(
+            with: .init(
+                flow: configuration.flow,
+                redirect: redirectResult,
+                localeIdentifier: configuration.localization.localeOverride?.identifier
+            )
+        )
+        try await setState(with: response)
+    }
+
+    private func openDeepLink(url: URL) async -> Bool {
+        let options: [UIApplication.OpenExternalURLOptionsKey: Any]
+        if url.scheme == "https" || url.scheme == "http" { // Determines whether link could be universal
+            options = [.universalLinksOnly: true]
+        } else {
+            options = [:]
+        }
+        return await UIApplication.shared.open(url, options: options)
     }
 
     // MARK: - Completed State
@@ -489,6 +497,10 @@ final class NativeAlternativePaymentDefaultInteractor:
     // MARK: - Failure State
 
     private func setFailureState(error: Error) {
+        guard !Task.isCancelled else {
+            logger.debug("Task is cancelled, ignoring attempt to set failure state with: \(error).")
+            return
+        }
         guard !state.isSink else {
             logger.debug("Already in a sink state, ignoring attempt to set failure state with: \(error).")
             return
@@ -899,6 +911,104 @@ final class NativeAlternativePaymentDefaultInteractor:
         )
         return nil
     }
+
+    // MARK: - External Events
+
+    private func observeEvents() {
+        let deepLinkEventsListener = eventEmitter.on(PODeepLinkReceivedEvent.self) { [weak self] event in
+            self?.didReceive(deepLinkEvent: event) ?? false
+        }
+        eventListeners.append(deepLinkEventsListener)
+    }
+
+    private nonisolated func didReceive(deepLinkEvent event: PODeepLinkReceivedEvent) -> Bool {
+        let stateSnapshot = MainActor.assumeIsolated {
+            state
+        }
+        switch stateSnapshot {
+        case .awaitingCompletion:
+            break
+        default:
+            return false
+        }
+        Task { @MainActor in
+            do {
+                let response = try await serviceAdapter.resolveUrl(
+                    with: .init(redirect: .init(result: .init(url: event.url)))
+                )
+                didResolveDeepLinkReturnUrl(response: response)
+            } catch {
+                didFailToResolveDeepLinkReturnUrl(error: error)
+            }
+        }
+        return true
+    }
+
+    private func didResolveDeepLinkReturnUrl(response: PONativeAlternativePaymentUrlResolutionResponseV2) {
+        switch configuration.flow {
+        case .authorization(let flow) where flow.invoiceId != response.invoice?.id:
+            logger.debug("Ignoring unrelated deep link resolution.")
+            return
+        case .tokenization(let flow) where flow.customerTokenId != response.customerToken?.id:
+            logger.debug("Ignoring unrelated deep link resolution.")
+            return
+        default:
+            break
+        }
+        let adapterResponse = NativeAlternativePaymentServiceAdapterResponse(
+            state: response.state,
+            paymentMethod: response.paymentMethod,
+            invoice: response.invoice,
+            elements: response.elements,
+            redirect: response.redirect
+        )
+        Task { @MainActor in
+            do {
+                switch state {
+                case .idle, .started, .awaitingRedirect:
+                    try await setState(with: adapterResponse)
+                case .awaitingCompletion(let currentState) where adapterResponse.state != .pending:
+                    currentState.task?.cancel()
+                    try await setState(with: adapterResponse)
+                default:
+                    logger.info("Unable to apply resolve deep link to current state: \(state).")
+                    return
+                }
+            } catch {
+                setFailureState(error: error)
+            }
+        }
+    }
+
+    private func didFailToResolveDeepLinkReturnUrl(error: Error) {
+        let failure: POFailure
+        if let error = error as? POFailure {
+            failure = error
+        } else {
+            logger.error("Unexpected error type: \(error)")
+            failure = .init(message: "Unable to resolve deep link URL.", code: .Mobile.generic, underlyingError: error)
+        }
+        guard failure.failureCode != .RequestValidation.redirectResultInvalid else {
+            return
+        }
+        switch state {
+        case .starting(let currentState):
+            currentState.task.cancel()
+        case .submitting(let currentState):
+            currentState.task.cancel()
+        case .redirecting(let currentState):
+            currentState.task.cancel()
+        case .awaitingCompletion(let currentState):
+            currentState.task?.cancel()
+        case .failure, .completed:
+            return
+        default:
+            break
+        }
+        setFailureState(error: failure)
+    }
+
+    private var eventListeners: [AnyObject] = []
 }
 
 // swiftlint:enable file_length type_body_length

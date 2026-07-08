@@ -5,6 +5,8 @@
 //  Created by Andrii Vysotskyi on 17.10.2022.
 //
 
+import Foundation
+
 protocol InvoicesRepository: PORepository {
 
     /// Creates invoice with given parameters.
@@ -22,6 +24,11 @@ protocol InvoicesRepository: PORepository {
     func authorizeInvoice(
         request: PONativeAlternativePaymentAuthorizationRequestV2
     ) async throws -> PONativeAlternativePaymentAuthorizationResponseV2
+
+    /// Resolves native alternative payment return URL.
+    func resolveUrl(
+        request: PONativeAlternativePaymentUrlResolutionRequestV2
+    ) async throws -> PONativeAlternativePaymentUrlResolutionResponseV2
 
     // MARK: - Alternative Payment (Deprecated)
 

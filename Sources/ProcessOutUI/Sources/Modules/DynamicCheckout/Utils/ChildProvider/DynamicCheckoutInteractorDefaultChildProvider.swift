@@ -60,9 +60,10 @@ final class DynamicCheckoutInteractorDefaultChildProvider: DynamicCheckoutIntera
                 tokensService: ProcessOut.shared.customerTokens,
                 paymentConfirmationTimeout: configuration.paymentConfirmation.timeout
             ),
-            alternativePaymentsService: ProcessOut.shared.alternativePayments,
+            webAuthenticationSession: ProcessOut.shared.webAuthenticationSession,
             imagesRepository: imagesRepository,
             barcodeImageProvider: DefaultBarcodeImageProvider(logger: logger),
+            eventEmitter: ProcessOut.shared.eventEmitter,
             logger: logger,
             completion: { _ in }
         )

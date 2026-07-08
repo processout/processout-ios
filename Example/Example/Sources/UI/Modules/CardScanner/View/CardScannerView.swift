@@ -55,8 +55,6 @@ struct CardScannerView: View {
                 scannedCard.cardholderName ?? "N/A"
             )
             message = .init(text: text, severity: .success)
-        case .failure(.Mobile.cancelled), .failure(.Customer.cancelled):
-            break
         default:
             message = .init(text: String(localized: .CardScanner.errorMessage), severity: .error)
         }

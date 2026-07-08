@@ -11,7 +11,7 @@ final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
 
     init(
         configuration: AlternativePaymentsServiceConfiguration,
-        webSession: WebAuthenticationSession,
+        webSession: POWebAuthenticationSession,
         logger: POLogger
     ) {
         self.configuration = .init(wrappedValue: configuration)
@@ -130,7 +130,7 @@ final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
 
     private let configuration: POUnfairlyLocked<AlternativePaymentsServiceConfiguration>
     private let logger: POLogger
-    private let webSession: WebAuthenticationSession
+    private let webSession: POWebAuthenticationSession
 
     // MARK: - Request
 

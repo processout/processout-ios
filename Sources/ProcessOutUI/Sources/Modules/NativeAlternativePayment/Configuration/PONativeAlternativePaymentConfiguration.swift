@@ -20,10 +20,16 @@ public struct PONativeAlternativePaymentConfiguration {
 
         public struct Authorization: Sendable {
 
-            public init(invoiceId: String, gatewayConfigurationId: String, customerTokenId: String? = nil) {
+            public init(
+                invoiceId: String,
+                gatewayConfigurationId: String,
+                customerTokenId: String? = nil,
+                configuration: PONativeAlternativePaymentConfigurationV2 = .init()
+            ) {
                 self.invoiceId = invoiceId
                 self.gatewayConfigurationId = gatewayConfigurationId
                 self.customerTokenId = customerTokenId
+                self.configuration = configuration
             }
 
             /// Unique identifier for the invoice associated with this payment request.
@@ -34,14 +40,23 @@ public struct PONativeAlternativePaymentConfiguration {
 
             /// Customer token ID to use as a payment source.
             public let customerTokenId: String?
+
+            /// Authorization configuration.
+            public let configuration: PONativeAlternativePaymentConfigurationV2
         }
 
         public struct Tokenization: Sendable {
 
-            public init(customerId: String, customerTokenId: String, gatewayConfigurationId: String) {
+            public init(
+                customerId: String,
+                customerTokenId: String,
+                gatewayConfigurationId: String,
+                configuration: PONativeAlternativePaymentConfigurationV2 = .init()
+            ) {
                 self.customerId = customerId
                 self.customerTokenId = customerTokenId
                 self.gatewayConfigurationId = gatewayConfigurationId
+                self.configuration = configuration
             }
 
             /// Customer ID.
@@ -52,6 +67,9 @@ public struct PONativeAlternativePaymentConfiguration {
 
             /// Gateway configuration identifier.
             public let gatewayConfigurationId: String
+
+            /// Authorization configuration.
+            public let configuration: PONativeAlternativePaymentConfigurationV2
         }
 
         /// Payment authorization flow.
@@ -131,14 +149,22 @@ public struct PONativeAlternativePaymentConfiguration {
         /// and if it's the only required step, it will complete the flow without starting the bottom sheet.
         public let enableHeadlessMode: Bool
 
+        /// Redirect confirmation button configuration. To remove button use `nil`, this is default behaviour.
+        ///
+        /// Displays a confirmation button when the user needs to perform a redirect. The user
+        /// must press this button to continue.
+        public let redirectButton: SubmitButton?
+
         public init(
             callback: POWebAuthenticationCallback? = nil,
             prefersEphemeralSession: Bool = true,
-            enableHeadlessMode: Bool = false
+            enableHeadlessMode: Bool = false,
+            redirectButton: SubmitButton? = nil
         ) {
             self.callback = callback
             self.prefersEphemeralSession = prefersEphemeralSession
             self.enableHeadlessMode = enableHeadlessMode
+            self.redirectButton = redirectButton
         }
     }
 
