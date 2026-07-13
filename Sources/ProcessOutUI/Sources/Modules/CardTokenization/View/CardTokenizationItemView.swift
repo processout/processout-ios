@@ -38,6 +38,7 @@ struct CardTokenizationItemView: View {
         case .toggle(let toggleItem):
             Toggle(toggleItem.title, isOn: toggleItem.$isSelected)
                 .poToggleStyle(style.toggle)
+                .disabled(!toggleItem.isEnabled)
         case .button(let buttonItem):
             Button.create(with: buttonItem)
                 .buttonStyle(forPrimaryRole: style.actionsContainer.primary, fallback: style.actionsContainer.secondary)

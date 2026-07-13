@@ -16,7 +16,7 @@ public struct POCardScannerConfiguration {
     @MainActor
     public struct CancelButton {
 
-        /// Button title. Pass `nil` title to use default value.
+        /// Cancel button title. Set `nil` to use default value, or empty string `""` to remove title.
         public let title: String?
 
         /// Button icon. Pass `nil` title to use default value.

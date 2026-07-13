@@ -17,7 +17,7 @@ public struct PODynamicCheckoutConfiguration {
     @MainActor
     public struct ExpressCheckout {
 
-        /// Express checkout section title.
+        /// Express checkout section title. Set `nil` to use default value, or empty string `""` to remove title.
         public let title: String?
 
         /// Settings button configuration.
@@ -32,7 +32,7 @@ public struct PODynamicCheckoutConfiguration {
     @MainActor
     public struct ExpressCheckoutSettingsButton {
 
-        /// Button title, such as "Settings". Pass `nil` title to use default value.
+        /// Button title, such as "Settings". Set `nil` to use default value, or empty string `""` to remove title.
         public let title: String?
 
         /// Button icon. Pass `nil` to use default value.
@@ -41,6 +41,34 @@ public struct PODynamicCheckoutConfiguration {
         public init<Icon: View>(title: String? = nil, icon: Icon? = AnyView?.none) {
             self.title = title
             self.icon = icon.map(AnyView.init(erasing:))
+        }
+    }
+
+    @MainActor
+    public struct RegularCheckout {
+
+        /// Regular checkout section title. Set `nil` to use default value, or empty string `""` to remove title.
+        public let title: String?
+
+        public init(title: String? = "") {
+            self.title = title
+        }
+    }
+
+    /// Payment method saving options.
+    @MainActor
+    public struct Saving {
+
+        /// Initial selection state.
+        public let isOnByDefault: Bool
+
+        /// If `true`, saving is enforced and cannot be disabled by the user.
+        public let isRequired: Bool
+
+        /// Creates a saving configuration.
+        public init(isOnByDefault: Bool = false, isRequired: Bool = false) {
+            self.isOnByDefault = isRequired ? true : isOnByDefault
+            self.isRequired = isRequired
         }
     }
 
@@ -69,7 +97,7 @@ public struct PODynamicCheckoutConfiguration {
     @MainActor
     public struct SubmitButton {
 
-        /// Button title, such as "Pay". Pass `nil` title to use default value.
+        /// Button title, such as "Pay". Set `nil` to use default value, or empty string `""` to remove title.
         public let title: String?
 
         /// Button icon. Pass `nil` to use default value.
@@ -85,7 +113,7 @@ public struct PODynamicCheckoutConfiguration {
     @MainActor
     public struct CancelButton {
 
-        /// Button title. Pass `nil` title to use default value.
+        /// Button title. Set `nil` to use default value, or empty string `""` to remove title.
         public let title: String?
 
         /// Button icon. Pass `nil` to use default value.
@@ -107,8 +135,21 @@ public struct PODynamicCheckoutConfiguration {
     /// Request to fetch invoice to initiate a payment.
     public let invoiceRequest: POInvoiceRequest
 
-    /// Express checkout section configuration.
-    public let expressCheckout: ExpressCheckout
+    /// Controls the visibility and appearance of the saved payment methods.
+    ///
+    /// Set this value to `nil` to hide the entire "Express Checkout" section and omit saved
+    /// payments from the flow.
+    ///
+    /// This setting does not affect the availability of other payment options , nor does it affect
+    /// whether the user can save a payment method.
+    public let expressCheckout: ExpressCheckout?
+
+    /// Controls the visibility and appearance of the regular payment methods section.
+    ///
+    /// Set this value to `nil` to hide the entire "Regular Checkout" section.
+    ///
+    /// This setting does not affect the availability of saved payment options.
+    public let regularCheckout: RegularCheckout?
 
     /// Card collection configuration.
     public let card: PODynamicCheckoutCardConfiguration
@@ -118,6 +159,11 @@ public struct PODynamicCheckoutConfiguration {
 
     /// PassKit payment button type.
     public let passKitPaymentButtonType: PKPaymentButtonType
+
+    /// Saving configuration for supported payment methods.
+    ///
+    /// When set to `nil` user won't be suggested to save payment method.
+    public let saving: Saving?
 
     /// Determines whether to enable skipping payment list step when there is only
     /// one non-instant payment method. Default value: `true`.
@@ -135,13 +181,15 @@ public struct PODynamicCheckoutConfiguration {
     /// Localization configuration. Defaults to device localization.
     public let localization: LocalizationConfiguration
 
-    // Creates configuration instance.
+    /// Creates configuration instance.
     public init(
         invoiceRequest: POInvoiceRequest,
-        expressCheckout: ExpressCheckout = .init(),
+        expressCheckout: ExpressCheckout? = .init(),
+        regularCheckout: RegularCheckout? = .init(),
         card: PODynamicCheckoutCardConfiguration = .init(),
         alternativePayment: PODynamicCheckoutAlternativePaymentConfiguration = .init(),
         passKitPaymentButtonType: PKPaymentButtonType = .plain,
+        saving: Saving? = .init(),
         allowsSkippingPaymentList: Bool = true,
         submitButton: SubmitButton = .init(),
         cancelButton: CancelButton? = .init(),
@@ -150,9 +198,11 @@ public struct PODynamicCheckoutConfiguration {
     ) {
         self.invoiceRequest = invoiceRequest
         self.expressCheckout = expressCheckout
+        self.regularCheckout = regularCheckout
         self.card = card
         self.alternativePayment = alternativePayment
         self.passKitPaymentButtonType = passKitPaymentButtonType
+        self.saving = saving
         self.allowsSkippingPaymentList = allowsSkippingPaymentList
         self.submitButton = submitButton
         self.cancelButton = cancelButton

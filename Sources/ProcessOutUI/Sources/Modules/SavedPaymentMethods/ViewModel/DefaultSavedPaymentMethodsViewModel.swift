@@ -147,6 +147,10 @@ final class DefaultSavedPaymentMethodsViewModel: ViewModel {
             title: configuration.title,
             icon: configuration.icon,
             isLoading: isLoading,
+            accessibilityLabel: configuration.title ?? String(
+                resource: .SavedPaymentMethods.Accessibility.deletePaymentMethod,
+                configuration: interactor.configuration.localization
+            ),
             confirmation: configuration.confirmation.map { [weak self] configuration in
                 .delete(with: configuration, localization: localizationConfiguration) {
                     self?.interactor.didRequestRemovalConfirmation(
@@ -174,6 +178,10 @@ final class DefaultSavedPaymentMethodsViewModel: ViewModel {
             title: configuration.title,
             icon: configuration.icon,
             role: .cancel,
+            accessibilityLabel: configuration.title ?? String(
+                resource: .SavedPaymentMethods.Accessibility.cancel,
+                configuration: interactor.configuration.localization
+            ),
             confirmation: configuration.confirmation.map { configuration in
                 .cancel(with: configuration, localization: localizationConfiguration)
             },

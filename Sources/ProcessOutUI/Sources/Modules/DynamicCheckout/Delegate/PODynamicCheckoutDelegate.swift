@@ -55,6 +55,12 @@ public protocol PODynamicCheckoutDelegate: AnyObject, Sendable {
     @MainActor
     func dynamicCheckout(didEmitCardTokenizationEvent event: POCardTokenizationEvent)
 
+    /// Asks the delegate to evaluate whether a card is eligible for tokenization based on its issuer information.
+    @MainActor
+    func dynamicCheckout(
+        evaluateCardEligibilityWith request: POCardTokenizationEligibilityRequest
+    ) async -> POCardTokenizationEligibilityEvaluation?
+
     /// Allows to choose preferred scheme that will be selected by default based on issuer information. Default
     /// implementation returns primary scheme.
     @MainActor
@@ -126,6 +132,13 @@ extension PODynamicCheckoutDelegate {
     @MainActor
     public func dynamicCheckout(didEmitCardTokenizationEvent event: POCardTokenizationEvent) {
         // Ignored
+    }
+
+    @MainActor
+    public func dynamicCheckout(
+        evaluateCardEligibilityWith request: POCardTokenizationEligibilityRequest
+    ) async -> POCardTokenizationEligibilityEvaluation? {
+        nil
     }
 
     @MainActor

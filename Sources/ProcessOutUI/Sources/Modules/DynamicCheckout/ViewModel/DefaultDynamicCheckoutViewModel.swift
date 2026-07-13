@@ -78,8 +78,10 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
             updateWithPaymentProcessingState(state)
         case .restarting(let state):
             updateWithRestartingState(state)
-        case .success:
+        case .success(let state) where state.isAuthorizationConfirmed:
             updateWithSuccessState()
+        case .success:
+            break // Ignored
         }
     }
 
@@ -109,36 +111,13 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
     private func createSectionsWithStartedState(
         _ state: DynamicCheckoutInteractorState.Started, selectedMethodId: String?, shouldSaveSelectedMethod: Bool?
     ) -> [DynamicCheckoutViewModelState.Section] {
-        var sections = [
+        let sections = [
             createErrorSection(state: state),
-            createExpressMethodsSection(state: state, processedPaymentMethodId: nil)
-        ]
-        let regularItems = state.paymentMethods.compactMap { paymentMethod -> DynamicCheckoutViewModelItem? in
-            guard !isExpress(paymentMethod: paymentMethod) else {
-                return nil
-            }
-            let isSelected = selectedMethodId == paymentMethod.id
-            guard let info = createPaymentInfo(
-                for: paymentMethod,
-                isSelected: isSelected,
-                isLoading: false,
-                shouldSaveSelected: shouldSaveSelectedMethod,
-                state: state
-            ) else {
-                return nil
-            }
-            let payment = DynamicCheckoutViewModelItem.RegularPayment(
-                id: paymentMethod.id,
-                info: info,
-                content: nil,
-                submitButton: createSubmitAction(for: paymentMethod.id, selectedMethodId: selectedMethodId)
+            createExpressMethodsSection(state: state, processedPaymentMethodId: nil),
+            createRegularMethodsSection(
+                state: state, selectedMethodId: selectedMethodId, shouldSaveSelectedMethod: shouldSaveSelectedMethod
             )
-            return .regularPayment(payment)
-        }
-        let regularSection = DynamicCheckoutViewModelState.Section(
-            id: SectionId.regularMethods, header: nil, items: regularItems, isTight: true, areBezelsVisible: true
-        )
-        sections.append(regularSection)
+        ]
         return sections.compactMap { $0 }
     }
 
@@ -158,6 +137,9 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
     private func createExpressMethodsSection(
         state: DynamicCheckoutInteractorState.Started, processedPaymentMethodId: String?
     ) -> DynamicCheckoutViewModelState.Section? {
+        guard let configuration = interactor.configuration.expressCheckout else {
+            return nil
+        }
         let expressItems = state.paymentMethods.compactMap { paymentMethod in
             createExpressPaymentItem(for: paymentMethod, processedPaymentMethodId: processedPaymentMethodId)
         }
@@ -166,7 +148,7 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
         }
         return .init(
             id: SectionId.expressMethods,
-            header: createExpressMethodsSectionHeader(state: state),
+            header: createExpressMethodsSectionHeader(state: state, configuration: configuration),
             items: expressItems,
             isTight: false,
             areBezelsVisible: false
@@ -174,9 +156,10 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
     }
 
     private func createExpressMethodsSectionHeader(
-        state: DynamicCheckoutInteractorState.Started
+        state: DynamicCheckoutInteractorState.Started,
+        configuration: PODynamicCheckoutConfiguration.ExpressCheckout
     ) -> DynamicCheckoutViewModelState.SectionHeader? {
-        let resolvedConfiguration = interactor.configuration.expressCheckout.resolved(
+        let resolvedConfiguration = configuration.resolved(
             defaultTitle: String(
                 resource: .DynamicCheckout.expressCheckout, configuration: interactor.configuration.localization
             )
@@ -210,12 +193,72 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
             id: ButtonId.expressCheckoutSettings,
             title: resolvedConfiguration.title,
             icon: resolvedConfiguration.icon,
+            accessibilityLabel: resolvedConfiguration.title ?? String(
+                resource: .DynamicCheckout.Accessibility.expressCheckoutSettings,
+                configuration: interactor.configuration.localization
+            ),
             confirmation: nil,
             action: { [weak self] in
                 self?.openExpressCheckoutSettings()
             }
         )
         return viewModel
+    }
+
+    private func createRegularMethodsSection(
+        state: DynamicCheckoutInteractorState.Started, selectedMethodId: String?, shouldSaveSelectedMethod: Bool?
+    ) -> DynamicCheckoutViewModelState.Section? {
+        guard let configuration = interactor.configuration.regularCheckout else {
+            return nil
+        }
+        let regularItems = state.paymentMethods.compactMap { paymentMethod -> DynamicCheckoutViewModelItem? in
+            guard !isExpress(paymentMethod: paymentMethod) else {
+                return nil
+            }
+            let isSelected = selectedMethodId == paymentMethod.id
+            guard let info = createPaymentInfo(
+                for: paymentMethod,
+                isSelected: isSelected,
+                isLoading: false,
+                shouldSaveSelected: shouldSaveSelectedMethod,
+                state: state
+            ) else {
+                return nil
+            }
+            let payment = DynamicCheckoutViewModelItem.RegularPayment(
+                id: paymentMethod.id,
+                info: info,
+                content: nil,
+                submitButton: createSubmitAction(for: paymentMethod.id, selectedMethodId: selectedMethodId)
+            )
+            return .regularPayment(payment)
+        }
+        guard !regularItems.isEmpty else {
+            return nil
+        }
+        let regularSection = DynamicCheckoutViewModelState.Section(
+            id: SectionId.regularMethods,
+            header: createRegularMethodsSectionHeader(state: state, configuration: configuration),
+            items: regularItems,
+            isTight: true,
+            areBezelsVisible: true
+        )
+        return regularSection
+    }
+
+    private func createRegularMethodsSectionHeader(
+        state: DynamicCheckoutInteractorState.Started,
+        configuration: PODynamicCheckoutConfiguration.RegularCheckout
+    ) -> DynamicCheckoutViewModelState.SectionHeader? {
+        let resolvedConfiguration = configuration.resolved(
+            defaultTitle: String(
+                resource: .DynamicCheckout.regularCheckout, configuration: interactor.configuration.localization
+            )
+        )
+        guard resolvedConfiguration.title != nil else {
+            return nil
+        }
+        return .init(title: resolvedConfiguration.title, button: nil)
     }
 
     private func openExpressCheckoutSettings() {
@@ -403,10 +446,20 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
     private func createSectionsWithPaymentProcessingState(
         _ state: DynamicCheckoutInteractorState.PaymentProcessing
     ) -> [DynamicCheckoutViewModelState.Section] {
-        var sections = [
+        let sections = [
             createErrorSection(state: state.snapshot),
-            createExpressMethodsSection(state: state.snapshot, processedPaymentMethodId: state.paymentMethod.id)
+            createExpressMethodsSection(state: state.snapshot, processedPaymentMethodId: state.paymentMethod.id),
+            createRegularMethodsSection(state)
         ]
+        return sections.compactMap { $0 }
+    }
+
+    private func createRegularMethodsSection(
+        _ state: DynamicCheckoutInteractorState.PaymentProcessing
+    ) -> DynamicCheckoutViewModelState.Section? {
+        guard let configuration = interactor.configuration.regularCheckout else {
+            return nil
+        }
         let regularItems = state.snapshot.paymentMethods.compactMap { paymentMethod -> DynamicCheckoutViewModelItem? in
             guard !isExpress(paymentMethod: paymentMethod) else {
                 return nil
@@ -429,15 +482,17 @@ final class DefaultDynamicCheckoutViewModel: ViewModel {
             )
             return .regularPayment(payment)
         }
+        guard !regularItems.isEmpty else {
+            return nil
+        }
         let regularSection = DynamicCheckoutViewModelState.Section(
             id: SectionId.regularMethods,
-            header: nil,
+            header: createRegularMethodsSectionHeader(state: state.snapshot, configuration: configuration),
             items: regularItems.compactMap { $0 },
             isTight: true,
             areBezelsVisible: true
         )
-        sections.append(regularSection)
-        return sections.compactMap { $0 }
+        return regularSection
     }
 
     private func createRegularPaymentContent(

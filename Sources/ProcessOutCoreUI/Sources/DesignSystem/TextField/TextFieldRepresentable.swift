@@ -10,10 +10,18 @@ import SwiftUI
 @MainActor
 struct TextFieldRepresentable: UIViewRepresentable {
 
-    init(text: Binding<String>, formatter: Formatter?, focusableView: Binding<FocusableViewProxy>) {
+    init(
+        text: Binding<String>,
+        formatter: Formatter?,
+        focusableView: Binding<FocusableViewProxy>,
+        accessibilityLabel: String,
+        accessibilityHint: String?,
+    ) {
         self._text = text
         self.formatter = formatter
         self._focusableView = focusableView
+        self.accessibilityLabel = accessibilityLabel
+        self.accessibilityHint = accessibilityHint
     }
 
     // MARK: - UIViewRepresentable
@@ -42,6 +50,8 @@ struct TextFieldRepresentable: UIViewRepresentable {
         textField.keyboardType = context.environment.poKeyboardType
         textField.textContentType = context.environment.poTextContentType
         textField.returnKeyType = context.environment.backportSubmitLabel.returnKeyType
+        textField.accessibilityLabel = accessibilityLabel
+        textField.accessibilityHint = accessibilityHint
         updateCoordinator(context.coordinator)
     }
 
@@ -79,7 +89,7 @@ struct TextFieldRepresentable: UIViewRepresentable {
 
     // MARK: - Private Properties
 
-    private let formatter: Formatter?
+    private let formatter: Formatter?, accessibilityLabel: String, accessibilityHint: String?
 
     @POBackport.ScaledMetric
     private var multiplier: CGFloat = 1.0

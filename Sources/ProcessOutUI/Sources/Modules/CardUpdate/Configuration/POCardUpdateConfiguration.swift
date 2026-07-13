@@ -36,7 +36,7 @@ public struct POCardUpdateConfiguration {
     @preconcurrency
     public struct SubmitButton {
 
-        /// Button title, such as "Pay". Pass `nil` title to use default value.
+        /// Button title, such as "Pay". Set `nil` to use default value, or empty string `""` to remove title.
         public let title: String?
 
         /// Button icon. Pass `nil` to use default value.
@@ -53,7 +53,7 @@ public struct POCardUpdateConfiguration {
     @preconcurrency
     public struct CancelButton {
 
-        /// Button title. Pass `nil` title to use default value.
+        /// Button title. Set `nil` to use default value, or empty string `""` to remove title.
         public let title: String?
 
         /// Button icon. Pass `nil` title to use default value.

@@ -384,6 +384,9 @@ final class NativeAlternativePaymentDefaultInteractor:
     }
 
     private func uncheckedRedirect(to redirect: PONativeAlternativePaymentRedirectV2) async throws {
+        delegate?.nativeAlternativePayment(
+            didEmitEvent: .willStartRedirect(.init(redirect: redirect))
+        )
         let redirectResult: PONativeAlternativePaymentRedirectResultV2?
         switch redirect.type {
         case .deepLink:

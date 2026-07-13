@@ -91,6 +91,25 @@ extension POStringResource {
 
         /// Save card message.
         static let saveCardMessage = POStringResource("card-tokenization.save-card-message", comment: "")
+
+        enum Accessibility {
+
+            enum Card {
+
+                /// Card number accessibility label.
+                static let number = POStringResource("card-tokenization.accessibility.card-number", comment: "")
+
+                /// Card expiration accessibility label.
+                static let expiration = POStringResource(
+                    "card-tokenization.accessibility.card-expiration", comment: ""
+                )
+
+                /// Card expiration accessibility hint.
+                static let expirationHint = POStringResource(
+                    "card-tokenization.accessibility.card-expiration-hint", comment: ""
+                )
+            }
+        }
     }
 }
 

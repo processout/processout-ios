@@ -15,12 +15,16 @@ public struct POTextField<Trailing: View>: View {
         text: Binding<String>,
         formatter: Formatter? = nil,
         prompt: String = "",
-        trailingView: Trailing = EmptyView()
+        trailingView: Trailing = EmptyView(),
+        accessibilityLabel: String? = nil,
+        accessibilityHint: String? = nil,
     ) {
         self._text = text
         self.formatter = formatter
         self.prompt = prompt
         self.trailingView = trailingView
+        self.accessibilityLabel = accessibilityLabel
+        self.accessibilityHint = accessibilityHint
     }
 
     public var body: some View {
@@ -28,7 +32,13 @@ public struct POTextField<Trailing: View>: View {
             text: $text,
             isEditing: focusableView.isFocused,
             textField: {
-                TextFieldRepresentable(text: $text, formatter: formatter, focusableView: $focusableView)
+                TextFieldRepresentable(
+                    text: $text,
+                    formatter: formatter,
+                    focusableView: $focusableView,
+                    accessibilityLabel: accessibilityLabel ?? prompt,
+                    accessibilityHint: accessibilityHint,
+                )
             },
             prompt: Text(prompt),
             trailingView: {
@@ -47,6 +57,9 @@ public struct POTextField<Trailing: View>: View {
     // MARK: - Private Properties
 
     private let formatter: Formatter?, prompt: String, trailingView: Trailing
+
+    /// Accessibility.
+    private let accessibilityLabel: String?, accessibilityHint: String?
 
     @Binding
     private var text: String

@@ -29,14 +29,23 @@ struct CardScannerViewModelState {
         let cardholderName: String?
     }
 
+    struct Torch {
+
+        /// Boolean value indicating whether torch is enabled.
+        let isEnabled: Binding<Bool>
+
+        /// Accessibility label.
+        let accessibilityLabel: String
+    }
+
     /// Screen title.
     let title: String?
 
     /// Description.
     let description: String?
 
-    /// Boolean value indicating whether torch is enabled.
-    var isTorchEnabled: Binding<Bool>
+    /// Torch configuration.
+    let torch: Torch
 
     /// Preview.
     let preview: Preview

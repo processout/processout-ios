@@ -40,6 +40,9 @@ extension POStringResource {
         /// Express checkout section title.
         static let expressCheckout = POStringResource("dynamic-checkout.express-checkout", comment: "")
 
+        /// Regular checkout section title.
+        static let regularCheckout = POStringResource("dynamic-checkout.regular-checkout", comment: "")
+
         /// Save payment method information message.
         static let savePaymentMessage = POStringResource("dynamic-checkout.save-payment-message", comment: "")
 
@@ -48,6 +51,14 @@ extension POStringResource {
 
         /// Success message.
         static let successMessage = POStringResource("dynamic-checkout.success-message", comment: "")
+
+        enum Accessibility {
+
+            /// Express checkout settings button.
+            static let expressCheckoutSettings = POStringResource(
+                "dynamic-checkout.accessibility.express-checkout-settings", comment: ""
+            )
+        }
     }
 }
 

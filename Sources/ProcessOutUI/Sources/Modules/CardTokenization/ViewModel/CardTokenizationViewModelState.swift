@@ -76,6 +76,9 @@ struct CardTokenizationViewModelState {
 
         /// Defines whether item is currently selected.
         @Binding var isSelected: Bool
+
+        /// Indicates whether toggle is enabled.
+        let isEnabled: Bool
     }
 
     struct ErrorItem: Identifiable {

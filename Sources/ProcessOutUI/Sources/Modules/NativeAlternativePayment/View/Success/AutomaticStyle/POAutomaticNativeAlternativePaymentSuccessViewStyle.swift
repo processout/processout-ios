@@ -25,6 +25,7 @@ public struct POAutomaticNativeAlternativePaymentSuccessViewStyle: PONativeAlter
     public func makeBody(configuration: Configuration) -> some View {
         VStack(spacing: POSpacing.space6) {
             Image(poResource: .success)
+                .accessibilityHidden(true)
             configuration.title
                 .textStyle(title)
             configuration.description

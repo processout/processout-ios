@@ -11,7 +11,7 @@ extension POSavedPaymentMethodsConfiguration.DeleteButton {
 
     func resolved(
         defaultTitle: @autoclosure () -> String?, icon defaultIcon: @autoclosure () -> Image?
-    ) -> POSavedPaymentMethodsConfiguration.DeleteButton {
+    ) -> Self {
         let resolvedTitle: String? = if title?.isEmpty == true {
             nil
         } else {
@@ -26,7 +26,7 @@ extension POSavedPaymentMethodsConfiguration.CancelButton {
 
     func resolved(
         defaultTitle: @autoclosure () -> String?, icon defaultIcon: @autoclosure () -> Image?
-    ) -> POSavedPaymentMethodsConfiguration.CancelButton {
+    ) -> Self {
         let resolvedTitle: String? = if title?.isEmpty == true {
             nil
         } else {

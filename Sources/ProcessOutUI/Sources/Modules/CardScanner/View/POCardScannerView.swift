@@ -52,15 +52,16 @@ public struct POCardScannerView: View {
                 }
             },
             torchToggle: {
-                Toggle(isOn: viewModel.state.isTorchEnabled) {
+                Toggle(isOn: viewModel.state.torch.isEnabled) {
                     Label {
                         EmptyView()
                     } icon: {
-                        let isOn = viewModel.state.isTorchEnabled.wrappedValue
+                        let isOn = viewModel.state.torch.isEnabled.wrappedValue
                         let icon = Image(poResource: isOn ? .lightningSlash : .lightning)
-                        icon.renderingMode(.template).resizable()
+                        icon.renderingMode(.template).resizable().accessibilityHidden(true)
                     }
                 }
+                .accessibilityLabel(Text(viewModel.state.torch.accessibilityLabel))
                 .fixedSize()
             },
             videoPreview: {

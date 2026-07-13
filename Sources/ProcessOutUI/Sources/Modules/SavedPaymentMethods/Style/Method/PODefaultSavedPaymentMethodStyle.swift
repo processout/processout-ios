@@ -31,6 +31,7 @@ public struct PODefaultSavedPaymentMethodStyle: POSavedPaymentMethodStyle {
     public func makeBody(configuration: Configuration) -> some View {
         HStack(spacing: POSpacing.small) {
             configuration.icon
+                .accessibilityHidden(true)
                 .frame(width: 24, height: 24)
             configuration.description
                 .textStyle(description)

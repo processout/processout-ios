@@ -21,6 +21,15 @@ public enum PODynamicCheckoutEvent: Sendable {
         public let failure: POFailure
     }
 
+    public struct DidTokenizePaymentMethod: Sendable {
+
+        /// Payment method that was tokenized.
+        public let paymentMethod: PODynamicCheckoutPaymentMethod
+
+        /// Customer token ID.
+        public let customerTokenId: String
+    }
+
     /// Initial event that is sent prior any other event.
     case willStart
 
@@ -40,6 +49,9 @@ public enum PODynamicCheckoutEvent: Sendable {
 
     /// Event is sent when user asked to confirm cancellation.
     case didRequestCancelConfirmation
+
+    /// Event is send after payment method tokenized (if consented by user).
+    case didTokenizePaymentMethod(DidTokenizePaymentMethod)
 
     /// Event is sent after payment was confirmed to be captured. This is a final event.
     case didCompletePayment

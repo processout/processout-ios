@@ -65,7 +65,7 @@ final class DefaultCardScannerViewModel: ViewModel {
         state = .init(
             title: title,
             description: description,
-            isTorchEnabled: .constant(false),
+            torch: .init(isEnabled: .constant(false), accessibilityLabel: torchToggleAccessibilityLabel),
             preview: .init(source: nil),
             recognizedCard: nil,
             cancelButton: cancelButtonViewModel,
@@ -77,13 +77,16 @@ final class DefaultCardScannerViewModel: ViewModel {
         state = .init(
             title: title,
             description: description,
-            isTorchEnabled: .init(
-                get: {
-                    startedState.isTorchEnabled.desired ?? startedState.isTorchEnabled.current
-                },
-                set: { [weak self] newValue in
-                    self?.interactor.setTorchEnabled(newValue)
-                }
+            torch: .init(
+                isEnabled: .init(
+                    get: {
+                        startedState.isTorchEnabled.desired ?? startedState.isTorchEnabled.current
+                    },
+                    set: { [weak self] newValue in
+                        self?.interactor.setTorchEnabled(newValue)
+                    }
+                ),
+                accessibilityLabel: torchToggleAccessibilityLabel
             ),
             preview: .init(source: startedState.previewSource),
             recognizedCard: cardViewModel(with: startedState.card),
@@ -96,7 +99,7 @@ final class DefaultCardScannerViewModel: ViewModel {
         state = .init(
             title: title,
             description: description,
-            isTorchEnabled: .constant(false),
+            torch: .init(isEnabled: .constant(false), accessibilityLabel: torchToggleAccessibilityLabel),
             preview: .init(source: nil),
             recognizedCard: nil,
             cancelButton: cancelButtonViewModel,
@@ -127,16 +130,19 @@ final class DefaultCardScannerViewModel: ViewModel {
     }
 
     private var cancelButtonViewModel: POButtonViewModel? {
-        guard let configuration = interactor.configuration.cancelButton else {
+        let defaultTitle = String(
+            resource: .CardScanner.cancelButton, configuration: interactor.configuration.localization
+        )
+        let configuration = interactor.configuration.cancelButton?.resolved(defaultTitle: defaultTitle, icon: nil)
+        guard let configuration else {
             return nil
         }
         let localizationConfiguration = interactor.configuration.localization
         let viewModel = POButtonViewModel(
             id: "cancel-button",
-            title: configuration.title ?? String(
-                resource: .CardScanner.cancelButton, configuration: interactor.configuration.localization
-            ),
+            title: configuration.title,
             icon: configuration.icon,
+            accessibilityLabel: configuration.title ?? defaultTitle,
             confirmation: configuration.confirmation.map { configuration in
                 .cancel(with: configuration, localization: localizationConfiguration)
             },
@@ -194,5 +200,9 @@ final class DefaultCardScannerViewModel: ViewModel {
             secondaryButton: secondaryButton
         )
         return confirmationDialog
+    }
+
+    private var torchToggleAccessibilityLabel: String {
+        String(resource: .CardScanner.Accessibility.torch, configuration: interactor.configuration.localization)
     }
 }

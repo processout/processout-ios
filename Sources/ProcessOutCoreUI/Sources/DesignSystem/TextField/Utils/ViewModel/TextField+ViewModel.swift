@@ -31,7 +31,9 @@ private struct TextFieldWrapper: View {
             text: viewModel.$value,
             formatter: viewModel.formatter,
             prompt: viewModel.placeholder,
-            trailingView: viewModel.icon?.accessibility(hidden: true)
+            trailingView: viewModel.icon?.accessibility(hidden: true),
+            accessibilityLabel: viewModel.accessibilityLabel,
+            accessibilityHint: viewModel.accessibilityHint
         )
         .backport.focused($focusedInputId, equals: viewModel.id)
         .backport.onSubmit(viewModel.onSubmit)

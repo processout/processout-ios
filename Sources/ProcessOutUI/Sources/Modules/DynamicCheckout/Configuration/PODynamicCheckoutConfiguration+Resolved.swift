@@ -9,9 +9,7 @@ import SwiftUI
 
 extension PODynamicCheckoutConfiguration.ExpressCheckoutSettingsButton {
 
-    func resolved(
-        defaultTitle: @autoclosure () -> String?, icon defaultIcon: @autoclosure () -> Image?
-    ) -> PODynamicCheckoutConfiguration.ExpressCheckoutSettingsButton {
+    func resolved(defaultTitle: @autoclosure () -> String?, icon defaultIcon: @autoclosure () -> Image?) -> Self {
         let resolvedTitle: String? = if title?.isEmpty == true {
             nil
         } else {
@@ -24,12 +22,37 @@ extension PODynamicCheckoutConfiguration.ExpressCheckoutSettingsButton {
 
 extension PODynamicCheckoutConfiguration.ExpressCheckout {
 
-    func resolved(defaultTitle: @autoclosure () -> String?) -> PODynamicCheckoutConfiguration.ExpressCheckout {
+    func resolved(defaultTitle: @autoclosure () -> String?) -> Self {
         let resolvedTitle: String? = if title?.isEmpty == true {
             nil
         } else {
             title ?? defaultTitle()
         }
         return .init(title: resolvedTitle, settingsButton: settingsButton)
+    }
+}
+
+extension PODynamicCheckoutConfiguration.RegularCheckout {
+
+    func resolved(defaultTitle: @autoclosure () -> String?) -> Self {
+        let resolvedTitle: String? = if title?.isEmpty == true {
+            nil
+        } else {
+            title ?? defaultTitle()
+        }
+        return .init(title: resolvedTitle)
+    }
+}
+
+extension PODynamicCheckoutConfiguration.SubmitButton {
+
+    func resolved(defaultTitle: @autoclosure () -> String?, icon defaultIcon: @autoclosure () -> Image?) -> Self {
+        let resolvedTitle: String? = if title?.isEmpty == true {
+            nil
+        } else {
+            title ?? defaultTitle()
+        }
+        let resolvedIcon = icon ?? defaultIcon().map(AnyView.init(erasing:))
+        return .init(title: resolvedTitle, icon: resolvedIcon)
     }
 }

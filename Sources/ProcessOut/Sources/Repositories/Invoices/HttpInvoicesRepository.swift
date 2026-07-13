@@ -48,21 +48,18 @@ final class HttpInvoicesRepository: InvoicesRepository {
         return response.value.invoice.replacing(clientSecret: clientSecret)
     }
 
-    func authorizeInvoice(request: POInvoiceAuthorizationRequest) async throws -> _CustomerAction? {
-        struct Response: Decodable, Sendable {
-            let customerAction: _CustomerAction?
-        }
+    func authorizeInvoice(request: POInvoiceAuthorizationRequest) async throws -> InvoiceAuthorizationResponse {
         let headers = [
             "X-Processout-Client-Secret": request.clientSecret
         ]
-        let httpRequest = HttpConnectorRequest<Response>.post(
+        let httpRequest = HttpConnectorRequest<InvoiceAuthorizationResponse>.post(
             path: "/invoices/\(request.invoiceId)/authorize",
             body: request,
             headers: headers.compactMapValues { $0 },
             locale: request.localeIdentifier,
             includesDeviceMetadata: true
         )
-        return try await connector.execute(request: httpRequest).customerAction
+        return try await connector.execute(request: httpRequest)
     }
 
     func authorizeInvoice(

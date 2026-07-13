@@ -26,7 +26,9 @@ public struct POSavedPaymentMethodsConfiguration {
     @MainActor
     public struct DeleteButton {
 
-        /// Cancel button title. Use `nil` for default title.
+        /// Cancel button title. Set `nil` to use default value, or empty string `""` to remove title.
+        ///
+        /// By default title is hidden.
         public let title: String?
 
         /// Button icon. 
@@ -49,7 +51,9 @@ public struct POSavedPaymentMethodsConfiguration {
     @MainActor
     public struct CancelButton {
 
-        /// Cancel button title. Use `nil` for default title.
+        /// Cancel button title. Set `nil` to use default value, or empty string `""` to remove title.
+        ///
+        /// By default title is hidden.
         public let title: String?
 
         /// Button icon.

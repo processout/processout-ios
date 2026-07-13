@@ -31,11 +31,13 @@ private struct DefaultTextFieldStyleContentView: View {
             } valueSizingView: {
                 Text(" ")
                     .typography(resolvedStyle.text.typography)
+                    .accessibilityHidden(true)
             } placeholder: { isFloating in
                 configuration.prompt
                     .lineLimit(1)
                     .textStyle(resolvedStyle.label.scaledBy(isFloating ? 0.8 : 1))
                     .allowsHitTesting(false)
+                    .accessibilityHidden(true)
             }
             configuration.trailingView
                 .foregroundColor(

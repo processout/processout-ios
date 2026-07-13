@@ -64,6 +64,9 @@ public struct POButtonViewModel: Identifiable {
     /// A value that describes the purpose of a button.
     public let role: POButtonRole?
 
+    /// Accessibility label.
+    public let accessibilityLabel: String?
+
     /// Confirmation dialog to present to user before invoking action.
     public let confirmation: Confirmation?
 
@@ -78,6 +81,7 @@ public struct POButtonViewModel: Identifiable {
         isEnabled: Bool = true,
         isLoading: Bool = false,
         role: POButtonRole? = nil,
+        accessibilityLabel: String? = nil,
         confirmation: Confirmation? = nil,
         action: @escaping @MainActor () -> Void
     ) {
@@ -87,6 +91,7 @@ public struct POButtonViewModel: Identifiable {
         self.isEnabled = isEnabled
         self.isLoading = isLoading
         self.role = role
+        self.accessibilityLabel = accessibilityLabel
         self.confirmation = confirmation
         self.action = action
     }

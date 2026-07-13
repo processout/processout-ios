@@ -27,5 +27,16 @@ extension POStringResource {
 
         /// Generic error.
         static let genericError = POStringResource("saved-payment-methods.generic-error", comment: "")
+
+        enum Accessibility { // swiftlint:disable:this nesting
+
+            /// Cancel button.
+            static let deletePaymentMethod = POStringResource(
+                "saved-payment-methods.accessibility.delete-payment-method", comment: ""
+            )
+
+            /// Cancel button.
+            static let cancel = POStringResource("saved-payment-methods.accessibility.cancel", comment: "")
+        }
     }
 }

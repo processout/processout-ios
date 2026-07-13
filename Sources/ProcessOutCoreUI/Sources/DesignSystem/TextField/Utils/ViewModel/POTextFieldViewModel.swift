@@ -32,6 +32,12 @@ public struct POTextFieldViewModel: Identifiable {
     /// Formatter to use to format value if any.
     public let formatter: Formatter?
 
+    /// Accessibility label.
+    public let accessibilityLabel: String?
+
+    /// Accessibility hint.
+    public let accessibilityHint: String?
+
     /// Keyboard type.
     public let keyboard: UIKeyboardType
 
@@ -52,6 +58,8 @@ public struct POTextFieldViewModel: Identifiable {
         isInvalid: Bool,
         isEnabled: Bool,
         formatter: Formatter?,
+        accessibilityLabel: String? = nil,
+        accessibilityHint: String? = nil,
         keyboard: UIKeyboardType,
         contentType: UITextContentType?,
         submitLabel: POBackport<Any>.SubmitLabel,
@@ -64,6 +72,8 @@ public struct POTextFieldViewModel: Identifiable {
         self.isInvalid = isInvalid
         self.isEnabled = isEnabled
         self.formatter = formatter
+        self.accessibilityLabel = accessibilityLabel
+        self.accessibilityHint = accessibilityHint
         self.keyboard = keyboard
         self.contentType = contentType
         self.submitLabel = submitLabel
