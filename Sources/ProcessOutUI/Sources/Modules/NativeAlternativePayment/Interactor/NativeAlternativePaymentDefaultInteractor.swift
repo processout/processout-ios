@@ -762,7 +762,8 @@ final class NativeAlternativePaymentDefaultInteractor:
                 }
                 return .phone(.init(regionCode: regionCode, number: value.number))
             }
-            if let defaultRegionCode = Locale.current.regionCode {
+            let locale = configuration.localization.localeOverride ?? .current
+            if let defaultRegionCode = locale.regionCode {
                 if specification.dialingCodes.contains(where: { $0.regionCode == defaultRegionCode }) {
                     return .phone(.init(regionCode: defaultRegionCode))
                 }
