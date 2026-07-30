@@ -730,11 +730,12 @@ final class NativeAlternativePaymentDefaultInteractor:
         )
         for parameter in parameters.values {
             parameters[parameter.specification.key]?.value = defaultValue(
-                for: parameter, fallback: defaultValues?[ parameter.specification.key]
+                for: parameter, fallback: defaultValues?[parameter.specification.key]
             )
         }
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     private func defaultValue(
         for parameter: NativeAlternativePaymentInteractorState.Parameter,
         fallback: PONativeAlternativePaymentParameterValue?
@@ -760,6 +761,11 @@ final class NativeAlternativePaymentDefaultInteractor:
                     }
                 }
                 return .phone(.init(regionCode: regionCode, number: value.number))
+            }
+            if let defaultRegionCode = Locale.current.regionCode {
+                if specification.dialingCodes.contains(where: { $0.regionCode == defaultRegionCode }) {
+                    return .phone(.init(regionCode: defaultRegionCode))
+                }
             }
         default:
             if case .string(let value) = fallback {
