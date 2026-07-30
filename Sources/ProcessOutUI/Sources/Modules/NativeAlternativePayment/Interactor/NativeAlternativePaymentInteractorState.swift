@@ -165,6 +165,17 @@ extension NativeAlternativePaymentInteractorState.Started {
 
 extension NativeAlternativePaymentInteractorState: InteractorState {
 
+    var startedStateSnapshot: Started? {
+        switch self {
+        case .started(let state):
+            return state
+        case .submitting(let state):
+            return state.snapshot
+        default:
+            return nil
+        }
+    }
+
     var isSink: Bool {
         switch self {
         case .completed, .failure:

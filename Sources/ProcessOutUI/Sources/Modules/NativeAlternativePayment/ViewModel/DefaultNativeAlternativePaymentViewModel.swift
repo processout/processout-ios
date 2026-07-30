@@ -488,8 +488,8 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         guard let maxLength = specification.maxLength, maxLength <= Constants.maximumCodeLength else {
             return nil
         }
-        let value = Binding<String> {
-            if case .string(let value) = parameter.value {
+        let value = Binding<String> { [weak self] in
+            if case .string(let value) = self?.parameterValue(forKey: parameter.specification.key) {
                 return value
             }
             return ""
@@ -517,8 +517,8 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
                 let displayName = locale.localizedString(forRegionCode: dialingCode.regionCode)
                 return .init(id: dialingCode.regionCode, displayName: displayName ?? "", code: dialingCode.value)
             }
-        let value = Binding<ProcessOutCoreUI.POPhoneNumber> {
-            if case .phone(let value) = parameter.value {
+        let value = Binding<ProcessOutCoreUI.POPhoneNumber> { [weak self] in
+            if case .phone(let value) = self?.parameterValue(forKey: parameter.specification.key) {
                 return .init(territoryId: value.regionCode, number: value.number ?? "")
             }
             return .init(territoryId: nil, number: "")
@@ -545,8 +545,8 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         for parameter: InteractorState.Parameter,
         with specification: PONativeAlternativePaymentFormV2.Parameter.SingleSelect
     ) -> NativeAlternativePaymentViewModelItem {
-        let value = Binding<String?> {
-            if case .string(let currentValue) = parameter.value {
+        let value = Binding<String?> { [weak self] in
+            if case .string(let currentValue) = self?.parameterValue(forKey: parameter.specification.key) {
                 return currentValue
             }
             return nil
@@ -567,8 +567,8 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     }
 
     private func createInputItem(for parameter: InteractorState.Parameter) -> NativeAlternativePaymentViewModelItem {
-        let value = Binding<String> {
-            if case .string(let currentValue) = parameter.value {
+        let value = Binding<String> { [weak self] in
+            if case .string(let currentValue) = self?.parameterValue(forKey: parameter.specification.key) {
                 return currentValue
             }
             return ""
@@ -627,8 +627,8 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         for parameter: InteractorState.Parameter,
         with specification: PONativeAlternativePaymentFormV2.Parameter.Boolean
     ) -> NativeAlternativePaymentViewModelItem {
-        let isSelected = Binding<Bool> {
-            if case .string(let value) = parameter.value {
+        let isSelected = Binding<Bool> { [weak self] in
+            if case .string(let value) = self?.parameterValue(forKey: parameter.specification.key) {
                 return value == true.description
             }
             return false
@@ -642,6 +642,14 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             isInvalid: parameter.recentErrorMessage != nil
         )
         return .toggle(item)
+    }
+
+    /// Returns the most recent parameter value for given key.
+    ///
+    /// - NOTE: Mostly useful inside bindings to make sure that getter returns up
+    /// to date value instead of captured value that could be potentially stale.
+    private func parameterValue(forKey key: String) -> PONativeAlternativePaymentParameterValue? {
+        interactor.state.startedStateSnapshot?.parameters[key]?.value
     }
 
     // MARK: - Customer Instructions

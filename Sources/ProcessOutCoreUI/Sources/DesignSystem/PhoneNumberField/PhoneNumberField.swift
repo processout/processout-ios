@@ -36,6 +36,7 @@ public struct POPhoneNumberField: View {
         } number: {
             POTextField(text: $phoneNumber.number, formatter: formatter, prompt: numberPrompt)
                 .poKeyboardType(.numberPad)
+                .poTextContentType(.telephoneNumber)
         }
         AnyView(erasing: style.makeBody(configuration: configuration))
             .onTextFieldEditingDidChange { newValue in
