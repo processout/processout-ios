@@ -7,8 +7,8 @@
 
 extension ProcessOut {
 
-    /// The current version of this library, value is "4.42.0".
+    /// The current version of this library, value is "4.43.0".
     public static var version: String {
-        "4.42.0"
+        "4.43.0"
     }
 }
