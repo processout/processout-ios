@@ -52,7 +52,7 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
         try await service.initialize(
             try configurationParameters(with: configuration),
             locale: self.configuration.locale?.identifier,
-            uiCustomization: uiCustomization(from: self.configuration.uiCustomizations)
+            uiCustomization: self.configuration.uiCustomizationsV2
         )
         self.service = service
         let transaction = try await service.createTransaction(
@@ -233,22 +233,6 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
             roots: roots
         )
         return scheme
-    }
-
-    private func uiCustomization(
-        from rawCustomizations: [String: UiCustomization]?
-    ) -> [UiCustomization.UICustomizationType: UiCustomization]? {
-        guard let rawCustomizations else {
-            return nil
-        }
-        var customizations: [UiCustomization.UICustomizationType: UiCustomization] = [:]
-        for rawCustomization in rawCustomizations {
-            guard let customizationType = UiCustomization.UICustomizationType(rawValue: rawCustomization.key) else {
-                continue
-            }
-            customizations[customizationType] = rawCustomization.value
-        }
-        return customizations
     }
 
     // MARK: - OOB

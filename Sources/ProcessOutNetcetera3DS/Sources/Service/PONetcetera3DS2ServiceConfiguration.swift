@@ -31,6 +31,29 @@ public struct PONetcetera3DS2ServiceConfiguration {
     public init(
         authenticationMode: AuthenticationMode = .compatibility,
         locale: Locale? = nil,
+        uiCustomizations: [UiCustomization.UICustomizationType: UiCustomization]? = nil,
+        showsProgressView: Bool = true,
+        bridgingExtensionVersion: BridgingExtensionVersion? = nil,
+        returnUrl: URL? = nil,
+        challengeTimeout: TimeInterval = 5 * 60,
+        logLevel: LogLevel = .error
+    ) {
+        self.authenticationMode = authenticationMode
+        self.locale = locale
+        self.uiCustomizationsV2 = uiCustomizations
+        self.showsProgressView = showsProgressView
+        self.bridgingExtensionVersion = bridgingExtensionVersion
+        self.returnUrl = returnUrl
+        self.challengeTimeout = challengeTimeout
+        self.logLevel = logLevel
+    }
+
+    /// Creates configuration instance.
+    @_disfavoredOverload
+    @available(*, deprecated, message: "Use init that accepts typed uiCustomizations instead.")
+    public init(
+        authenticationMode: AuthenticationMode = .compatibility,
+        locale: Locale? = nil,
         uiCustomizations: [String: UiCustomization]? = nil,
         showsProgressView: Bool = true,
         bridgingExtensionVersion: BridgingExtensionVersion? = nil,
@@ -40,7 +63,7 @@ public struct PONetcetera3DS2ServiceConfiguration {
     ) {
         self.authenticationMode = authenticationMode
         self.locale = locale
-        self.uiCustomizations = uiCustomizations
+        self.uiCustomizationsV2 = uiCustomizations.map(Self.uiCustomizationV2(from:))
         self.showsProgressView = showsProgressView
         self.bridgingExtensionVersion = bridgingExtensionVersion
         self.returnUrl = returnUrl
@@ -57,7 +80,17 @@ public struct PONetcetera3DS2ServiceConfiguration {
     /// UI configuration information that is used to specify the UI layout and theme. For example, font
     /// style and font size. Use UICustomizationType raw values as String keys for the uiCustomizations
     /// dictionary. Each key represents a UI customization for a particular iOS appearance.
-    public let uiCustomizations: [String: UiCustomization]?
+    @available(*, deprecated, message: "Use typed uiCustomizationsV2 instead.")
+    public var uiCustomizations: [String: UiCustomization]? {
+        uiCustomizationsV2.map { uiCustomizationsV2 in
+            Dictionary(uniqueKeysWithValues: uiCustomizationsV2.map { ($0.key.rawValue, $0.value) })
+        }
+    }
+
+    /// Typed UI configuration information that is used to specify the UI layout and theme. For example, font
+    /// style and font size. Use UICustomizationType raw values as String keys for the uiCustomizations
+    /// dictionary. Each key represents a UI customization for a particular iOS appearance.
+    public let uiCustomizationsV2: [UiCustomization.UICustomizationType: UiCustomization]?
 
     /// Indicates whether progress view is going to be presented to user during authentication.
     public let showsProgressView: Bool
@@ -80,4 +113,19 @@ public struct PONetcetera3DS2ServiceConfiguration {
 
     /// Netcetera SDK log level. Defaults to `.error`.
     public let logLevel: LogLevel
+
+    // MARK: - Private Methods
+
+    private static func uiCustomizationV2(
+        from customizations: [String: UiCustomization]
+    ) -> [UiCustomization.UICustomizationType: UiCustomization] {
+        var customizationsV2: [UiCustomization.UICustomizationType: UiCustomization] = [:]
+        customizations.forEach { typeRawValue, customization in
+            guard let type = UiCustomization.UICustomizationType(rawValue: typeRawValue) else {
+                return
+            }
+            customizationsV2[type] = customization
+        }
+        return customizationsV2
+    }
 }
