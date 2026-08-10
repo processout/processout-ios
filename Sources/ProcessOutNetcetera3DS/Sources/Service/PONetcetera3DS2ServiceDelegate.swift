@@ -7,6 +7,7 @@
 
 import ProcessOut
 import ThreeDS_SDK
+import UIKit
 
 /// A delegate that allows customization of the 3DS2 flow in `PONetcetera3DS2Service`.
 public protocol PONetcetera3DS2ServiceDelegate: AnyObject, Sendable {

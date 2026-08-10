@@ -6,6 +6,7 @@
 //
 
 import ThreeDS_SDK
+import UIKit
 
 extension Transaction {
 
@@ -17,15 +18,17 @@ extension Transaction {
             let statusReceiver = BlockChallengeStatusReceiver { status in
                 continuation.resume(returning: status)
             }
-            do {
-                try doChallenge(
-                    challengeParameters: challengeParameters,
-                    challengeStatusReceiver: statusReceiver,
-                    timeOut: timeout,
-                    inViewController: viewController
-                )
-            } catch {
-                continuation.resume(throwing: error)
+            Task {
+                do {
+                    try await doChallenge(
+                        challengeParameters: challengeParameters,
+                        challengeStatusReceiver: statusReceiver,
+                        timeOut: timeout,
+                        inViewController: viewController
+                    )
+                } catch {
+                    continuation.resume(throwing: error)
+                }
             }
         }
     }
