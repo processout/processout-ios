@@ -15,8 +15,8 @@ packages:
     url: https://github.com/checkout/checkout-3ds-sdk-ios
     version: 3.3.3
   ThreeDS_SDK:
-    url: https://github.com/ios-3ds-sdk/SPM.git
-    version: 2.5.32
+    url: https://github.com/netceteragroup/ios-3ds-sdk-spm
+    version: 2.7.00
 targets:
   ProcessOutCoreUI:
     type: framework

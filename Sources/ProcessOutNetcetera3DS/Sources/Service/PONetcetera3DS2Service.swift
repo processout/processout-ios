@@ -52,10 +52,10 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
         try await service.initialize(
             try configurationParameters(with: configuration),
             locale: self.configuration.locale?.identifier,
-            uiCustomizationMap: self.configuration.uiCustomizations
+            uiCustomization: uiCustomization(from: self.configuration.uiCustomizations)
         )
         self.service = service
-        let transaction = try service.createTransaction(
+        let transaction = try await service.createTransaction(
             directoryServerId: configuration.directoryServerId, messageVersion: configuration.messageVersion
         )
         self.transaction = transaction
@@ -116,12 +116,12 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
             await MainActor.run {
                 try? transaction.getProgressView().stop()
             }
-            try? transaction.close()
+            try? await transaction.close()
             self.transaction = nil
         }
         transactionId = nil
         if let service {
-            try? service.cleanup()
+            try? await service.cleanup()
             self.service = nil
         }
         deepLinkObservation = nil
@@ -233,6 +233,22 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
             roots: roots
         )
         return scheme
+    }
+
+    private func uiCustomization(
+        from rawCustomizations: [String: UiCustomization]?
+    ) -> [UiCustomization.UICustomizationType: UiCustomization]? {
+        guard let rawCustomizations else {
+            return nil
+        }
+        var customizations: [UiCustomization.UICustomizationType: UiCustomization] = [:]
+        for rawCustomization in rawCustomizations {
+            guard let customizationType = UiCustomization.UICustomizationType(rawValue: rawCustomization.key) else {
+                continue
+            }
+            customizations[customizationType] = rawCustomization.value
+        }
+        return customizations
     }
 
     // MARK: - OOB

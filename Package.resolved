@@ -1,5 +1,5 @@
 {
-  "originHash" : "5d9befdbb8cbea133392e0403fde6278e16acb4277379c8e3448a46a2de21ced",
+  "originHash" : "81219b36d7dde792b257b8b81e3a2a828f19cffb1a8ffc6031132cf6642991e3",
   "pins" : [
     {
       "identity" : "checkout-3ds-sdk-ios",
@@ -24,8 +24,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/netceteragroup/ios-3ds-sdk-spm",
       "state" : {
-        "revision" : "0cabeb92c66959ab922cd1e872e8dbaecc66174a",
-        "version" : "2.6.0"
+        "revision" : "e2fe4a1430d3d3185ea7c84b87a0cfdefbe3e077",
+        "version" : "2.7.0"
       }
     },
     {
