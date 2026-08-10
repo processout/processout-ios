@@ -178,7 +178,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         }
         setFailureState(
             error: POFailure(
-                message: "Alternative payment has been canceled. Reason: \(reason).",
+                message: "Alternative payment has been canceled. Reason: '\(reason)'.",
                 code: .Mobile.cancelled
             )
         )

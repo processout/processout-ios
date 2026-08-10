@@ -45,6 +45,10 @@ public final class PONativeAlternativePaymentComponent {
         self.interactor = interactor
     }
 
+    deinit {
+        Task { @MainActor [interactor] in interactor.cancel(reason: .lifecycle) }
+    }
+
     /// Starts the payment.
     public func start() async {
         await interactor.start()
