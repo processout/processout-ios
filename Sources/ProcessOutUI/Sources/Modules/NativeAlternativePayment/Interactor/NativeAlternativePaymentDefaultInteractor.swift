@@ -159,7 +159,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         cancel(reason: .programmatic)
     }
 
-    func cancel(reason: NativeAlternativePaymentCancelationReason) {
+    func cancel(reason: NativeAlternativePaymentCancellationReason) {
         switch state {
         case .starting(let currentState):
             currentState.task.cancel()

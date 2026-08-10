@@ -1,5 +1,5 @@
 //
-//  NativeAlternativePaymentCancelationReason.swift
+//  NativeAlternativePaymentCancellationReason.swift
 //  ProcessOut
 //
 //  Created by Andrii Vysotskyi on 10.08.2026.
@@ -8,7 +8,7 @@
 import Foundation
 
 /// Describes the reason why the payment flow was cancelled.
-enum NativeAlternativePaymentCancelationReason {
+enum NativeAlternativePaymentCancellationReason {
 
     /// The customer explicitly cancelled the payment flow (for example, by tapping a Cancel button).
     case customer
