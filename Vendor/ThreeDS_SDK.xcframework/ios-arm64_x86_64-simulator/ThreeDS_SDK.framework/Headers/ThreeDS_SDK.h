@@ -1,4 +1,10 @@
-#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
+#import "NCAEllipticCurveCrypto.h"
+#import "NCAEllipticCurveCrypto+hash.h"
+#import "NCASSLCredentials.h"
+#import "NSData+NCASecurity.h"
+#import "BinaryEncryptionCheck.h"
+#import "NCAConfigParameters.h"
 
 //! Project version number for ThreeDS_SDK.
 FOUNDATION_EXPORT double ThreeDS_SDKVersionNumber;

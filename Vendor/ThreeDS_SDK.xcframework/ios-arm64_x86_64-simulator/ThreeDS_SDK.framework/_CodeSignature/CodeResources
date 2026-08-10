@@ -26,7 +26,7 @@
 		</data>
 		<key>Assets.car</key>
 		<data>
-		z5dTgPEGHmu4UFYPQQm+F5ALfuY=
+		+1O6ltUqcEtrNt+JL/kBHuPJdZM=
 		</data>
 		<key>BrandingZoneView.nib</key>
 		<data>
@@ -60,21 +60,49 @@
 		<data>
 		LEl/+QDrd2i523IJ3mSnDdoFKUE=
 		</data>
+		<key>GMEllipticCurveCrypto_LICENSE.txt</key>
+		<data>
+		eK9DqHrGTiR/F+E2OcDhNs8Vk4Q=
+		</data>
 		<key>GirdersSwift_LICENSE.txt</key>
 		<data>
 		YUrWIkNzwq3YsRH4fO6WFMRNK6Y=
 		</data>
+		<key>Headers/BinaryEncryptionCheck.h</key>
+		<data>
+		zwXgsfwFP7auiS8fyd08xxl82wc=
+		</data>
+		<key>Headers/NCAConfigParameters.h</key>
+		<data>
+		ZT7IPpD2YJSceIsvQEtaKMO/7uc=
+		</data>
+		<key>Headers/NCAEllipticCurveCrypto+hash.h</key>
+		<data>
+		gZqB0+VioTsF2afqgDVtCqAFI70=
+		</data>
+		<key>Headers/NCAEllipticCurveCrypto.h</key>
+		<data>
+		JdfIv5tCLzI5frMMHEIxNqy/kno=
+		</data>
+		<key>Headers/NCASSLCredentials.h</key>
+		<data>
+		1ONyvwywKtBpSBHeXKBGrtAQlM8=
+		</data>
+		<key>Headers/NSData+NCASecurity.h</key>
+		<data>
+		ZfGPEyzPchkZF6Ile01868/0cMA=
+		</data>
 		<key>Headers/ThreeDS_SDK-Swift.h</key>
 		<data>
-		JFnELeK+c2CgOSecxh3yzdj/lDA=
+		AulFCXrP8ieZuawb+DpUKRR8UW0=
 		</data>
 		<key>Headers/ThreeDS_SDK.h</key>
 		<data>
-		zeI3FcWAi+DdYAugfT9LCBZqwi8=
+		FiO13wBSDi19pzVPWSesd8qsFlc=
 		</data>
 		<key>Info.plist</key>
 		<data>
-		FXxpVGsiY29IbHQVpzhfQjKM+zU=
+		MA42cuOlkBX14dSKeg6fgi099UI=
 		</data>
 		<key>InformationView.nib</key>
 		<data>
@@ -82,47 +110,47 @@
 		</data>
 		<key>Modules/ThreeDS_SDK.swiftmodule/arm64-apple-ios-simulator.abi.json</key>
 		<data>
-		naeNcc/grcIR9mHSajm+xlHU8Ro=
+		p1YM65DXbLomoK7NqMVrU9QgACw=
 		</data>
 		<key>Modules/ThreeDS_SDK.swiftmodule/arm64-apple-ios-simulator.private.swiftinterface</key>
 		<data>
-		i5XzCTKbDc0PuXGYM/Z2c4eJXtM=
+		aSJnaMQuWzHMISeXQvxNR8uS8Ps=
 		</data>
 		<key>Modules/ThreeDS_SDK.swiftmodule/arm64-apple-ios-simulator.swiftdoc</key>
 		<data>
-		qDmR0Z78fxIMYBL7evwAl9CC0to=
+		ySjHto6g2IqTLn1bAChchIZ58SY=
 		</data>
 		<key>Modules/ThreeDS_SDK.swiftmodule/arm64-apple-ios-simulator.swiftinterface</key>
 		<data>
-		i5XzCTKbDc0PuXGYM/Z2c4eJXtM=
+		aSJnaMQuWzHMISeXQvxNR8uS8Ps=
 		</data>
 		<key>Modules/ThreeDS_SDK.swiftmodule/arm64-apple-ios-simulator.swiftmodule</key>
 		<data>
-		l5OV3IM9xmh5K0ab3Fyl5GZkW88=
+		YVJkzuxOQTvtsUETTypz+JIBeek=
 		</data>
 		<key>Modules/ThreeDS_SDK.swiftmodule/x86_64-apple-ios-simulator.abi.json</key>
 		<data>
-		naeNcc/grcIR9mHSajm+xlHU8Ro=
+		p1YM65DXbLomoK7NqMVrU9QgACw=
 		</data>
 		<key>Modules/ThreeDS_SDK.swiftmodule/x86_64-apple-ios-simulator.private.swiftinterface</key>
 		<data>
-		57zGKDNQI0+nBX6yyX5Evd5Z5N4=
+		03LI330jcKEVw1B2imXyuB74how=
 		</data>
 		<key>Modules/ThreeDS_SDK.swiftmodule/x86_64-apple-ios-simulator.swiftdoc</key>
 		<data>
-		Ve5rD4IYhPoL4nYRmPN91Kc3Zg8=
+		0wM9ged+uvtRc3WsjbLwYnKD6GQ=
 		</data>
 		<key>Modules/ThreeDS_SDK.swiftmodule/x86_64-apple-ios-simulator.swiftinterface</key>
 		<data>
-		57zGKDNQI0+nBX6yyX5Evd5Z5N4=
+		03LI330jcKEVw1B2imXyuB74how=
 		</data>
 		<key>Modules/ThreeDS_SDK.swiftmodule/x86_64-apple-ios-simulator.swiftmodule</key>
 		<data>
-		TrlSzlDVCO8+TFdOVypf86paFMM=
+		FJE/crx7QK2+s5+bRvp1bP2sWqw=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
-		EDtAkFZmsld+Hg03OzlBcjdejqk=
+		KUdSnXqM7YY2TOYF0/yKBZDo77o=
 		</data>
 		<key>OobView.nib</key>
 		<data>
@@ -150,7 +178,7 @@
 		</data>
 		<key>SelectionView.nib</key>
 		<data>
-		4S+3bWnCX1DxqFvJR3gP0n31USA=
+		g9cze/AK86EPPHR8K/dejDJ5boE=
 		</data>
 		<key>WhitelistingZone.nib</key>
 		<data>
@@ -258,7 +286,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			KKLw+yJzDT158b4YXrOb103maRAZgNnIfjqwQzAKnbc=
+			7OLqcyA0A1fX6Ni4DRSCUehuSiNK/1hVM3yITit+Snw=
 			</data>
 		</dict>
 		<key>BrandingZoneView.nib</key>
@@ -317,6 +345,13 @@
 			eLxUEfkObjPN5uxvwXRuDsjAXf0zW30hQ0DzbzfRh6s=
 			</data>
 		</dict>
+		<key>GMEllipticCurveCrypto_LICENSE.txt</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			CRFRzoBVg/QTdQrGYi1uzcTOJGcCOlRtNA4c+zrEwM4=
+			</data>
+		</dict>
 		<key>GirdersSwift_LICENSE.txt</key>
 		<dict>
 			<key>hash2</key>
@@ -324,18 +359,60 @@
 			5vQnVYvfAciD6hjxJXr4jjnZOkrhqheUiNJidarBIhE=
 			</data>
 		</dict>
+		<key>Headers/BinaryEncryptionCheck.h</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			MfDkWdKIyvQCr3IR6yNCYuK6cp28yVp4Id0/xc74ylc=
+			</data>
+		</dict>
+		<key>Headers/NCAConfigParameters.h</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			Tk51H7COuFSelsfYv+F5isBFIkrtj9lLtBhWRMXLtxE=
+			</data>
+		</dict>
+		<key>Headers/NCAEllipticCurveCrypto+hash.h</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			BADsyW9aGA/5XM2mqC1VoE8yrbYOKC8E0jRqOgJxwRU=
+			</data>
+		</dict>
+		<key>Headers/NCAEllipticCurveCrypto.h</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			1PMvNU2cibHQdPGfMbynNK7l7ZVMmn+BG4vXrP0eBh0=
+			</data>
+		</dict>
+		<key>Headers/NCASSLCredentials.h</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			/M0CZMiZWmaT7CrVyM7wTprCWaHJ8FjXowJcJksH6Ic=
+			</data>
+		</dict>
+		<key>Headers/NSData+NCASecurity.h</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			xYXQ0WKAm+Fb58G3e4G1GRPMlik59hOcxioRAfEnhBc=
+			</data>
+		</dict>
 		<key>Headers/ThreeDS_SDK-Swift.h</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			BwBZucE75J2gApyQ2bi2i+XoDgs0VgO0IYzm0i1qe7M=
+			fUPich1YOkLA9Y+8UlX15BcXgAEAa4eFWOUvzRQpt9s=
 			</data>
 		</dict>
 		<key>Headers/ThreeDS_SDK.h</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			Z9jegqWXhmc+mzjJSCA4W7Itk0U8iBwxMaqEIKz4qB0=
+			mjCwSVV8Dn7fi7pVKjPbvjcP1HR/MnpriYmNrNaEcZI=
 			</data>
 		</dict>
 		<key>InformationView.nib</key>
@@ -349,77 +426,77 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			F2kEw+VerpCkaQSSIyIHAgBdSdQl96DAb4XZJ8+JnHk=
+			grBopm5yxESm6g/Sr8CYXPCzx8gi1rB12cNOWbnZqco=
 			</data>
 		</dict>
 		<key>Modules/ThreeDS_SDK.swiftmodule/arm64-apple-ios-simulator.private.swiftinterface</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			9cewzvTVWF9SFh+CshEiWtRYKI0o2JHjPz04rf8G2YI=
+			VYdPoy8DRr6cj0mzXMhob9vNX0IEjcPQmAt9TlqxB6A=
 			</data>
 		</dict>
 		<key>Modules/ThreeDS_SDK.swiftmodule/arm64-apple-ios-simulator.swiftdoc</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			h+m6VeFZjmrpfeCbwzvaKC6m87b0Wgvkei9NUg1wBoA=
+			8RY0UvK95IywEUxQ5yh0v8WxLzz56UAR7/4r9PH97GI=
 			</data>
 		</dict>
 		<key>Modules/ThreeDS_SDK.swiftmodule/arm64-apple-ios-simulator.swiftinterface</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			9cewzvTVWF9SFh+CshEiWtRYKI0o2JHjPz04rf8G2YI=
+			VYdPoy8DRr6cj0mzXMhob9vNX0IEjcPQmAt9TlqxB6A=
 			</data>
 		</dict>
 		<key>Modules/ThreeDS_SDK.swiftmodule/arm64-apple-ios-simulator.swiftmodule</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			BJK3KI1cBUDtlDr4lgxoNd9Wen/XPC1mCbyOPs+OfYM=
+			P6SYbhHo5XjvwvmFEWuxHo5Sln9LxW9KkWVNblB3/lA=
 			</data>
 		</dict>
 		<key>Modules/ThreeDS_SDK.swiftmodule/x86_64-apple-ios-simulator.abi.json</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			F2kEw+VerpCkaQSSIyIHAgBdSdQl96DAb4XZJ8+JnHk=
+			grBopm5yxESm6g/Sr8CYXPCzx8gi1rB12cNOWbnZqco=
 			</data>
 		</dict>
 		<key>Modules/ThreeDS_SDK.swiftmodule/x86_64-apple-ios-simulator.private.swiftinterface</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			94w7++pHPmbcc3LsYVG9gl1ot5O72fAxiAUxenPNq0E=
+			B6lxjiaFJTjk9v9yOZRrSY/yVaIHr0iJwp+mhm/xd0s=
 			</data>
 		</dict>
 		<key>Modules/ThreeDS_SDK.swiftmodule/x86_64-apple-ios-simulator.swiftdoc</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			1IUBfBwHTR6b6hxO4tRRAvB75VsZaMDhkDM3NmIOMBg=
+			Baw2sij+XxtUO/vCyqTsZzJTgSLz/GleI8KHPQZVYxs=
 			</data>
 		</dict>
 		<key>Modules/ThreeDS_SDK.swiftmodule/x86_64-apple-ios-simulator.swiftinterface</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			94w7++pHPmbcc3LsYVG9gl1ot5O72fAxiAUxenPNq0E=
+			B6lxjiaFJTjk9v9yOZRrSY/yVaIHr0iJwp+mhm/xd0s=
 			</data>
 		</dict>
 		<key>Modules/ThreeDS_SDK.swiftmodule/x86_64-apple-ios-simulator.swiftmodule</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			48/UDfXsu2niXKCdYf3tE5PNUcuEfDmzIlLf/3Bqi6I=
+			4PORQlLnssHuY03QsE5+bRNOeqH7CwuuZHafnygG75E=
 			</data>
 		</dict>
 		<key>Modules/module.modulemap</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			preWsJPyaJecPYpQ7LdzFVpA75cxzyqTSuJDn4riFlk=
+			WN8cfa4U1Pmf6wNMbXFE40IxvzZQLMaPBGS45F8mGbw=
 			</data>
 		</dict>
 		<key>OobView.nib</key>
@@ -468,7 +545,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			9tH6f2j0+UZqpzTfccnl1HyRtB9QseCn6yt1L90uWr8=
+			1cCU4zruRu2FCSNQg59W9uWqChsSDtK6fcZAYuYxHEc=
 			</data>
 		</dict>
 		<key>WhitelistingZone.nib</key>
