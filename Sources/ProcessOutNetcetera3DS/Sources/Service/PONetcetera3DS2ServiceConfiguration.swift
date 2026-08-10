@@ -87,9 +87,8 @@ public struct PONetcetera3DS2ServiceConfiguration {
         }
     }
 
-    /// Typed UI configuration information that is used to specify the UI layout and theme. For example, font
-    /// style and font size. Use UICustomizationType raw values as String keys for the uiCustomizations
-    /// dictionary. Each key represents a UI customization for a particular iOS appearance.
+    /// Typed UI configuration information that is used to specify the UI layout and theme.
+    /// For example, font style and font size.
     public let uiCustomizationsV2: [UiCustomization.UICustomizationType: UiCustomization]?
 
     /// Indicates whether progress view is going to be presented to user during authentication.
