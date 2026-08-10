@@ -14,7 +14,7 @@ enum NativeAlternativePaymentCancelationReason {
     case customer
 
     /// The payment flow was cancelled because the associated objects were released as part of the
-    /// application's lifecycle.
+    /// lifecycle.
     ///
     /// This commonly happens when the screen is dismissed, but it can also occur for other reasons
     /// that result in the flow being deallocated.
