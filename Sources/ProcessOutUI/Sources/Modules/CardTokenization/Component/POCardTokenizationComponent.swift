@@ -26,6 +26,10 @@ public final class POCardTokenizationComponent {
         self.interactor = interactor
     }
 
+    deinit {
+        Task { @MainActor [interactor] in interactor.cancel() }
+    }
+
     /// Starts the card tokenization process.
     public func tokenize() {
         interactor.tokenize()
