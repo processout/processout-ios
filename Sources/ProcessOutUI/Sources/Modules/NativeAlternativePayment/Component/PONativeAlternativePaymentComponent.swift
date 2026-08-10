@@ -52,7 +52,7 @@ public final class PONativeAlternativePaymentComponent {
 
     /// Cancels the ongoing payment.
     public func cancel() {
-        interactor.cancel()
+        interactor.cancel(reason: .programmatic)
     }
 
     // MARK: - Internal

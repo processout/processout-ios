@@ -20,7 +20,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     }
 
     deinit {
-        Task { @MainActor [interactor] in interactor.cancel() }
+        Task { @MainActor [interactor] in interactor.cancel(reason: .lifecycle) }
     }
 
     // MARK: - NativeAlternativePaymentViewModel
@@ -413,7 +413,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             accessibilityLabel: configuration.title ?? defaultTitle,
             confirmation: nil,
             action: { [weak self] in
-                self?.interactor.cancel()
+                self?.interactor.cancel(reason: .customer)
             }
         )
         return .button(viewModel)
@@ -833,7 +833,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
                 }
             },
             action: { [weak self] in
-                self?.interactor.cancel()
+                self?.interactor.cancel(reason: .customer)
             }
         )
         return action

@@ -33,4 +33,7 @@ protocol NativeAlternativePaymentInteractor: Interactor<NativeAlternativePayment
 
     /// Notifies interactor that user requested cancel confirmation.
     func didRequestCancelConfirmation()
+
+    /// Explicitly cancels payment with specified reason.
+    func cancel(reason: NativeAlternativePaymentCancelationReason)
 }

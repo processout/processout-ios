@@ -151,7 +151,15 @@ final class NativeAlternativePaymentDefaultInteractor:
         state = .redirecting(newState)
     }
 
+    func didRequestCancelConfirmation() {
+        send(event: .didRequestCancelConfirmation)
+    }
+
     override func cancel() {
+        cancel(reason: .programmatic)
+    }
+
+    func cancel(reason: NativeAlternativePaymentCancelationReason) {
         switch state {
         case .starting(let currentState):
             currentState.task.cancel()
@@ -168,11 +176,12 @@ final class NativeAlternativePaymentDefaultInteractor:
         default:
             break
         }
-        setFailureState(error: POFailure(message: "Alternative payment has been canceled.", code: .Mobile.cancelled))
-    }
-
-    func didRequestCancelConfirmation() {
-        send(event: .didRequestCancelConfirmation)
+        setFailureState(
+            error: POFailure(
+                message: "Alternative payment has been canceled. Reason: \(reason).",
+                code: .Mobile.cancelled
+            )
+        )
     }
 
     // MARK: - Private Properties
