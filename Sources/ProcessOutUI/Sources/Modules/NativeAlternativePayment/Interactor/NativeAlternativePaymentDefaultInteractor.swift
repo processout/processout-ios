@@ -204,14 +204,15 @@ final class NativeAlternativePaymentDefaultInteractor:
             } else {
                 try await setStartedState(response: response)
             }
-        case .pending:
+        case .pending, .authorizationPending:
             await setAwaitingCompletionState(response: response)
-        case .success:
+        case .customerActionsCompleted:
+            try await setFinalizingPaymentState(with: response)
+        case .authorized, .success:
             await setCompletedState(response: response)
         default:
             logger.error("Unexpected alternative payment state: \(response.state).")
-            let failure = POFailure(message: "Something went wrong.", code: .Mobile.generic)
-            setFailureState(error: failure)
+            throw POFailure(message: "Something went wrong.", code: .Mobile.generic)
         }
     }
 
@@ -430,6 +431,27 @@ final class NativeAlternativePaymentDefaultInteractor:
             options = [:]
         }
         return await UIApplication.shared.open(url, options: options)
+    }
+
+    // MARK: - Payment Finalization
+
+    /// - NOTE: Payment finalization is an ephemeral state meaning there is no explicit
+    /// representation for it in interactor's state machine.
+    private func setFinalizingPaymentState(with response: NativeAlternativePaymentServiceAdapterResponse) async throws {
+        guard let availableActions = response.availableActions else {
+            throw POFailure(message: "No available actions to finalize payment.", code: .Mobile.internal)
+        }
+        guard let delegate else {
+            throw POFailure(message: "Delegate is not set, unable to finalize payment.", code: .Mobile.internal)
+        }
+        try await delegate.nativeAlternativePayment(finalizeWith: availableActions)
+        let finalizedPaymentResponse = try await serviceAdapter.continuePayment(
+            with: .init(
+                flow: configuration.flow,
+                localeIdentifier: configuration.localization.localeOverride?.identifier
+            )
+        )
+        try await setState(with: finalizedPaymentResponse)
     }
 
     // MARK: - Completed State
