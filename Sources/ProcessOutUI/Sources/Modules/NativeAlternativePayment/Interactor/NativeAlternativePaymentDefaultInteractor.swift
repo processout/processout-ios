@@ -976,7 +976,8 @@ final class NativeAlternativePaymentDefaultInteractor:
             paymentMethod: response.paymentMethod,
             invoice: response.invoice,
             elements: response.elements,
-            redirect: response.redirect
+            redirect: response.redirect,
+            availableActions: response.availableActions
         )
         Task { @MainActor in
             do {

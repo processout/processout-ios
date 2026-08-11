@@ -25,5 +25,5 @@ public struct PONativeAlternativePaymentAuthorizationResponseV2: Sendable, Decod
     public let redirect: PONativeAlternativePaymentRedirectV2?
 
     /// Currently available actions to advance payment.
-    public let availableActions: PONativeAlternativePaymentAvailableActionV2?
+    public let availableActions: [PONativeAlternativePaymentAvailableActionV2]?
 }
