@@ -36,7 +36,7 @@ extension PONativeAlternativePaymentDelegateV2 {
     public func nativeAlternativePayment(
         finalizeWith availableActions: [PONativeAlternativePaymentAvailableActionV2]
     ) async throws(POFailure) {
-        assertionFailure("Method must be implemented when manual finalization is enabled.")
+        assertionFailure("Method must be implemented when manual finalization is used.")
         throw .init(message: "Manual finalization is not implemented.", code: .Mobile.generic)
     }
 }
