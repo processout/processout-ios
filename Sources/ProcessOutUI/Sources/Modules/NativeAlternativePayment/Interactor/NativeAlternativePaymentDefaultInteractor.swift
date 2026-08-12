@@ -114,16 +114,11 @@ final class NativeAlternativePaymentDefaultInteractor:
                         )
                     )
                     logger.debug("More parameters are expected, waiting for parameters to update.")
-                case .success, .pending:
+                default:
                     send(
                         event: .didSubmitParameters(
                             .init(parameters: submittedParametersSpecifications, additionalParametersExpected: false)
                         )
-                    )
-                default:
-                    setFailureState(
-                        error: POFailure(message: "Unexpected payment state.", code: .Mobile.generic),
-                        paymentState: payment.state
                     )
                 }
                 try await setState(with: payment)
