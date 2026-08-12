@@ -5,13 +5,26 @@
 //  Created by Andrii Vysotskyi on 11.08.2026.
 //
 
-public struct PONativeAlternativePaymentAvailableActionV2: Sendable, Decodable {
+public struct PONativeAlternativePaymentAvailableActionV2: Sendable {
 
     /// The string value representing the type of barcode.
     public let rawValue: String
 
     public init(rawValue: String) {
         self.rawValue = rawValue
+    }
+}
+
+extension PONativeAlternativePaymentAvailableActionV2: Codable {
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        rawValue = try container.decode(String.self)
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(self.rawValue)
     }
 }
 
