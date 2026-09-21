@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 import SwiftUI
-import ProcessOut
+@_spi(PO) import ProcessOut
 import ProcessOutUI
 
 @MainActor
@@ -19,6 +19,7 @@ final class AlternativePaymentsViewModel: ObservableObject {
         cancellables = []
         observeInteractorStateChanges()
         updateStateFlows()
+        updateStateFinalizationModes()
     }
 
     // MARK: - AlternativePaymentsViewModel
@@ -133,8 +134,14 @@ final class AlternativePaymentsViewModel: ObservableObject {
         state.flow = .init(sources: flows, id: \.self, selection: .payment)
     }
 
+    private func updateStateFinalizationModes() {
+        let modes: [AlternativePaymentsViewModelState.FinalizationMode] = [.automatic, .authorization, .capture]
+        state.finalizationMode = .init(sources: modes, id: \.self, selection: .automatic)
+    }
+
     // MARK: -
 
+    // swiftlint:disable:next function_body_length
     private func startPayment() async {
         guard let gatewayConfigurationId = state.gatewayConfiguration?.selection else {
             return
@@ -142,7 +149,11 @@ final class AlternativePaymentsViewModel: ObservableObject {
         do {
             let invoice = if state.invoice.id.isEmpty {
                 try await interactor.createInvoice(
-                    amount: state.invoice.amount, currencyCode: state.invoice.currencyCode
+                    amount: state.invoice.amount,
+                    currencyCode: state.invoice.currencyCode,
+                    paymentConfiguration: paymentConfiguration(
+                        with: state.finalizationMode.selection
+                    )
                 )
             } else {
                 try await interactor.invoice(id: state.invoice.id)
@@ -186,6 +197,17 @@ final class AlternativePaymentsViewModel: ObservableObject {
         }
     }
 
+    private func paymentConfiguration(
+        with finalizationMode: AlternativePaymentsViewModelState.FinalizationMode
+    ) -> POInvoiceCreationRequest.PaymentConfiguration {
+        switch finalizationMode {
+        case .automatic:
+            .init(apm: .init(preferredFinalizationMode: .automatic))
+        case .authorization, .capture:
+            .init(apm: .init(preferredFinalizationMode: .manual))
+        }
+    }
+
     private func authorizeNatively(
         invoice: POInvoice, flow: PONativeAlternativePaymentConfiguration.Flow
     ) async throws {
@@ -200,8 +222,15 @@ final class AlternativePaymentsViewModel: ObservableObject {
                 showProgressViewAfter: 5, confirmButton: .init(), cancelButton: .init(disabledFor: 10)
             )
         )
+        let delegate = NativeAlternativePaymentDelegate(
+            invoiceId: invoice.id,
+            finalizationMode: state.finalizationMode.selection,
+            interactor: interactor
+        )
         var continuation: CheckedContinuation<Void, any Error>?, result: Result<Void, POFailure>?
-        let component = PONativeAlternativePaymentComponent(configuration: configuration) { [weak self] paymentResult in
+        let component = PONativeAlternativePaymentComponent(
+            configuration: configuration, delegate: delegate
+        ) { [weak self] paymentResult in
             self?.state.nativePayment = nil
             continuation?.resume(with: paymentResult)
             result = paymentResult
@@ -215,7 +244,70 @@ final class AlternativePaymentsViewModel: ObservableObject {
             continuation = newContinuation
             state.nativePayment = .init(id: UUID().uuidString, component: component)
         }
+        withExtendedLifetime(delegate) { } // Ensure delegate is kept alive for a duration of the payment
     }
+}
+
+@MainActor
+private final class NativeAlternativePaymentDelegate: PONativeAlternativePaymentDelegateV2 {
+
+    init(
+        invoiceId: String,
+        finalizationMode: AlternativePaymentsViewModelState.FinalizationMode,
+        interactor: AlternativePaymentsInteractor
+    ) {
+        self.invoiceId = invoiceId
+        self.finalizationMode = finalizationMode
+        self.interactor = interactor
+    }
+
+    // MARK: - PONativeAlternativePaymentDelegateV2
+
+    func nativeAlternativePayment(didEmitEvent event: PONativeAlternativePaymentEventV2) {
+        // Ignored
+    }
+
+    func nativeAlternativePayment(
+        defaultValuesFor parameters: [PONativeAlternativePaymentFormV2.Parameter]
+    ) async -> [String: PONativeAlternativePaymentParameterValue] {
+        [:]
+    }
+
+    func nativeAlternativePayment(
+        finalizeWith availableActions: [PONativeAlternativePaymentAvailableActionV2]
+    ) async throws(POFailure) {
+        do {
+            switch finalizationMode {
+            case .automatic:
+                throw POFailure(
+                    message: "Payment with automatic finalization mode is not expected to be finalized manually.",
+                    code: .Mobile.generic
+                )
+            case .authorization:
+                guard availableActions.contains(.authorize) else {
+                    throw POFailure(message: "Authorization is not available.", code: .Mobile.generic)
+                }
+                try await interactor.authorize(invoiceId: invoiceId)
+            case .capture:
+                guard availableActions.contains(.capture) else {
+                    throw POFailure(message: "Capture is not available.", code: .Mobile.generic)
+                }
+                try await interactor.capture(invoiceId: invoiceId)
+            }
+        } catch let failure as POFailure {
+            throw failure
+        } catch {
+            throw POFailure(
+                message: "Unable to finalize payment.", code: .Mobile.generic, underlyingError: error
+            )
+        }
+    }
+
+    // MARK: - Private Properties
+
+    private let invoiceId: String
+    private let finalizationMode: AlternativePaymentsViewModelState.FinalizationMode
+    private let interactor: AlternativePaymentsInteractor
 }
 
 extension AlternativePaymentsViewModel {
