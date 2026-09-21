@@ -7,9 +7,11 @@
 
 import Foundation
 
+// swiftlint:disable nesting
+
 @_spi(PO)
 public struct POInvoiceCreationRequest: Encodable, Sendable {
-    
+
     /// Payment configuration of the invoice.
     public struct PaymentConfiguration: Encodable, Sendable {
 
@@ -106,3 +108,5 @@ public struct POInvoiceCreationRequest: Encodable, Sendable {
         self.paymentConfiguration = paymentConfiguration
     }
 }
+
+// swiftlint:enable nesting

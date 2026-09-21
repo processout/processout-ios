@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 11.08.2026.
 //
 
-public struct PONativeAlternativePaymentAvailableActionV2: Sendable {
+public struct PONativeAlternativePaymentAvailableActionV2: Sendable, Hashable {
 
     /// The string value representing the type of barcode.
     public let rawValue: String
