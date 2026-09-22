@@ -7,7 +7,7 @@
 
 public struct PONativeAlternativePaymentAvailableActionV2: Sendable, Hashable {
 
-    /// The string value representing the type of barcode.
+    /// The string value representing the action.
     public let rawValue: String
 
     public init(rawValue: String) {

@@ -142,7 +142,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             do {
                 try await uncheckedRedirect(to: currentState.redirect)
             } catch {
-                setFailureState(error: error, paymentState: .nextStepRequired)
+                setFailureState(error: error, paymentState: currentState.paymentState)
             }
         }
         let newState = State.Redirecting(task: task, snapshot: currentState)
@@ -509,7 +509,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             return
         }
         guard let failure = error as? POFailure else {
-            setFailureState(error: error, paymentState: .nextStepRequired)
+            setFailureState(error: error, paymentState: newState.paymentState)
             return
         }
         let invalidFields = failure.invalidFields.map { invalidFields in
@@ -517,7 +517,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         }
         guard let invalidFields = invalidFields, !invalidFields.isEmpty else {
             logger.debug("Submission error is not recoverable, aborting.")
-            setFailureState(error: failure, paymentState: .nextStepRequired)
+            setFailureState(error: failure, paymentState: newState.paymentState)
             return
         }
         for parameter in newState.parameters.values {
@@ -548,9 +548,10 @@ final class NativeAlternativePaymentDefaultInteractor:
             logger.error("Unexpected error type: \(error)")
             failure = POFailure(message: "Something went wrong.", code: .Mobile.generic, underlyingError: error)
         }
+        let resolvedPaymentState = paymentState ?? state.paymentState
         state = .failure(failure)
         let failureEvent = PONativeAlternativePaymentEventV2.DidFail(
-            failure: failure, paymentState: paymentState ?? state.paymentState
+            failure: failure, paymentState: resolvedPaymentState
         )
         send(event: .didFail(failureEvent))
         completion(.failure(failure))
@@ -996,7 +997,9 @@ final class NativeAlternativePaymentDefaultInteractor:
                 switch state {
                 case .idle, .started, .awaitingRedirect:
                     try await setState(with: adapterResponse)
-                case .awaitingCompletion(let currentState) where adapterResponse.state != .pending:
+                case .awaitingCompletion(let currentState)
+                    where ![.pending, .authorizationPending].contains(adapterResponse.state):
+
                     currentState.task?.cancel()
                     try await setState(with: adapterResponse)
                 default:
