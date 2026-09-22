@@ -54,14 +54,21 @@ final class NativeAlternativePaymentDefaultInteractor:
         logger.info("Starting native alternative payment.")
         send(event: .willStart)
         let task = Task { @MainActor in
+            let payment: NativeAlternativePaymentServiceAdapterResponse
             do {
                 let request = NativeAlternativePaymentServiceAdapterRequest(
-                    flow: configuration.flow, localeIdentifier: configuration.localization.localeOverride?.identifier
+                    flow: configuration.flow,
+                    localeIdentifier: configuration.localization.localeOverride?.identifier
                 )
-                let payment = try await serviceAdapter.continuePayment(with: request)
-                try await setState(with: payment)
+                payment = try await serviceAdapter.continuePayment(with: request)
             } catch {
                 setFailureState(error: error, paymentState: nil)
+                return
+            }
+            do {
+                try await setState(with: payment)
+            } catch {
+                setFailureState(error: error, paymentState: payment.state)
             }
         }
         state = .starting(.init(task: task))
@@ -97,6 +104,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         }
         willSubmit(parameters: Array(currentState.parameters.values))
         let task = Task { @MainActor in
+            let payment: NativeAlternativePaymentServiceAdapterResponse
             do {
                 let values = try validatedValues(for: Array(currentState.parameters.values))
                 let request = NativeAlternativePaymentServiceAdapterRequest(
@@ -104,26 +112,27 @@ final class NativeAlternativePaymentDefaultInteractor:
                     submitData: .init(parameters: values),
                     localeIdentifier: configuration.localization.localeOverride?.identifier
                 )
-                let payment = try await serviceAdapter.continuePayment(with: request)
-                let submittedParametersSpecifications = Array(currentState.parameters.values.map(\.specification))
-                switch payment.state {
-                case .nextStepRequired:
-                    send(
-                        event: .didSubmitParameters(
-                            .init(parameters: submittedParametersSpecifications, additionalParametersExpected: true)
-                        )
-                    )
-                    logger.debug("More parameters are expected, waiting for parameters to update.")
-                default:
-                    send(
-                        event: .didSubmitParameters(
-                            .init(parameters: submittedParametersSpecifications, additionalParametersExpected: false)
-                        )
-                    )
-                }
-                try await setState(with: payment)
+                payment = try await serviceAdapter.continuePayment(with: request)
             } catch {
                 attemptRecoverSubmissionError(error)
+                return
+            }
+            let submittedParametersSpecifications = Array(currentState.parameters.values.map(\.specification))
+            switch payment.state {
+            case .nextStepRequired:
+                send(event: .didSubmitParameters(
+                    .init(parameters: submittedParametersSpecifications, additionalParametersExpected: true)
+                ))
+                logger.debug("More parameters are expected, waiting for parameters to update.")
+            default:
+                send(event: .didSubmitParameters(
+                    .init(parameters: submittedParametersSpecifications, additionalParametersExpected: false)
+                ))
+            }
+            do {
+                try await setState(with: payment)
+            } catch {
+                setFailureState(error: error, paymentState: payment.state)
             }
         }
         state = .submitting(.init(snapshot: currentState, task: task))
