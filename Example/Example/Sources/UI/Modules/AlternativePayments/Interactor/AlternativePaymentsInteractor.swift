@@ -87,7 +87,11 @@ final class AlternativePaymentsInteractor {
         return try await invoicesService.invoice(request: request)
     }
 
-    func createInvoice(amount: Decimal, currencyCode: String) async throws -> POInvoice {
+    func createInvoice(
+        amount: Decimal,
+        currencyCode: String,
+        paymentConfiguration: POInvoiceCreationRequest.PaymentConfiguration
+    ) async throws -> POInvoice {
         let request = POInvoiceCreationRequest(
             name: UUID().uuidString,
             amount: amount,
@@ -96,7 +100,8 @@ final class AlternativePaymentsInteractor {
             customerId: Example.Constants.customerId,
             details: [
                 .init(name: "Test", amount: amount, quantity: 1)
-            ]
+            ],
+            paymentConfiguration: paymentConfiguration,
         )
         return try await invoicesService.createInvoice(request: request)
     }
@@ -144,6 +149,19 @@ final class AlternativePaymentsInteractor {
         )
         let threeDSService = POTest3DSService()
         return try await tokensService.assignCustomerToken(request: tokenAssignRequest, threeDSService: threeDSService)
+    }
+
+    /// Advances alternative payment to an authorized state.
+    func authorize(invoiceId: String) async throws {
+        let request = POInvoiceAuthorizationRequest(invoiceId: invoiceId, source: "")
+        let threeDSService = POUnsupported3DS2Service()
+        try await invoicesService.authorizeInvoice(request: request, threeDSService: threeDSService)
+    }
+
+    /// Advances alternative payment to a captured state.
+    func capture(invoiceId: String) async throws {
+        let request = POInvoiceCaptureRequest(invoiceId: invoiceId, source: "")
+        try await invoicesService.captureInvoice(request: request)
     }
 
     func authorize(invoice: POInvoice, customerToken: POCustomerToken) async throws {

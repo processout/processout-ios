@@ -1026,6 +1026,23 @@ extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegateV2
         )
         return await delegate?.dynamicCheckout(alternativePaymentDefaultsWith: request) ?? [:]
     }
+
+    func nativeAlternativePayment(
+        finalizeWith availableActions: [PONativeAlternativePaymentAvailableActionV2]
+    ) async throws(POFailure) {
+        guard case .paymentProcessing(let currentState) = state,
+              case .nativeAlternativePayment(let paymentMethod) = currentState.paymentMethod else {
+            logger.error("Unable to finalize payment in current state: \(state).")
+            throw POFailure(message: "Unable to finalize payment in current state.", code: .Mobile.generic)
+        }
+        guard let delegate else {
+            throw POFailure(message: "Delegate is not set, unable to finalize payment.", code: .Mobile.internal)
+        }
+        let request = PODynamicCheckoutAlternativePaymentFinalizeRequest(
+            paymentMethod: paymentMethod, availableActions: availableActions
+        )
+        try await delegate.dynamicCheckout(finalizeAlternativePaymentWith: request)
+    }
 }
 
 // swiftlint:enable file_length type_body_length

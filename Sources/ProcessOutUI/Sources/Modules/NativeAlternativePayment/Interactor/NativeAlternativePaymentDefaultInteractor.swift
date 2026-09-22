@@ -54,14 +54,21 @@ final class NativeAlternativePaymentDefaultInteractor:
         logger.info("Starting native alternative payment.")
         send(event: .willStart)
         let task = Task { @MainActor in
+            let payment: NativeAlternativePaymentServiceAdapterResponse
             do {
                 let request = NativeAlternativePaymentServiceAdapterRequest(
-                    flow: configuration.flow, localeIdentifier: configuration.localization.localeOverride?.identifier
+                    flow: configuration.flow,
+                    localeIdentifier: configuration.localization.localeOverride?.identifier
                 )
-                let payment = try await serviceAdapter.continuePayment(with: request)
+                payment = try await serviceAdapter.continuePayment(with: request)
+            } catch {
+                setFailureState(error: error, paymentState: nil)
+                return
+            }
+            do {
                 try await setState(with: payment)
             } catch {
-                setFailureState(error: error)
+                setFailureState(error: error, paymentState: payment.state)
             }
         }
         state = .starting(.init(task: task))
@@ -97,6 +104,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         }
         willSubmit(parameters: Array(currentState.parameters.values))
         let task = Task { @MainActor in
+            let payment: NativeAlternativePaymentServiceAdapterResponse
             do {
                 let values = try validatedValues(for: Array(currentState.parameters.values))
                 let request = NativeAlternativePaymentServiceAdapterRequest(
@@ -104,28 +112,27 @@ final class NativeAlternativePaymentDefaultInteractor:
                     submitData: .init(parameters: values),
                     localeIdentifier: configuration.localization.localeOverride?.identifier
                 )
-                let payment = try await serviceAdapter.continuePayment(with: request)
-                let submittedParametersSpecifications = Array(currentState.parameters.values.map(\.specification))
-                switch payment.state {
-                case .nextStepRequired:
-                    send(
-                        event: .didSubmitParameters(
-                            .init(parameters: submittedParametersSpecifications, additionalParametersExpected: true)
-                        )
-                    )
-                    logger.debug("More parameters are expected, waiting for parameters to update.")
-                case .success, .pending:
-                    send(
-                        event: .didSubmitParameters(
-                            .init(parameters: submittedParametersSpecifications, additionalParametersExpected: false)
-                        )
-                    )
-                default:
-                    setFailureState(error: POFailure(message: "Unexpected payment state.", code: .Mobile.generic))
-                }
-                try await setState(with: payment)
+                payment = try await serviceAdapter.continuePayment(with: request)
             } catch {
                 attemptRecoverSubmissionError(error)
+                return
+            }
+            let submittedParametersSpecifications = Array(currentState.parameters.values.map(\.specification))
+            switch payment.state {
+            case .nextStepRequired:
+                send(event: .didSubmitParameters(
+                    .init(parameters: submittedParametersSpecifications, additionalParametersExpected: true)
+                ))
+                logger.debug("More parameters are expected, waiting for parameters to update.")
+            default:
+                send(event: .didSubmitParameters(
+                    .init(parameters: submittedParametersSpecifications, additionalParametersExpected: false)
+                ))
+            }
+            do {
+                try await setState(with: payment)
+            } catch {
+                setFailureState(error: error, paymentState: payment.state)
             }
         }
         state = .submitting(.init(snapshot: currentState, task: task))
@@ -144,7 +151,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             do {
                 try await uncheckedRedirect(to: currentState.redirect)
             } catch {
-                setFailureState(error: error)
+                setFailureState(error: error, paymentState: currentState.paymentState)
             }
         }
         let newState = State.Redirecting(task: task, snapshot: currentState)
@@ -173,6 +180,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             // Intent here is not to cancel invocation of completion but to fast-forward
             // it by cancelling any ongoing delay operation if any.
             currentState.completionTask.cancel()
+            return
         default:
             break
         }
@@ -180,7 +188,8 @@ final class NativeAlternativePaymentDefaultInteractor:
             error: POFailure(
                 message: "Alternative payment has been canceled. Reason: '\(reason)'.",
                 code: .Mobile.cancelled
-            )
+            ),
+            paymentState: nil
         )
     }
 
@@ -204,14 +213,15 @@ final class NativeAlternativePaymentDefaultInteractor:
             } else {
                 try await setStartedState(response: response)
             }
-        case .pending:
+        case .pending, .authorizationPending:
             await setAwaitingCompletionState(response: response)
-        case .success:
+        case .customerActionsCompleted:
+            try await setFinalizingPaymentState(with: response)
+        case .authorized, .success:
             await setCompletedState(response: response)
         default:
             logger.error("Unexpected alternative payment state: \(response.state).")
-            let failure = POFailure(message: "Something went wrong.", code: .Mobile.generic)
-            setFailureState(error: failure)
+            throw POFailure(message: "Something went wrong.", code: .Mobile.generic)
         }
     }
 
@@ -234,6 +244,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         let startedState = State.Started(
             paymentMethod: paymentMethod,
             invoice: response.invoice,
+            paymentState: response.state,
             elements: elements,
             parameters: parameters,
             isCancellable: configuration.cancelButton?.disabledFor.isZero ?? true
@@ -284,7 +295,7 @@ final class NativeAlternativePaymentDefaultInteractor:
     private func setAwaitingCompletionState(response: NativeAlternativePaymentServiceAdapterResponse) async {
         if case .awaitingCompletion(let currentState) = state, !currentState.shouldConfirmPayment {
             let failure = POFailure(code: .Mobile.generic)
-            setFailureState(error: failure)
+            setFailureState(error: failure, paymentState: response.state)
             return
         }
         do {
@@ -303,6 +314,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             let awaitingPaymentCompletionState = State.AwaitingCompletion(
                 paymentMethod: await resolve(paymentMethod: response.paymentMethod),
                 invoice: response.invoice,
+                paymentState: response.state,
                 elements: resolvedElements,
                 estimatedCompletionDate: nil,
                 isCancellable: configuration.paymentConfirmation.cancelButton?.disabledFor.isZero ?? true,
@@ -314,7 +326,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             }
             enablePaymentConfirmationCancellationAfterDelay()
         } catch {
-            setFailureState(error: error)
+            setFailureState(error: error, paymentState: response.state)
         }
     }
 
@@ -339,7 +351,7 @@ final class NativeAlternativePaymentDefaultInteractor:
                 let response = try await serviceAdapter.expectPaymentCompletion(with: request)
                 try await setState(with: response)
             } catch {
-                setFailureState(error: error)
+                setFailureState(error: error, paymentState: currentState.paymentState)
             }
         }
         newState.estimatedCompletionDate = Date().addingTimeInterval(configuration.paymentConfirmation.timeout)
@@ -367,6 +379,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             let newState = State.AwaitingRedirect(
                 paymentMethod: paymentMethod,
                 invoice: response.invoice,
+                paymentState: response.state,
                 elements: elements,
                 redirect: redirect,
                 isCancellable: configuration.cancelButton?.disabledFor.isZero ?? true
@@ -432,6 +445,27 @@ final class NativeAlternativePaymentDefaultInteractor:
         return await UIApplication.shared.open(url, options: options)
     }
 
+    // MARK: - Payment Finalization
+
+    /// - NOTE: Payment finalization is an ephemeral state meaning there is no explicit
+    /// representation for it in interactor's state machine.
+    private func setFinalizingPaymentState(with response: NativeAlternativePaymentServiceAdapterResponse) async throws {
+        guard let availableActions = response.availableActions else {
+            throw POFailure(message: "No available actions to finalize payment.", code: .Mobile.internal)
+        }
+        guard let delegate else {
+            throw POFailure(message: "Delegate is not set, unable to finalize payment.", code: .Mobile.internal)
+        }
+        try await delegate.nativeAlternativePayment(finalizeWith: availableActions)
+        let finalizedPaymentResponse = try await serviceAdapter.continuePayment(
+            with: .init(
+                flow: configuration.flow,
+                localeIdentifier: configuration.localization.localeOverride?.identifier
+            )
+        )
+        try await setState(with: finalizedPaymentResponse)
+    }
+
     // MARK: - Completed State
 
     private func setCompletedState(response: NativeAlternativePaymentServiceAdapterResponse) async {
@@ -455,6 +489,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             let newState = State.Completed(
                 paymentMethod: await resolve(paymentMethod: response.paymentMethod),
                 invoice: response.invoice,
+                paymentState: response.state,
                 elements: resolvedElements,
                 completionTask: task
             )
@@ -464,7 +499,7 @@ final class NativeAlternativePaymentDefaultInteractor:
                 completion(.success(()))
             }
         } catch {
-            setFailureState(error: error)
+            setFailureState(error: error, paymentState: response.state)
         }
     }
 
@@ -472,10 +507,6 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     private func attemptRecoverSubmissionError(_ error: Error) {
         logger.info("Did fail to submit parameters: \(error)")
-        guard let failure = error as? POFailure else {
-            setFailureState(error: error)
-            return
-        }
         var newState: State.Started
         switch state {
         case let .started(state):
@@ -486,12 +517,16 @@ final class NativeAlternativePaymentDefaultInteractor:
             logger.debug("Ignoring attempt to recover submission error from unsupported state: \(state).")
             return
         }
+        guard let failure = error as? POFailure else {
+            setFailureState(error: error, paymentState: newState.paymentState)
+            return
+        }
         let invalidFields = failure.invalidFields.map { invalidFields in
             Dictionary(grouping: invalidFields, by: \.name).compactMapValues(\.first)
         }
         guard let invalidFields = invalidFields, !invalidFields.isEmpty else {
             logger.debug("Submission error is not recoverable, aborting.")
-            setFailureState(error: failure)
+            setFailureState(error: failure, paymentState: newState.paymentState)
             return
         }
         for parameter in newState.parameters.values {
@@ -505,7 +540,7 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     // MARK: - Failure State
 
-    private func setFailureState(error: Error) {
+    private func setFailureState(error: Error, paymentState: PONativeAlternativePaymentStateV2?) {
         guard !Task.isCancelled else {
             logger.debug("Task is cancelled, ignoring attempt to set failure state with: \(error).")
             return
@@ -522,26 +557,13 @@ final class NativeAlternativePaymentDefaultInteractor:
             logger.error("Unexpected error type: \(error)")
             failure = POFailure(message: "Something went wrong.", code: .Mobile.generic, underlyingError: error)
         }
+        let resolvedPaymentState = paymentState ?? state.paymentState
         state = .failure(failure)
         let failureEvent = PONativeAlternativePaymentEventV2.DidFail(
-            failure: failure, paymentState: currentPaymentState
+            failure: failure, paymentState: resolvedPaymentState
         )
         send(event: .didFail(failureEvent))
         completion(.failure(failure))
-    }
-
-    /// Payment state resolve from current interactor's state.
-    private var currentPaymentState: PONativeAlternativePaymentStateV2? {
-        switch state {
-        case .idle, .starting, .failure:
-            return nil
-        case .started, .submitting, .awaitingRedirect, .redirecting:
-            return .nextStepRequired
-        case .awaitingCompletion:
-            return .pending
-        case .completed:
-            return .success
-        }
     }
 
     // MARK: - Cancellation Availability
@@ -976,14 +998,17 @@ final class NativeAlternativePaymentDefaultInteractor:
             paymentMethod: response.paymentMethod,
             invoice: response.invoice,
             elements: response.elements,
-            redirect: response.redirect
+            redirect: response.redirect,
+            availableActions: response.availableActions
         )
         Task { @MainActor in
             do {
                 switch state {
                 case .idle, .started, .awaitingRedirect:
                     try await setState(with: adapterResponse)
-                case .awaitingCompletion(let currentState) where adapterResponse.state != .pending:
+                case .awaitingCompletion(let currentState)
+                    where ![.pending, .authorizationPending].contains(adapterResponse.state):
+
                     currentState.task?.cancel()
                     try await setState(with: adapterResponse)
                 default:
@@ -991,7 +1016,7 @@ final class NativeAlternativePaymentDefaultInteractor:
                     return
                 }
             } catch {
-                setFailureState(error: error)
+                setFailureState(error: error, paymentState: response.state)
             }
         }
     }
@@ -1021,7 +1046,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         default:
             break
         }
-        setFailureState(error: failure)
+        setFailureState(error: failure, paymentState: nil)
     }
 
     private var eventListeners: [AnyObject] = []

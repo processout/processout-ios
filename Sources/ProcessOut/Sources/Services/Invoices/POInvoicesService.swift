@@ -39,6 +39,13 @@ public protocol POInvoicesService: POService { // sourcery: AutoCompletion
         request: PONativeAlternativePaymentUrlResolutionRequestV2
     ) async throws -> PONativeAlternativePaymentUrlResolutionResponseV2
 
+    /// Captures invoice with a given request.
+    ///
+    /// Unlike ``captureNativeAlternativePayment(request:)`` capture is attempted only once, so method either
+    /// succeeds or fails.
+    @_spi(PO)
+    func captureInvoice(request: POInvoiceCaptureRequest) async throws // sourcery:completion: skip
+
     // MARK: - Alternative Payment (Deprecated)
 
     /// Requests information needed to continue existing payment or start new one.
@@ -76,6 +83,11 @@ extension POInvoicesService {
     public func resolveUrl(
         request: PONativeAlternativePaymentUrlResolutionRequestV2
     ) async throws -> PONativeAlternativePaymentUrlResolutionResponseV2 {
+        throw POFailure(code: .Mobile.generic)
+    }
+
+    @_spi(PO)
+    public func captureInvoice(request: POInvoiceCaptureRequest) async throws {
         throw POFailure(code: .Mobile.generic)
     }
 }

@@ -30,6 +30,11 @@ protocol InvoicesRepository: PORepository {
         request: PONativeAlternativePaymentUrlResolutionRequestV2
     ) async throws -> PONativeAlternativePaymentUrlResolutionResponseV2
 
+    // MARK: - Invoice Capture
+
+    /// Captures invoice with a given request.
+    func captureInvoice(request: POInvoiceCaptureRequest) async throws
+
     // MARK: - Alternative Payment (Deprecated)
 
     /// Requests information needed to continue existing payment or start new one.

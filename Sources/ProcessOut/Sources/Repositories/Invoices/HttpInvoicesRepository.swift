@@ -82,6 +82,17 @@ final class HttpInvoicesRepository: InvoicesRepository {
         return try await connector.execute(request: httpRequest)
     }
 
+    func captureInvoice(request: POInvoiceCaptureRequest) async throws {
+        struct Request: Encodable, Sendable {
+            let source: String
+        }
+        let requestBox = Request(source: request.source)
+        let httpRequest = HttpConnectorRequest<VoidCodable>.post(
+            path: "/invoices/\(request.invoiceId)/capture", body: requestBox
+        )
+        _ = try await connector.execute(request: httpRequest)
+    }
+
     // MARK: - Deprecated
 
     func nativeAlternativePaymentMethodTransactionDetails(

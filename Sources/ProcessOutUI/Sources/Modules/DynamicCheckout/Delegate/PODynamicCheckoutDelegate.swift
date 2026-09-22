@@ -92,6 +92,14 @@ public protocol PODynamicCheckoutDelegate: AnyObject, Sendable {
         alternativePaymentDefaultsWith request: PODynamicCheckoutAlternativePaymentDefaultsRequest
     ) async -> [String: PONativeAlternativePaymentParameterValue]
 
+    /// Asks delegate to finalize alternative payment by explicitly advancing it to an authorized and/or captured
+    /// state using one of the available actions. Method is only invoked when invoice was created with manual
+    /// finalization mode.
+    @MainActor
+    func dynamicCheckout(
+        finalizeAlternativePaymentWith request: PODynamicCheckoutAlternativePaymentFinalizeRequest
+    ) async throws(POFailure)
+
     // MARK: - Pass Kit
 
     /// Gives implementation an opportunity to modify payment request before it is used to authorize invoice.
@@ -170,6 +178,14 @@ extension PODynamicCheckoutDelegate {
         alternativePaymentDefaultsWith request: PODynamicCheckoutAlternativePaymentDefaultsRequest
     ) async -> [String: PONativeAlternativePaymentParameterValue] {
         [:]
+    }
+
+    @MainActor
+    public func dynamicCheckout(
+        finalizeAlternativePaymentWith request: PODynamicCheckoutAlternativePaymentFinalizeRequest
+    ) async throws(POFailure) {
+        assertionFailure("Method must be implemented when manual finalization is used.")
+        throw .init(message: "Manual finalization is not implemented.", code: .Mobile.generic)
     }
 
     // MARK: - Pass Kit

@@ -22,4 +22,21 @@ public protocol PONativeAlternativePaymentDelegateV2: AnyObject, Sendable {
     func nativeAlternativePayment(
         defaultValuesFor parameters: [PONativeAlternativePaymentFormV2.Parameter]
     ) async -> [String: PONativeAlternativePaymentParameterValue]
+
+    /// Asks delegate to finalize payment.
+    @MainActor
+    func nativeAlternativePayment(
+        finalizeWith availableActions: [PONativeAlternativePaymentAvailableActionV2]
+    ) async throws(POFailure)
+}
+
+extension PONativeAlternativePaymentDelegateV2 {
+
+    @MainActor
+    public func nativeAlternativePayment(
+        finalizeWith availableActions: [PONativeAlternativePaymentAvailableActionV2]
+    ) async throws(POFailure) {
+        assertionFailure("Method must be implemented when manual finalization is used.")
+        throw .init(message: "Manual finalization is not implemented.", code: .Mobile.generic)
+    }
 }
