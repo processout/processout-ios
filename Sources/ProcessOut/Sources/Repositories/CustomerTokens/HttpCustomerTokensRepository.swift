@@ -9,13 +9,13 @@ import Foundation
 
 final class HttpCustomerTokensRepository: CustomerTokensRepository {
 
-    init(connector: HttpConnector) {
+    init(connector: any HttpConnector<POFailure>) {
         self.connector = connector
     }
 
     // MARK: - CustomerTokensRepository
 
-    func createCustomerToken(request: POCreateCustomerTokenRequest) async throws -> POCustomerToken {
+    func createCustomerToken(request: POCreateCustomerTokenRequest) async throws(POFailure) -> POCustomerToken {
         struct Response: Decodable {
             let token: POCustomerToken
         }
@@ -28,7 +28,9 @@ final class HttpCustomerTokensRepository: CustomerTokensRepository {
         return try await connector.execute(request: httpRequest).token
     }
 
-    func assignCustomerToken(request: POAssignCustomerTokenRequest) async throws -> AssignCustomerTokenResponse {
+    func assignCustomerToken(
+        request: POAssignCustomerTokenRequest
+    ) async throws(POFailure) -> AssignCustomerTokenResponse {
         let httpRequest = HttpConnectorRequest<AssignCustomerTokenResponse>.put(
             path: "/customers/\(request.customerId)/tokens/\(request.tokenId)",
             body: request,
@@ -40,7 +42,7 @@ final class HttpCustomerTokensRepository: CustomerTokensRepository {
 
     func tokenize(
         request: PONativeAlternativePaymentTokenizationRequestV2
-    ) async throws -> PONativeAlternativePaymentTokenizationResponseV2 {
+    ) async throws(POFailure) -> PONativeAlternativePaymentTokenizationResponseV2 {
         let httpRequest = HttpConnectorRequest<PONativeAlternativePaymentTokenizationResponseV2>.post(
             path: "/customers/\(request.customerId)/apm-tokens/\(request.customerTokenId)/tokenize",
             body: request,
@@ -49,7 +51,7 @@ final class HttpCustomerTokensRepository: CustomerTokensRepository {
         return try await connector.execute(request: httpRequest)
     }
 
-    func delete(request: PODeleteCustomerTokenRequest) async throws {
+    func delete(request: PODeleteCustomerTokenRequest) async throws(POFailure) {
         let httpRequest = HttpConnectorRequest<VoidCodable>.delete(
             path: "/customers/\(request.customerId)/tokens/\(request.tokenId)",
             headers: ["X-Processout-Client-Secret": request.clientSecret],
@@ -60,5 +62,5 @@ final class HttpCustomerTokensRepository: CustomerTokensRepository {
 
     // MARK: - Private Properties
 
-    private let connector: HttpConnector
+    private let connector: any HttpConnector<POFailure>
 }

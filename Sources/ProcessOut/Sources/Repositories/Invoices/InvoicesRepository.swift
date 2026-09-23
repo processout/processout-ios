@@ -10,37 +10,39 @@ import Foundation
 protocol InvoicesRepository: PORepository {
 
     /// Creates invoice with given parameters.
-    func createInvoice(request: POInvoiceCreationRequest) async throws -> POInvoice
+    func createInvoice(request: POInvoiceCreationRequest) async throws(POFailure) -> POInvoice
 
     /// Invoice details.
-    func invoice(request: POInvoiceRequest) async throws -> POInvoice
+    func invoice(request: POInvoiceRequest) async throws(POFailure) -> POInvoice
 
     // MARK: - Invoice Authorization
 
     /// Performs invoice authorization with given request.
-    func authorizeInvoice(request: POInvoiceAuthorizationRequest) async throws -> InvoiceAuthorizationResponse
+    func authorizeInvoice(
+        request: POInvoiceAuthorizationRequest
+    ) async throws(POFailure) -> InvoiceAuthorizationResponse
 
     /// Continue alternative payment.
     func authorizeInvoice(
         request: PONativeAlternativePaymentAuthorizationRequestV2
-    ) async throws -> PONativeAlternativePaymentAuthorizationResponseV2
+    ) async throws(POFailure) -> PONativeAlternativePaymentAuthorizationResponseV2
 
     /// Resolves native alternative payment return URL.
     func resolveUrl(
         request: PONativeAlternativePaymentUrlResolutionRequestV2
-    ) async throws -> PONativeAlternativePaymentUrlResolutionResponseV2
+    ) async throws(POFailure) -> PONativeAlternativePaymentUrlResolutionResponseV2
 
     // MARK: - Invoice Capture
 
     /// Captures invoice with a given request.
-    func captureInvoice(request: POInvoiceCaptureRequest) async throws
+    func captureInvoice(request: POInvoiceCaptureRequest) async throws(POFailure)
 
     // MARK: - Alternative Payment (Deprecated)
 
     /// Requests information needed to continue existing payment or start new one.
     func nativeAlternativePaymentMethodTransactionDetails(
         request: PONativeAlternativePaymentMethodTransactionDetailsRequest
-    ) async throws -> PONativeAlternativePaymentMethodTransactionDetails
+    ) async throws(POFailure) -> PONativeAlternativePaymentMethodTransactionDetails
 
     /// Initiates native alternative payment with a given request.
     ///
@@ -48,10 +50,10 @@ protocol InvoicesRepository: PORepository {
     /// `nativeApm` in response object to understand if additional data is required.
     func initiatePayment(
         request: PONativeAlternativePaymentMethodRequest
-    ) async throws -> PONativeAlternativePaymentMethodResponse
+    ) async throws(POFailure) -> PONativeAlternativePaymentMethodResponse
 
     /// Captures native alternative payment.
     func captureNativeAlternativePayment(
         request: NativeAlternativePaymentCaptureRequest
-    ) async throws -> PONativeAlternativePaymentMethodResponse
+    ) async throws(POFailure) -> PONativeAlternativePaymentMethodResponse
 }
