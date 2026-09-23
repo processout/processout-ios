@@ -26,7 +26,7 @@ final class DefaultCustomerActionsService: CustomerActionsService {
 
     // MARK: - CustomerActionsService
 
-    func handle(request: CustomerActionRequest, threeDSService: PO3DS2Service) async throws -> String {
+    func handle(request: CustomerActionRequest, threeDSService: PO3DS2Service) async throws(POFailure) -> String {
         try await semaphore.waitUnlessCancelled(
             cancellationError: POFailure(message: "Customer action handling was cancelled.", code: .Mobile.cancelled)
         )

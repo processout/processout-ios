@@ -21,13 +21,13 @@ final class DefaultCustomerTokensService: POCustomerTokensService {
 
     // MARK: - POCustomerTokensService
 
-    func createCustomerToken(request: POCreateCustomerTokenRequest) async throws -> POCustomerToken {
+    func createCustomerToken(request: POCreateCustomerTokenRequest) async throws(POFailure) -> POCustomerToken {
         try await repository.createCustomerToken(request: request)
     }
 
     func assignCustomerToken(
         request: POAssignCustomerTokenRequest, threeDSService: PO3DS2Service
-    ) async throws -> POCustomerToken {
+    ) async throws(POFailure) -> POCustomerToken {
         do {
             let customerToken = try await _assignCustomerToken(request: request, threeDSService: threeDSService)
             await threeDSService.clean()
@@ -40,11 +40,11 @@ final class DefaultCustomerTokensService: POCustomerTokensService {
 
     func tokenize(
         request: PONativeAlternativePaymentTokenizationRequestV2
-    ) async throws -> PONativeAlternativePaymentTokenizationResponseV2 {
+    ) async throws(POFailure) -> PONativeAlternativePaymentTokenizationResponseV2 {
         try await repository.tokenize(request: request)
     }
 
-    func deleteCustomerToken(request: PODeleteCustomerTokenRequest) async throws {
+    func deleteCustomerToken(request: PODeleteCustomerTokenRequest) async throws(POFailure) {
         try await repository.delete(request: request)
         eventEmitter.emit(event: POCustomerTokenDeletedEvent(customerId: request.customerId, tokenId: request.tokenId))
     }
@@ -60,7 +60,7 @@ final class DefaultCustomerTokensService: POCustomerTokensService {
 
     private func _assignCustomerToken(
         request: POAssignCustomerTokenRequest, threeDSService: PO3DS2Service
-    ) async throws -> POCustomerToken {
+    ) async throws(POFailure) -> POCustomerToken {
         let request = request.replacing(
             thirdPartySdkVersion: request.thirdPartySdkVersion ?? threeDSService.version
         )
