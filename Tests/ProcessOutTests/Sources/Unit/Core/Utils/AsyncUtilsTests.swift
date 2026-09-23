@@ -20,7 +20,7 @@ struct AsyncUtilsTests {
         let operationDuration: TimeInterval = 1
 
         // When
-        let value = try await withTimeout(timeout, error: Failure.timeout) {
+        let value = try await withTimeout(timeout, error: Failure.timeout as any Error) {
             try? await Task.sleep(for: .seconds(operationDuration))
             return "value"
         }
@@ -55,7 +55,7 @@ struct AsyncUtilsTests {
         let operationDuration: TimeInterval = 3
 
         // When
-        try await withTimeout(timeout, error: Failure.timeout) {
+        try await withTimeout(timeout, error: Failure.timeout as any Error) {
             try? await Task.sleep(for: .seconds(operationDuration))
         }
     }
@@ -122,7 +122,7 @@ struct AsyncUtilsTests {
                 false
             },
             timeout: 0,
-            timeoutError: Failure.timeout
+            timeoutError: Failure.timeout as any Error
         )
 
         // Then
@@ -139,7 +139,7 @@ struct AsyncUtilsTests {
                 },
                 while: { _ in false },
                 timeout: 1,
-                timeoutError: Failure.timeout
+                timeoutError: Failure.timeout as any Error
             )
         } matching: { issue in
             if let failure = issue.error as? Failure, failure == .timeout {
@@ -164,7 +164,7 @@ struct AsyncUtilsTests {
                 return false
             },
             timeout: 10,
-            timeoutError: Failure.timeout,
+            timeoutError: Failure.timeout as any Error,
             retryStrategy: .init(function: .linear(interval: 0), maximumRetries: 1, minimum: 0)
         )
 
@@ -186,7 +186,7 @@ struct AsyncUtilsTests {
                 true
             },
             timeout: 10,
-            timeoutError: Failure.timeout,
+            timeoutError: Failure.timeout as any Error,
             retryStrategy: .init(function: .linear(interval: 0), maximumRetries: 1, minimum: 0)
         )
 
@@ -207,7 +207,7 @@ struct AsyncUtilsTests {
                     true
                 },
                 timeout: 10,
-                timeoutError: Failure.timeout,
+                timeoutError: Failure.timeout as any Error,
                 retryStrategy: .init(function: .linear(interval: 5), maximumRetries: 1)
             )
         }
@@ -240,7 +240,7 @@ struct AsyncUtilsTests {
                 true
             },
             timeout: 10,
-            timeoutError: Failure.timeout,
+            timeoutError: Failure.timeout as any Error,
             retryStrategy: .init(function: .linear(interval: 0), maximumRetries: 1, minimum: 0)
         )
 
@@ -265,7 +265,7 @@ struct AsyncUtilsTests {
                 false
             },
             timeout: 10,
-            timeoutError: Failure.timeout,
+            timeoutError: Failure.timeout as any Error,
             retryStrategy: .init(function: .linear(interval: 0), maximumRetries: 1, minimum: 0)
         )
 
@@ -285,7 +285,7 @@ struct AsyncUtilsTests {
                     true
                 },
                 timeout: 10,
-                timeoutError: Failure.timeout
+                timeoutError: Failure.timeout as any Error
             )
         }
 

@@ -10,52 +10,57 @@ import Foundation
 // MARK: - Timeout
 
 /// - Warning: operation should support cancellation, otherwise calling this method has no effect.
-func withTimeout<T: Sendable>(
+func withTimeout<T: Sendable, Failure: Error>(
     _ timeout: TimeInterval,
-    error timeoutError: Error,
-    perform operation: @escaping @Sendable @isolated(any) () async throws -> T
-) async throws -> T {
-    let isTimedOut = POUnfairlyLocked(wrappedValue: false)
-    let task = Task(operation: operation)
+    error timeoutError: Failure,
+    perform operation: @escaping @Sendable @isolated(any) () async throws(Failure) -> T
+) async throws(Failure) -> T {
+    let task = Task {
+        await Result(catching: operation)
+    }
     let timeoutTask = Task {
-        try await Task.sleep(seconds: timeout)
-        isTimedOut.withLock { value in
-            value = true
-        }
-        guard !Task.isCancelled else {
-            return
+        do {
+            try await Task.sleep(seconds: timeout)
+        } catch {
+            return false // Cancelled before firing.
         }
         task.cancel()
+        return true
     }
-    return try await withTaskCancellationHandler {
-        do {
-            let value = try await task.value
-            timeoutTask.cancel()
-            return value
-        } catch {
-            if task.isCancelled, isTimedOut.wrappedValue {
-                throw timeoutError
-            }
-            timeoutTask.cancel()
-            throw error
-        }
+    let result = await withTaskCancellationHandler {
+        await task.value
     } onCancel: {
         task.cancel()
         timeoutTask.cancel()
+    }
+    timeoutTask.cancel()
+    switch result {
+    case .success(let value):
+        return value
+    case .failure(let error):
+        throw await timeoutTask.value ? timeoutError : error
     }
 }
 
 // MARK: - Retry
 
+/// Retries the given operation while condition is met.
+///
+/// - Parameters:
+///   - operation: operation to retry.
+///   - condition: closure that determines whether operation should be retried based on its result.
+///   - timeout: maximum amount of time to retry for.
+///   - timeoutError: error thrown when timeout is reached.
+///   - retryStrategy: strategy that defines delay between retries.
 @_spi(PO)
-public func retry<T: Sendable>(
-    operation: @escaping @Sendable @isolated(any) () async throws -> T,
-    while condition: @escaping @Sendable (Result<T, Error>) -> Bool,
+public func retry<T: Sendable, Failure: Error>(
+    operation: @escaping @Sendable @isolated(any) () async throws(Failure) -> T,
+    while condition: @escaping @Sendable (Result<T, Failure>) -> Bool,
     timeout: TimeInterval,
-    timeoutError: Error,
+    timeoutError: Failure,
     retryStrategy: RetryStrategy? = nil
-) async throws -> T {
-    let operationBox = { @Sendable in
+) async throws(Failure) -> T {
+    let operationBox = { @Sendable () async throws(Failure) -> T in
         try await retry(
             operation: operation,
             after: await Result(catching: operation),
@@ -67,13 +72,13 @@ public func retry<T: Sendable>(
     return try await withTimeout(timeout, error: timeoutError, perform: operationBox)
 }
 
-private func retry<T: Sendable>(
-    operation: @escaping @Sendable @isolated(any) () async throws -> T,
-    after result: Result<T, Error>,
-    while condition: @escaping (Result<T, Error>) -> Bool,
+private func retry<T: Sendable, Failure: Error>(
+    operation: @escaping @Sendable @isolated(any) () async throws(Failure) -> T,
+    after result: Result<T, Failure>,
+    while condition: @escaping (Result<T, Failure>) -> Bool,
     retryStrategy: RetryStrategy?,
     attempt: Int
-) async throws -> T {
+) async throws(Failure) -> T {
     guard let retryStrategy, attempt < retryStrategy.maximumRetries, !Task.isCancelled, condition(result) else {
         return try result.get()
     }
@@ -92,10 +97,10 @@ private func retry<T: Sendable>(
     )
 }
 
-extension Result where Failure == Error, Success: Sendable {
+extension Result where Success: Sendable {
 
     // swiftlint:disable:next strict_fileprivate
-    fileprivate init(catching body: () async throws -> Success) async {
+    fileprivate init(catching body: () async throws(Failure) -> Success) async {
         do {
             let success = try await body()
             self = .success(success)
