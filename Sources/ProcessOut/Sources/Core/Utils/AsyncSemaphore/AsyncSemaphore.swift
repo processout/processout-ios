@@ -29,37 +29,49 @@ public actor AsyncSemaphore {
 
     /// Decrements the semaphore.
     ///
-    /// If the count is negative, the current task is suspended without blocking
-    /// the thread. Otherwise, no suspension occurs.
+    /// If the resulting count is negative, the current task is suspended without blocking
+    /// the thread until the semaphore is signalled. Otherwise, no suspension occurs.
     public func wait() async {
-        if value == 0 {
-            await withUnsafeContinuation { continuation in
-                let suspension = AsyncSemaphoreSuspension()
-                if suspension.setContinuation(continuation) {
-                    suspensions.insert(suspension, at: 0)
-                }
+        value -= 1
+        guard value < 0 else {
+            return
+        }
+        await withUnsafeContinuation { continuation in
+            let suspension = AsyncSemaphoreSuspension()
+            if suspension.setContinuation(continuation) {
+                suspensions.insert(suspension, at: 0)
             }
         }
-        assert(value > 0, "Value is expected to be positive after suspension.")
-        value -= 1
     }
 
     /// Decrements a semaphore with cancellation support.
     ///
-    /// If the count is negative, the current task is suspended without blocking
-    /// the thread. Otherwise, no suspension occurs.
+    /// If the resulting count is negative, the current task is suspended without blocking
+    /// the thread until the semaphore is signalled. Otherwise, no suspension occurs.
+    ///
+    /// If canceled before signalling, this function throws `CancellationError`.
+    public func waitUnlessCancelled() async throws(CancellationError) {
+        try await waitUnlessCancelled(cancellationError: CancellationError())
+    }
+
+    /// Decrements a semaphore with cancellation support.
+    ///
+    /// If the resulting count is negative, the current task is suspended without blocking
+    /// the thread until the semaphore is signalled. Otherwise, no suspension occurs.
     ///
     /// If canceled before signalling, this function throws `cancellationError`.
-    public func waitUnlessCancelled(
-        cancellationError: @Sendable @escaping @autoclosure () -> Error = CancellationError()
-    ) async throws {
-        do {
-            try Task.checkCancellation()
-        } catch {
+    public func waitUnlessCancelled<Failure: Error>(
+        cancellationError: @Sendable @escaping @autoclosure () -> Failure
+    ) async throws(Failure) {
+        guard !Task.isCancelled else {
             throw cancellationError()
         }
-        if value == 0 {
-            let suspension = AsyncSemaphoreSuspension()
+        value -= 1
+        guard value < 0 else {
+            return
+        }
+        let suspension = AsyncSemaphoreSuspension()
+        do {
             try await withTaskCancellationHandler {
                 try await withUnsafeThrowingContinuation { continuation in
                     if suspension.setContinuation(continuation, cancellationError: cancellationError) {
@@ -71,15 +83,17 @@ public actor AsyncSemaphore {
                     await self.cancel(suspension: suspension)
                 }
             }
+        } catch let error as Failure {
+            throw error
+        } catch {
+            preconditionFailure("Suspension is expected to be resumed only with the cancellation error.")
         }
-        assert(value > 0, "Value is expected to be positive after suspension.")
-        value -= 1
     }
 
     /// Signals the semaphore, incrementing its count.
     ///
-    /// Increases the semaphore's count, potentially unblocking a suspended task
-    /// if the count transitions from negative to non-negative.
+    /// Increases the semaphore's count, resuming the longest waiting suspended task
+    /// if there is one.
     public nonisolated func signal() {
         Task {
             await signalSemaphore()
@@ -100,16 +114,21 @@ public actor AsyncSemaphore {
 
     private func cancel(suspension: AsyncSemaphoreSuspension) {
         if let index = suspensions.firstIndex(where: { $0 === suspension }) {
+            // Suspension is still pending, so its slot is given back to the semaphore.
             suspensions.remove(at: index)
+            value += 1
         }
+        // Cancelling a suspension that was already resumed by a signal is a no-op.
         suspension.cancel()
     }
 
     private func signalSemaphore() {
-        if value == initialValue {
+        if value >= initialValue {
             assertionFailure("The semaphore value cannot exceed its initial value.")
         }
         value += 1
-        suspensions.popLast()?.resume()
+        if value <= 0 {
+            suspensions.popLast()?.resume()
+        }
     }
 }

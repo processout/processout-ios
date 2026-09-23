@@ -36,10 +36,9 @@ final class AsyncSemaphoreSuspension: Sendable {
                 unsafeContinuation.resume(throwing: cancellationError())
             case .suspended:
                 assertionFailure("Cancellation attempted on a continuation that does not support it.")
-            case .cancelled:
+            case .cancelled, .resumed:
+                // Suspension may be legitimately resumed by a signal before cancellation is processed.
                 break
-            case .resumed:
-                assertionFailure("Cannot cancel a suspension that has already been resumed.")
             case nil:
                 state = .cancelled
             }
