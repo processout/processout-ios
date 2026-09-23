@@ -19,14 +19,16 @@ public struct POUnsupported3DS2Service: PO3DS2Service {
 
     public func authenticationRequestParameters(
         configuration: PO3DS2Configuration
-    ) async throws -> PO3DS2AuthenticationRequestParameters {
+    ) async throws(POFailure) -> PO3DS2AuthenticationRequestParameters {
         throw POFailure(
             message: "Unable to create authentication request parameters: 3DS is not supported.",
             code: .Mobile.generic
         )
     }
 
-    public func performChallenge(with parameters: PO3DS2ChallengeParameters) async throws -> PO3DS2ChallengeResult {
+    public func performChallenge(
+        with parameters: PO3DS2ChallengeParameters
+    ) async throws(POFailure) -> PO3DS2ChallengeResult {
         throw POFailure(
             message: "Unable to perform challenge: 3DS is not supported.",
             code: .Mobile.generic
