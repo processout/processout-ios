@@ -16,7 +16,7 @@ actor ThrottledWebAuthenticationSessionDecorator: POWebAuthenticationSession {
 
     // MARK: - WebAuthenticationSession
 
-    func authenticate(using request: POWebAuthenticationRequest) async throws -> URL {
+    func authenticate(using request: POWebAuthenticationRequest) async throws(POFailure) -> URL {
         try await semaphore.waitUnlessCancelled(
             cancellationError: POFailure(message: "Authentication session was cancelled.", code: .Mobile.cancelled)
         )

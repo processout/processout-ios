@@ -14,5 +14,5 @@ protocol ApplePayAuthorizationSession: Sendable {
     @MainActor
     func authorize(
         request: PKPaymentRequest, delegate: ApplePayAuthorizationSessionDelegate?
-    ) async throws -> PKPayment
+    ) async throws(POFailure) -> PKPayment
 }

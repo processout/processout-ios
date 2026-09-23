@@ -18,7 +18,21 @@ final class DefaultWebAuthenticationSession:
 
     // MARK: - WebAuthenticationSession
 
-    func authenticate(using request: POWebAuthenticationRequest) async throws -> URL {
+    func authenticate(using request: POWebAuthenticationRequest) async throws(POFailure) -> URL {
+        do {
+            return try await _authenticate(using: request)
+        } catch let failure as POFailure {
+            throw failure
+        } catch {
+            throw POFailure(
+                message: "Unable to complete authentication.", code: .Mobile.internal, underlyingError: error
+            )
+        }
+    }
+
+    // MARK: - Authentication
+
+    private func _authenticate(using request: POWebAuthenticationRequest) async throws -> URL {
         let operationProxy = WebAuthenticationOperationProxy(
             callback: request.callback, eventEmitter: eventEmitter
         )
