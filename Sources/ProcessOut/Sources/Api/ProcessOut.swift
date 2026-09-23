@@ -93,8 +93,8 @@ public final class ProcessOut: @unchecked Sendable {
 
     private let _alternativePayments: DefaultAlternativePaymentsService
     private let telemetryService: TelemetryService
-    private let httpConnector: HttpConnector
-    private let telemetryHttpConnector: HttpConnector
+    private let httpConnector: any HttpConnector<POFailure>
+    private let telemetryHttpConnector: any HttpConnector<POFailure>
     private let serviceLogger: POLogger
     private let connectorLogger: POLogger
     private let telemetryConnectorLogger: POLogger
@@ -177,7 +177,7 @@ public final class ProcessOut: @unchecked Sendable {
     // MARK: - Services
 
     private static func createInvoicesService(
-        httpConnector: HttpConnector,
+        httpConnector: any HttpConnector<POFailure>,
         customerActionsService: CustomerActionsService,
         eventEmitter: POEventEmitter,
         logger: POLogger
@@ -208,7 +208,9 @@ public final class ProcessOut: @unchecked Sendable {
         .init(projectId: configuration.projectId, baseUrl: configuration.environment.checkoutBaseUrl)
     }
 
-    private static func createCardsService(httpConnector: HttpConnector, logger: POLogger) -> POCardsService {
+    private static func createCardsService(
+        httpConnector: any HttpConnector<POFailure>, logger: POLogger
+    ) -> POCardsService {
         let contactMapper = DefaultPassKitContactMapper(logger: logger)
         let requestMapper = DefaultApplePayCardTokenizationRequestMapper(
             contactMapper: contactMapper, decoder: JSONDecoder(), logger: logger
@@ -223,7 +225,7 @@ public final class ProcessOut: @unchecked Sendable {
     }
 
     private static func createCustomerTokensService(
-        httpConnector: HttpConnector,
+        httpConnector: any HttpConnector<POFailure>,
         customerActionsService: CustomerActionsService,
         eventEmitter: POEventEmitter,
         logger: POLogger
@@ -248,7 +250,7 @@ public final class ProcessOut: @unchecked Sendable {
     private static func createTelemetryService(
         configuration: ProcessOutConfiguration,
         deviceMetadataProvider: DeviceMetadataProvider,
-        connector: HttpConnector
+        connector: any HttpConnector<POFailure>
     ) -> DefaultTelemetryService {
         let serviceConfiguration = telemetryConfiguration(with: configuration)
         let repository = DefaultTelemetryRepository(connector: connector)
@@ -280,7 +282,7 @@ public final class ProcessOut: @unchecked Sendable {
         sessionId: String,
         deviceMetadataProvider: DeviceMetadataProvider,
         logger: POLogger
-    ) -> HttpConnector {
+    ) -> any HttpConnector<POFailure> {
         let connectorConfiguration = Self.connectorConfiguration(with: configuration, sessionId: sessionId)
         let connector = ProcessOutHttpConnectorBuilder().build(
             configuration: connectorConfiguration,

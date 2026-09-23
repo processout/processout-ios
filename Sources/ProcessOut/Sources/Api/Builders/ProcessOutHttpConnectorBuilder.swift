@@ -14,7 +14,7 @@ final class ProcessOutHttpConnectorBuilder {
         configuration: HttpConnectorConfiguration,
         deviceMetadataProvider: DeviceMetadataProvider,
         logger: POLogger
-    ) -> HttpConnector {
+    ) -> any HttpConnector<POFailure> {
         let requestMapper = DefaultHttpConnectorRequestMapper(
             configuration: configuration,
             encoder: encoder,
@@ -31,8 +31,7 @@ final class ProcessOutHttpConnectorBuilder {
                 ),
                 retryStrategy: .init(function: .exponential(interval: 0.1, rate: 3), maximumRetries: 3)
             ),
-            failureMapper: DefaultHttpConnectorFailureMapper(logger: logger),
-            logger: logger
+            failureMapper: DefaultHttpConnectorFailureMapper(logger: logger)
         )
         return connector
     }
