@@ -21,7 +21,9 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
         self.logger = logger
     }
 
-    func urlRequest(from request: HttpConnectorRequest<some Decodable>) async throws -> URLRequest {
+    func urlRequest(
+        from request: HttpConnectorRequest<some Decodable>
+    ) async throws(HttpConnectorFailure) -> URLRequest {
         let configuration = configuration.wrappedValue
         guard var components = URLComponents(url: configuration.baseUrl, resolvingAgainstBaseURL: true) else {
             logger.error("Unable to create a request with base URL \(configuration.baseUrl)")
@@ -64,7 +66,7 @@ final class DefaultHttpConnectorRequestMapper: HttpConnectorRequestMapper {
 
     private func encodedRequestBody(
         _ request: HttpConnectorRequest<some Decodable>, configuration: HttpConnectorConfiguration
-    ) async throws -> Data? {
+    ) async throws(HttpConnectorFailure) -> Data? {
         let decoratedBody: Encodable?
         if request.includesDeviceMetadata {
             let metadata = await deviceMetadataProvider.deviceMetadata

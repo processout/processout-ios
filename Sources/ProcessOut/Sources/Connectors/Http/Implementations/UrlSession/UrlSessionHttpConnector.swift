@@ -10,6 +10,8 @@ import UIKit.UIDevice
 
 final class UrlSessionHttpConnector: HttpConnector {
 
+    typealias Failure = HttpConnectorFailure
+
     init(
         sessionConfiguration: URLSessionConfiguration,
         requestMapper: HttpConnectorRequestMapper,
@@ -26,7 +28,9 @@ final class UrlSessionHttpConnector: HttpConnector {
 
     // MARK: - HttpConnectorType
 
-    func execute<Value>(request: HttpConnectorRequest<Value>) async throws -> HttpConnectorResponse<Value> {
+    func execute<Value>(
+        request: HttpConnectorRequest<Value>
+    ) async throws(HttpConnectorFailure) -> HttpConnectorResponse<Value> {
         let sessionRequest = try await requestMapper.urlRequest(from: request)
         var logger = self.logger
         logger[attributeKey: "RequestId"] = request.id
@@ -63,7 +67,7 @@ final class UrlSessionHttpConnector: HttpConnector {
 
     private func decodeResponse<Value: Decodable>(
         _ valueType: Value.Type, from data: Data, response: URLResponse, logger: POLogger
-    ) throws -> HttpConnectorResponse<Value> {
+    ) throws(HttpConnectorFailure) -> HttpConnectorResponse<Value> {
         guard let response = response as? HTTPURLResponse else {
             logger.error("Unexpected url response type.")
             throw Failure(code: .internal, underlyingError: nil)
@@ -78,9 +82,14 @@ final class UrlSessionHttpConnector: HttpConnector {
             }
             let serverCode = try decoder.decode(HttpConnectorFailure.Server.self, from: data)
             throw Failure(code: .server(serverCode, statusCode: response.statusCode), underlyingError: nil)
+        } catch let failure as Failure {
+            throw failure
         } catch let error as DecodingError {
             logger.error("Did fail to decode response: '\(error)'")
             throw Failure(code: .decoding(statusCode: response.statusCode), underlyingError: error)
+        } catch {
+            logger.error("Did fail to decode response with unknown error: '\(error)'")
+            throw Failure(code: .internal, underlyingError: error)
         }
     }
 
