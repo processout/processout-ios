@@ -95,6 +95,9 @@ public protocol PODynamicCheckoutDelegate: AnyObject, Sendable {
     /// Asks delegate to finalize alternative payment by explicitly advancing it to an authorized and/or captured
     /// state using one of the available actions. Method is only invoked when invoice was created with manual
     /// finalization mode.
+    ///
+    /// Method is invoked at most once per payment attempt. If payment is already authorized, implementation may
+    /// return without advancing payment to leave it authorized.
     @MainActor
     func dynamicCheckout(
         finalizeAlternativePaymentWith request: PODynamicCheckoutAlternativePaymentFinalizeRequest

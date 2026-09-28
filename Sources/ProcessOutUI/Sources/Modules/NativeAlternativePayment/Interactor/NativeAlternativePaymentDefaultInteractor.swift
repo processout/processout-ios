@@ -176,6 +176,8 @@ final class NativeAlternativePaymentDefaultInteractor:
             currentState.task?.cancel()
         case .redirecting(let currentState):
             currentState.task.cancel()
+        case .finalizing(let currentState):
+            currentState.task.cancel()
         case .completed(let currentState):
             // Intent here is not to cancel invocation of completion but to fast-forward
             // it by cancelling any ongoing delay operation if any.
@@ -216,7 +218,10 @@ final class NativeAlternativePaymentDefaultInteractor:
         case .pending, .authorizationPending:
             await setAwaitingCompletionState(response: response)
         case .customerActionsCompleted:
-            try await setFinalizingPaymentState(with: response)
+            try setFinalizingPaymentState(with: response)
+        case .authorized where !didRequestFinalization && response.availableActions?.contains(.capture) == true:
+            // Payment could be authorized without an explicit request, so delegate is given an opportunity to capture it.
+            try setFinalizingPaymentState(with: response)
         case .authorized, .success:
             await setCompletedState(response: response)
         default:
@@ -232,7 +237,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         let paymentMethod = await resolve(paymentMethod: response.paymentMethod)
         let parameters = await createParameters(for: response.elements ?? [])
         switch state {
-        case .starting, .submitting, .redirecting:
+        case .starting, .submitting, .redirecting, .finalizing:
             break // todo(andrii-vysotskyi): check if more states should be supported
         default:
             logger.debug("Ignoring attempt to set started state in unsupported state: \(state).")
@@ -301,7 +306,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         do {
             let resolvedElements = try await resolve(elements: response.elements ?? [])
             switch state {
-            case .starting, .submitting, .redirecting:
+            case .starting, .submitting, .redirecting, .finalizing:
                 break
             default:
                 logger.debug("Ignoring attempt to wait for payment confirmation from unsupported state.")
@@ -370,7 +375,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             let paymentMethod = await resolve(paymentMethod: response.paymentMethod)
             let elements = try await resolve(elements: response.elements ?? [])
             switch state {
-            case .starting, .submitting, .redirecting:
+            case .starting, .submitting, .redirecting, .finalizing:
                 break // todo(andrii-vysotskyi): check if more states should be supported
             default:
                 logger.debug("Ignoring attempt to set started state in unsupported state: \(state).")
@@ -447,24 +452,61 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     // MARK: - Payment Finalization
 
-    /// - NOTE: Payment finalization is an ephemeral state meaning there is no explicit
-    /// representation for it in interactor's state machine.
-    private func setFinalizingPaymentState(with response: NativeAlternativePaymentServiceAdapterResponse) async throws {
+    /// - NOTE: Delegate is asked to finalize payment at most once.
+    private func setFinalizingPaymentState(with response: NativeAlternativePaymentServiceAdapterResponse) throws {
+        guard !didRequestFinalization else {
+            // Delegate is expected to advance payment, so asking it again would most likely result in an endless loop.
+            throw POFailure(message: "Payment was not advanced during finalization.", code: .Mobile.generic)
+        }
+        guard let snapshot = finalizingStateSnapshot() else {
+            logger.debug("Ignoring attempt to finalize payment in unsupported state: \(state).")
+            return
+        }
         guard let availableActions = response.availableActions else {
             throw POFailure(message: "No available actions to finalize payment.", code: .Mobile.internal)
         }
         guard let delegate else {
             throw POFailure(message: "Delegate is not set, unable to finalize payment.", code: .Mobile.internal)
         }
-        try await delegate.nativeAlternativePayment(finalizeWith: availableActions)
-        let finalizedPaymentResponse = try await serviceAdapter.continuePayment(
-            with: .init(
-                flow: configuration.flow,
-                localeIdentifier: configuration.localization.localeOverride?.identifier
-            )
+        didRequestFinalization = true
+        let request = PONativeAlternativePaymentFinalizeRequestV2(
+            paymentState: response.state, availableActions: availableActions
         )
-        try await setState(with: finalizedPaymentResponse)
+        let task = Task { @MainActor [configuration] in
+            do {
+                try await delegate.nativeAlternativePayment(finalizeWith: request)
+                let finalizedPaymentResponse = try await serviceAdapter.continuePayment(
+                    with: .init(
+                        flow: configuration.flow,
+                        localeIdentifier: configuration.localization.localeOverride?.identifier
+                    )
+                )
+                try await setState(with: finalizedPaymentResponse)
+            } catch {
+                setFailureState(error: error, paymentState: response.state)
+            }
+        }
+        state = .finalizing(.init(paymentState: response.state, snapshot: snapshot, task: task))
+        logger.info("Waiting for payment to be finalized.")
     }
+
+    private func finalizingStateSnapshot() -> NativeAlternativePaymentInteractorState.Finalizing.Snapshot? {
+        switch state {
+        case .starting(let currentState):
+            return .starting(currentState)
+        case .submitting(let currentState):
+            return .submitting(currentState)
+        case .redirecting(let currentState):
+            return .redirecting(currentState)
+        case .awaitingCompletion(let currentState):
+            return .awaitingCompletion(currentState)
+        case .idle, .started, .awaitingRedirect, .finalizing, .completed, .failure:
+            return nil // Payment could only be finalized as a result of an ongoing operation
+        }
+    }
+
+    /// Boolean value indicating whether delegate was already asked to finalize payment.
+    private var didRequestFinalization = false
 
     // MARK: - Completed State
 
@@ -1041,6 +1083,8 @@ final class NativeAlternativePaymentDefaultInteractor:
             currentState.task.cancel()
         case .awaitingCompletion(let currentState):
             currentState.task?.cancel()
+        case .finalizing:
+            return // Customer actions are already completed, so finalization outcome takes precedence.
         case .failure, .completed:
             return
         default:

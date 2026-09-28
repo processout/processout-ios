@@ -1,18 +1,14 @@
 //
-//  PODynamicCheckoutAlternativePaymentFinalizeRequest.swift
+//  PONativeAlternativePaymentFinalizeRequestV2.swift
 //  ProcessOutUI
 //
-//  Created by Andrii Vysotskyi on 22.09.2026.
+//  Created by Andrii Vysotskyi on 28.09.2026.
 //
 
-@_spi(PO) import ProcessOut
+import ProcessOut
 
-/// Request to finalize alternative payment.
-@_spi(PO)
-public struct PODynamicCheckoutAlternativePaymentFinalizeRequest {
-
-    /// Payment method details.
-    public let paymentMethod: PODynamicCheckoutPaymentMethod.NativeAlternativePayment
+/// Request to finalize native alternative payment.
+public struct PONativeAlternativePaymentFinalizeRequestV2: Sendable {
 
     /// Current payment state. Either ``PONativeAlternativePaymentStateV2/customerActionsCompleted`` or
     /// ``PONativeAlternativePaymentStateV2/authorized`` when payment could still be captured.

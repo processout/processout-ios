@@ -106,6 +106,34 @@ enum NativeAlternativePaymentInteractorState {
         var shouldConfirmPayment: Bool
     }
 
+    struct Finalizing {
+
+        /// State that was active when finalization started.
+        enum Snapshot { // swiftlint:disable:this nesting
+
+            /// Interactor was loading initial content.
+            case starting(Starting)
+
+            /// Parameters were being submitted.
+            case submitting(Submitting)
+
+            /// User was being redirected.
+            case redirecting(Redirecting)
+
+            /// Interactor was awaiting payment completion.
+            case awaitingCompletion(AwaitingCompletion)
+        }
+
+        /// Payment state.
+        let paymentState: PONativeAlternativePaymentStateV2
+
+        /// Snapshot of the state that was active when finalization started.
+        let snapshot: Snapshot
+
+        /// Finalization task.
+        let task: Task<Void, Never>
+    }
+
     struct Completed {
 
         /// Payment method information.
@@ -163,6 +191,9 @@ enum NativeAlternativePaymentInteractorState {
     /// Parameters were submitted and accepted.
     case awaitingCompletion(AwaitingCompletion)
 
+    /// Delegate is finalizing payment.
+    case finalizing(Finalizing)
+
     /// Payment is completed.
     case completed(Completed)
 }
@@ -183,6 +214,11 @@ extension NativeAlternativePaymentInteractorState: InteractorState {
             return state
         case .submitting(let state):
             return state.snapshot
+        case .finalizing(let state):
+            if case .submitting(let submittingState) = state.snapshot {
+                return submittingState.snapshot
+            }
+            return nil
         default:
             return nil
         }
@@ -201,6 +237,8 @@ extension NativeAlternativePaymentInteractorState: InteractorState {
         case .redirecting(let state):
             state.snapshot.paymentState
         case .awaitingCompletion(let state):
+            state.paymentState
+        case .finalizing(let state):
             state.paymentState
         case .completed(let state):
             state.paymentState

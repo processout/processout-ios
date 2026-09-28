@@ -274,7 +274,7 @@ private final class NativeAlternativePaymentDelegate: PONativeAlternativePayment
     }
 
     func nativeAlternativePayment(
-        finalizeWith availableActions: [PONativeAlternativePaymentAvailableActionV2]
+        finalizeWith request: PONativeAlternativePaymentFinalizeRequestV2
     ) async throws(POFailure) {
         do {
             switch finalizationMode {
@@ -284,12 +284,15 @@ private final class NativeAlternativePaymentDelegate: PONativeAlternativePayment
                     code: .Mobile.generic
                 )
             case .authorization:
-                guard availableActions.contains(.authorize) else {
+                guard request.paymentState != .authorized else {
+                    return // Payment is already authorized
+                }
+                guard request.availableActions.contains(.authorize) else {
                     throw POFailure(message: "Authorization is not available.", code: .Mobile.generic)
                 }
                 try await interactor.authorize(invoiceId: invoiceId)
             case .capture:
-                guard availableActions.contains(.capture) else {
+                guard request.availableActions.contains(.capture) else {
                     throw POFailure(message: "Capture is not available.", code: .Mobile.generic)
                 }
                 try await interactor.capture(invoiceId: invoiceId)
