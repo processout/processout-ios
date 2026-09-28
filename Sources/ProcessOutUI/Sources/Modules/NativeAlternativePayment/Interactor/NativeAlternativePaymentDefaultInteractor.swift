@@ -1071,7 +1071,12 @@ final class NativeAlternativePaymentDefaultInteractor:
             logger.error("Unexpected error type: \(error)")
             failure = .init(message: "Unable to resolve deep link URL.", code: .Mobile.generic, underlyingError: error)
         }
-        guard failure.failureCode != .RequestValidation.redirectResultInvalid else {
+        // Redirect result is either unrelated to this payment or no longer needed, so payment continues as is.
+        let ignoredFailureCodes: [POFailureCode] = [
+            .RequestValidation.redirectResultInvalid,
+            .RequestValidation.redirectResultUnexpected
+        ]
+        guard !ignoredFailureCodes.contains(failure.failureCode) else {
             return
         }
         switch state {
