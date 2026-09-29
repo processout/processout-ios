@@ -56,6 +56,10 @@ final class DefaultInvoicesService: POInvoicesService {
         try await repository.resolveUrl(request: request)
     }
 
+    func captureInvoice(request: POInvoiceCaptureRequest) async throws {
+        try await repository.captureInvoice(request: request)
+    }
+
     // MARK: - Deprecated
 
     func nativeAlternativePaymentMethodTransactionDetails(

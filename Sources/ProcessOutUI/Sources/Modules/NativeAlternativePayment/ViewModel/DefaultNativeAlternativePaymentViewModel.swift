@@ -73,6 +73,8 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             update(with: state)
         case .awaitingCompletion(let state):
             update(with: state)
+        case .finalizing(let state):
+            update(with: state)
         case .completed(let state) where configuration.success != nil:
             update(with: state)
         default:
@@ -130,7 +132,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         newState: InteractorState.Started, oldState: InteractorState
     ) -> AnyHashable? {
         switch oldState {
-        case .idle, .starting, .submitting, .redirecting:
+        case .idle, .starting, .submitting, .redirecting, .finalizing:
             break
         default:
             let isFocusedParameterAvailable = newState.parameters.values
@@ -163,12 +165,12 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
 
     // MARK: - Awaiting Capture State
 
-    private func update(with state: InteractorState.AwaitingCompletion) {
+    private func update(with state: InteractorState.AwaitingCompletion, isFinalizing: Bool = false) {
         let newState = NativeAlternativePaymentViewModelState(
             items: createItems(state: state),
             focusedItemId: nil,
             confirmationDialog: nil,
-            controls: createFormControlGroup(state: state)
+            controls: createFormControlGroup(state: state, isFinalizing: isFinalizing)
         )
         self.state = newState
     }
@@ -216,10 +218,10 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
     }
 
     private func createFormControlGroup(
-        state: InteractorState.AwaitingCompletion
+        state: InteractorState.AwaitingCompletion, isFinalizing: Bool
     ) -> NativeAlternativePaymentViewModelControlGroup? {
         let buttons = [
-            createConfirmPaymentButton(state: state),
+            createConfirmPaymentButton(state: state, isLoading: isFinalizing),
             createCancelButton(
                 configuration: configuration.paymentConfirmation.cancelButton,
                 isEnabled: state.isCancellable
@@ -231,7 +233,9 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
         return .init(buttons: buttons, inline: configuration.prefersInlineControls)
     }
 
-    private func createConfirmPaymentButton(state: InteractorState.AwaitingCompletion) -> POButtonViewModel? {
+    private func createConfirmPaymentButton(
+        state: InteractorState.AwaitingCompletion, isLoading: Bool
+    ) -> POButtonViewModel? {
         guard state.shouldConfirmPayment else {
             return nil
         }
@@ -249,6 +253,7 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             id: "primary-button",
             title: buttonConfiguration.title,
             icon: buttonConfiguration.icon,
+            isLoading: isLoading,
             role: .primary,
             accessibilityLabel: buttonConfiguration.title ?? defaultTitle,
             action: { [weak self] in
@@ -346,6 +351,25 @@ final class DefaultNativeAlternativePaymentViewModel: ViewModel {
             }
         )
         return viewModel
+    }
+
+    // MARK: - Finalizing State
+
+    /// Keeps content of the state that was active when finalization started but disables interactions.
+    private func update(with state: InteractorState.Finalizing) {
+        switch state.snapshot {
+        case .starting:
+            updateWithStartingState()
+        case .submitting(let submittingState):
+            update(withSubmittingState: submittingState.snapshot)
+        case .redirecting(let redirectingState):
+            var awaitingRedirectState = redirectingState.snapshot
+            awaitingRedirectState.isCancellable = false
+            update(with: awaitingRedirectState, isRedirecting: true)
+        case .awaitingCompletion(var awaitingCompletionState):
+            awaitingCompletionState.isCancellable = false
+            update(with: awaitingCompletionState, isFinalizing: true)
+        }
     }
 
     // MARK: - Completed State

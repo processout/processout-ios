@@ -23,6 +23,9 @@ struct NativeAlternativePaymentServiceAdapterResponse {
 
     /// Redirect details.
     let redirect: PONativeAlternativePaymentRedirectV2?
+
+    /// Currently available actions to advance payment.
+    let availableActions: [PONativeAlternativePaymentAvailableActionV2]?
 }
 
 extension NativeAlternativePaymentServiceAdapterResponse {
@@ -33,6 +36,7 @@ extension NativeAlternativePaymentServiceAdapterResponse {
         self.invoice = authorizationResponse.invoice
         self.elements = authorizationResponse.elements
         self.redirect = authorizationResponse.redirect
+        self.availableActions = authorizationResponse.availableActions
     }
 
     init(tokenizationResponse: PONativeAlternativePaymentTokenizationResponseV2) {
@@ -41,5 +45,6 @@ extension NativeAlternativePaymentServiceAdapterResponse {
         self.invoice = nil
         self.elements = tokenizationResponse.elements
         self.redirect = tokenizationResponse.redirect
+        self.availableActions = tokenizationResponse.availableActions
     }
 }

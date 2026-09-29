@@ -51,6 +51,16 @@
         }
       }
     },
+    "alternative-payments.finalization-mode" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finalization Mode"
+          }
+        }
+      }
+    },
     "alternative-payments.flow" : {
       "localizations" : {
         "en" : {
