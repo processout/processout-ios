@@ -5,6 +5,7 @@
 //  Created by Andrii Vysotskyi on 27.06.2025.
 //
 
+import Combine
 import SwiftUI
 @_spi(PO) import ProcessOut
 @_spi(PO) import ProcessOutCoreUI

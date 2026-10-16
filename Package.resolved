@@ -1,22 +1,13 @@
 {
-  "originHash" : "81219b36d7dde792b257b8b81e3a2a828f19cffb1a8ffc6031132cf6642991e3",
+  "originHash" : "7d8a971d0ba6f966b3ed4064ff51b270c41824ffcf710d8144736c5c06da9887",
   "pins" : [
     {
       "identity" : "checkout-3ds-sdk-ios",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/checkout/checkout-3ds-sdk-ios",
       "state" : {
-        "revision" : "138658b149793a7526558291976519e684abeb41",
-        "version" : "3.3.3"
-      }
-    },
-    {
-      "identity" : "checkout-event-logger-ios-framework",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/checkout/checkout-event-logger-ios-framework.git",
-      "state" : {
-        "revision" : "a914d754b4ffb1843730e8e1f8e7e60c4bf81cf9",
-        "version" : "1.2.4"
+        "revision" : "d859b62647880131c9025b6c6615e2c099383f61",
+        "version" : "3.5.0"
       }
     },
     {
