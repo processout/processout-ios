@@ -37,6 +37,16 @@ extension PONativeAlternativePaymentStateV2 {
     /// Payment is pending.
     public static let pending = Self(rawValue: "PENDING")
 
+    /// Customer interaction completed. Explicit authorize and/or capture is expected to advance payment.
+    public static let customerActionsCompleted = Self(rawValue: "CUSTOMER_ACTIONS_COMPLETED")
+
+    /// Authorization was requested and it’s still pending. No further actions are expected, payment will
+    /// advance to next state automatically.
+    public static let authorizationPending = Self(rawValue: "AUTHORIZATION_PENDING")
+
+    /// Authorization was requested and completed.
+    public static let authorized = Self(rawValue: "AUTHORIZED")
+
     /// Payment is successfully completed.
     public static let success = Self(rawValue: "SUCCESS")
 }

@@ -38,6 +38,11 @@ struct AlternativePaymentsView: View {
                 } label: {
                     Text(.AlternativePayments.flow)
                 }
+                Picker(data: $viewModel.state.finalizationMode) { mode in
+                    Text(mode.rawValue.capitalized)
+                } label: {
+                    Text(.AlternativePayments.finalizationMode)
+                }
                 Toggle(
                     String(localized: .AlternativePayments.nativePreference),
                     isOn: $viewModel.state.preferNative
