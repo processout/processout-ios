@@ -90,6 +90,9 @@ public struct POInvoiceCreationRequest: Encodable, Sendable {
     /// Payment configuration.
     public let paymentConfiguration: PaymentConfiguration?
 
+    /// Additional metadata attached to the invoice.
+    public let metadata: [String: String]?
+
     public init(
         name: String,
         amount: Decimal,
@@ -98,6 +101,7 @@ public struct POInvoiceCreationRequest: Encodable, Sendable {
         customerId: String? = nil,
         details: [Detail] = [],
         paymentConfiguration: PaymentConfiguration? = nil,
+        metadata: [String: String]? = nil
     ) {
         self.name = name
         self._amount = .init(value: amount)
@@ -106,6 +110,7 @@ public struct POInvoiceCreationRequest: Encodable, Sendable {
         self.customerId = customerId
         self.details = details
         self.paymentConfiguration = paymentConfiguration
+        self.metadata = metadata
     }
 }
 
