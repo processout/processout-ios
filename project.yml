@@ -13,7 +13,7 @@ options:
 packages:
   Checkout3DSPackages:
     url: https://github.com/checkout/checkout-3ds-sdk-ios
-    version: 3.3.3
+    version: 3.5.0
   ThreeDS_SDK:
     url: https://github.com/netceteragroup/ios-3ds-sdk-spm
     version: 2.7.00
