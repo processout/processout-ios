@@ -10,6 +10,13 @@
 import ThreeDS_SDK
 
 /// A concrete implementation of `PO3DS2Service` using the Netcetera 3DS SDK.
+///
+/// 3DS flow is strictly sequential: an authentication, optionally followed by a challenge, and
+/// `clean()` at the end. The service does not serialize concurrent calls. Overlapping operations
+/// are considered a developer error and are rejected.
+///
+/// The Netcetera SDK does not tolerate concurrent use, so only one authentication should be
+/// running at a time across all instances of this service.
 public actor PONetcetera3DS2Service: PO3DS2Service {
 
     /// Creates a new instance of `PONetcetera3DS2Service`.
@@ -18,6 +25,7 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
         delegate: PONetcetera3DS2ServiceDelegate? = nil
     ) {
         self.eventEmitter = ProcessOut.shared.eventEmitter
+        self.logger = ProcessOut.shared.logger
         self.configuration = configuration
         self.delegate = delegate
     }
@@ -29,64 +37,158 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
 
     /// Returns the version of the 3DS SDK that is integrated with the 3DS Requestor App.
     public nonisolated var version: String? {
-        "2.5.2.2"
+        "2.7.00"
     }
 
     public func authenticationRequestParameters(
         configuration: PO3DS2Configuration
     ) async throws -> PO3DS2AuthenticationRequestParameters {
-        try await Self.authenticationSemaphore.waitUnlessCancelled(
-            cancellationError: POFailure(message: "Authentication was cancelled.", code: .Mobile.cancelled)
-        )
-        shouldSignalAuthenticationSemaphoreAfterClean = true
-        try await executionSemaphore.waitUnlessCancelled(
-            cancellationError: POFailure(message: "Authentication was cancelled.", code: .Mobile.cancelled)
-        )
-        defer {
-            executionSemaphore.signal()
+        if Task.isCancelled {
+            throw POFailure(message: "Authentication was cancelled.", code: .Mobile.cancelled)
         }
-        guard transaction == nil else {
-            throw POFailure(message: "Another authentication is already in progress.", code: .Mobile.generic)
+        switch state {
+        case .idle:
+            break
+        case .ready:
+            throw POFailure(message: "Previous transaction was not cleaned, call clean() first.", code: .Mobile.generic)
+        case .authenticating, .challenging, .cleaning:
+            throw POFailure(message: "Another operation is already in progress.", code: .Mobile.generic)
         }
-        let service = ThreeDS2ServiceSDK()
-        try await service.initialize(
-            try configurationParameters(with: configuration),
-            locale: self.configuration.locale?.identifier,
-            uiCustomization: self.configuration.uiCustomizationsV2
-        )
-        self.service = service
-        let transaction = try await service.createTransaction(
-            directoryServerId: configuration.directoryServerId, messageVersion: configuration.messageVersion
-        )
-        self.transaction = transaction
-        self.transactionId = configuration.directoryServerTransactionId
-        if self.configuration.showsProgressView {
-            try await MainActor.run {
-                try transaction.getProgressView().start()
-            }
+        state = .authenticating
+        do {
+            let (context, parameters) = try await createTransaction(configuration: configuration)
+            state = .ready(context)
+            return parameters
+        } catch {
+            state = .idle
+            throw error
         }
-        if let version = self.configuration.bridgingExtensionVersion {
-            transaction.useBridgingExtension(version: version)
-        }
-        if let delegate, await !delegate.netcetera3DS2Service(self, shouldContinueWith: try service.getWarnings()) {
-            throw POFailure(code: .Mobile.cancelled)
-        }
-        let parameters = try transaction.getAuthenticationRequestParameters()
-        return PO3DS2AuthenticationRequestParameters(parameters: parameters)
     }
 
     public func performChallenge(
         with parameters: PO3DS2ChallengeParameters
     ) async throws -> PO3DS2ChallengeResult {
-        try await executionSemaphore.waitUnlessCancelled(
-            cancellationError: POFailure(message: "Challenge was cancelled.", code: .Mobile.cancelled)
-        )
-        defer {
-            executionSemaphore.signal()
+        if Task.isCancelled {
+            throw POFailure(message: "Challenge was cancelled.", code: .Mobile.cancelled)
         }
-        guard let transaction, transactionId == parameters.threeDSServerTransactionId else {
+        guard case .ready(let context) = state,
+              context.transactionId == parameters.threeDSServerTransactionId else {
             throw POFailure(message: "Unable to resolve current transaction.", code: .Mobile.generic)
         }
+        state = .challenging(context)
+        defer {
+            state = .ready(context)
+        }
+        return try await performChallenge(with: parameters, in: context)
+    }
+
+    public func clean() async {
+        switch state {
+        case .idle:
+            break
+        case .ready(let context):
+            state = .cleaning
+            await tearDown(service: context.service, transaction: context.transaction)
+            deepLinkObservation = nil
+            state = .idle
+        case .authenticating, .challenging, .cleaning:
+            logger.warn("Ignoring clean() while another operation is in progress.")
+        }
+    }
+
+    // MARK: -
+
+    init(
+        configuration: PONetcetera3DS2ServiceConfiguration = .init(),
+        delegate: PONetcetera3DS2ServiceDelegate? = nil,
+        eventEmitter: POEventEmitter,
+        logger: POLogger
+    ) {
+        self.eventEmitter = eventEmitter
+        self.logger = logger
+        self.configuration = configuration
+        self.delegate = delegate
+    }
+
+    // MARK: - Private Nested Types
+
+    private enum State {
+
+        /// No transaction. The only state from which authentication may start.
+        case idle
+
+        /// Authentication request parameters are being created.
+        case authenticating
+
+        /// Transaction exists and may be challenged or cleaned.
+        case ready(TransactionContext)
+
+        /// Challenge is being performed on the transaction.
+        case challenging(TransactionContext)
+
+        /// Transaction is being closed and SDK resources are being released.
+        case cleaning
+    }
+
+    private struct TransactionContext {
+        let service: ThreeDS2ServiceSDK, transaction: Transaction, transactionId: String
+    }
+
+    // MARK: - Private Properties
+
+    private let configuration: PONetcetera3DS2ServiceConfiguration
+    private let eventEmitter: POEventEmitter, logger: POLogger
+
+    private var state: State = .idle
+    private var deepLinkObservation: AnyObject?
+
+    // MARK: - Authentication
+
+    /// Initializes the SDK and creates a transaction. Resources created before a failure are
+    /// released here, so a failed authentication leaves nothing behind to clean.
+    private func createTransaction(
+        configuration: PO3DS2Configuration
+    ) async throws -> (TransactionContext, PO3DS2AuthenticationRequestParameters) {
+        var initializedService: ThreeDS2ServiceSDK?, createdTransaction: Transaction?
+        do {
+            let service = ThreeDS2ServiceSDK()
+            try await service.initialize(
+                try configurationParameters(with: configuration),
+                locale: self.configuration.locale?.identifier,
+                uiCustomization: self.configuration.uiCustomizationsV2
+            )
+            initializedService = service
+            let transaction = try await service.createTransaction(
+                directoryServerId: configuration.directoryServerId, messageVersion: configuration.messageVersion
+            )
+            createdTransaction = transaction
+            if self.configuration.showsProgressView {
+                try await MainActor.run {
+                    try transaction.getProgressView().start()
+                }
+            }
+            if let version = self.configuration.bridgingExtensionVersion {
+                transaction.useBridgingExtension(version: version)
+            }
+            if let delegate, await !delegate.netcetera3DS2Service(self, shouldContinueWith: try service.getWarnings()) {
+                throw POFailure(code: .Mobile.cancelled)
+            }
+            let parameters = try transaction.getAuthenticationRequestParameters()
+            let context = TransactionContext(
+                service: service, transaction: transaction, transactionId: configuration.directoryServerTransactionId
+            )
+            return (context, PO3DS2AuthenticationRequestParameters(parameters: parameters))
+        } catch {
+            await tearDown(service: initializedService, transaction: createdTransaction)
+            throw error
+        }
+    }
+
+    // MARK: - Challenge
+
+    private func performChallenge(
+        with parameters: PO3DS2ChallengeParameters, in context: TransactionContext
+    ) async throws -> PO3DS2ChallengeResult {
         var presentingViewController = await PresentingViewControllerProvider.find()
         await delegate?.netcetera3DS2Service(
             self, willPerformChallengeOn: &presentingViewController
@@ -96,13 +198,13 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
         }
         try await MainActor.run {
             // Workaround to prevent Netcetera from modifing UI from background thread
-            try transaction.getProgressView().start()
+            try context.transaction.getProgressView().start()
         }
         let challengeParameters = ChallengeParameters(parameters: parameters)
         if let returnUrl = configuration.returnUrl {
             setReturnUrl(returnUrl, in: challengeParameters, transactionId: parameters.threeDSServerTransactionId)
         }
-        let challengeStatus = try await transaction.doChallenge(
+        let challengeStatus = try await context.transaction.doChallenge(
             challengeParameters: challengeParameters,
             timeout: Int(configuration.challengeTimeout / 60),
             in: presentingViewController
@@ -110,57 +212,19 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
         return try .init(status: challengeStatus)
     }
 
-    public func clean() async {
-        await executionSemaphore.wait()
+    // MARK: - Clean
+
+    private func tearDown(service: ThreeDS2ServiceSDK?, transaction: Transaction?) async {
         if let transaction {
             await MainActor.run {
                 try? transaction.getProgressView().stop()
             }
             try? await transaction.close()
-            self.transaction = nil
         }
-        transactionId = nil
         if let service {
             try? await service.cleanup()
-            self.service = nil
         }
-        deepLinkObservation = nil
-        if shouldSignalAuthenticationSemaphoreAfterClean {
-            shouldSignalAuthenticationSemaphoreAfterClean = false
-            Self.authenticationSemaphore.signal()
-        }
-        executionSemaphore.signal()
     }
-
-    // MARK: -
-
-    init(
-        configuration: PONetcetera3DS2ServiceConfiguration = .init(),
-        delegate: PONetcetera3DS2ServiceDelegate? = nil,
-        eventEmitter: POEventEmitter
-    ) {
-        self.eventEmitter = eventEmitter
-        self.configuration = configuration
-        self.delegate = delegate
-        self.service = .init()
-    }
-
-    // MARK: - Private Properties
-
-    private let configuration: PONetcetera3DS2ServiceConfiguration, eventEmitter: POEventEmitter
-    private var service: ThreeDS2ServiceSDK?, transaction: Transaction?, transactionId: String?
-
-    /// A semaphore used to ensure that only one method of this object runs at a time,
-    /// providing atomic-like behavior.
-    private let executionSemaphore = AsyncSemaphore(value: 1)
-
-    /// The Netcetera SDK, while allowing multiple instances, appears to have shared state issues
-    /// that can lead to incorrect behavior during concurrent authentication requests.
-    ///
-    /// This semaphore acts as a workaround to ensure that only one authentication process is
-    /// executed at a time, effectively enforcing singleton-like behavior.
-    private static let authenticationSemaphore = AsyncSemaphore(value: 1)
-    private var shouldSignalAuthenticationSemaphoreAfterClean = false // swiftlint:disable:this identifier_name
 
     // MARK: - Configuration
 
@@ -262,6 +326,4 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
             return ThreeDSSDKAppDelegate.shared.appOpened(url: event.url)
         }
     }
-
-    private var deepLinkObservation: AnyObject?
 }
