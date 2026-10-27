@@ -37,32 +37,29 @@ struct ThrottledWebAuthenticationSessionDecoratorTests {
     }
 
     @Test
-    func authenticate_runsAuthenticationsInOrder() async throws {
+    func authenticate_runsAuthenticationsSerially() async throws {
         // Given
-        var authenticatedUrls: [URL] = []
+        let inFlightCounts = POUnfairlyLocked(wrappedValue: InFlightCounts())
         let mockSession = MockWebAuthenticationSession()
-        mockSession.authenticateFromClosure = { request in
-            authenticatedUrls.append(request.url)
+        mockSession.authenticateFromClosure = { _ in
+            inFlightCounts.withLock { $0.increment() }
             try await Task.sleep(for: .milliseconds(200))
+            inFlightCounts.withLock { $0.decrement() }
             return URL(string: "response.com")!
         }
         let sut = ThrottledWebAuthenticationSessionDecorator(session: mockSession)
 
         // When
-        let urls = ["request1.com", "request2.com", "request3.com"]
-        var authentications: [Task<URL, Error>] = []
-        for url in urls {
-            authentications.append(
-                Task { try await sut.authenticate(using: Self.request(url: url)) }
-            )
-            try await Task.sleep(for: .milliseconds(50))
-        }
-        for authentication in authentications {
-            _ = try await authentication.value
+        try await withThrowingTaskGroup(of: URL.self) { group in
+            for url in ["request1.com", "request2.com", "request3.com"] {
+                group.addTask { try await sut.authenticate(using: Self.request(url: url)) }
+            }
+            try await group.waitForAll()
         }
 
         // Then
-        #expect(authenticatedUrls == urls.map { URL(string: $0)! })
+        #expect(inFlightCounts.wrappedValue.maximum == 1)
+        #expect(mockSession.authenticateCallsCount == 3)
     }
 
     @Test
@@ -158,5 +155,19 @@ struct ThrottledWebAuthenticationSessionDecoratorTests {
 
     private static func request(url: String) -> POWebAuthenticationRequest {
         .init(url: URL(string: url)!, callback: nil, prefersEphemeralSession: true)
+    }
+
+    private struct InFlightCounts {
+
+        private(set) var current = 0, maximum = 0
+
+        mutating func increment() {
+            current += 1
+            maximum = max(maximum, current)
+        }
+
+        mutating func decrement() {
+            current -= 1
+        }
     }
 }

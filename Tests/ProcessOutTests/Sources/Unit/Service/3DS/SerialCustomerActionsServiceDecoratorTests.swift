@@ -35,32 +35,31 @@ struct SerialCustomerActionsServiceDecoratorTests {
     }
 
     @Test
-    func handle_runsHandlingsInOrder() async throws {
+    func handle_runsHandlingsSerially() async throws {
         // Given
-        var handledValues: [String] = []
+        let inFlightCounts = POUnfairlyLocked(wrappedValue: InFlightCounts())
         let mockService = MockCustomerActionsService()
-        mockService.handleFromClosure = { request, _ in
-            handledValues.append(request.customerAction.value)
+        mockService.handleFromClosure = { _, _ in
+            inFlightCounts.withLock { $0.increment() }
             try await Task.sleep(for: .milliseconds(200))
+            inFlightCounts.withLock { $0.decrement() }
             return "response"
         }
         let sut = SerialCustomerActionsServiceDecorator(service: mockService)
 
         // When
-        let values = ["request1", "request2", "request3"]
-        var handlings: [Task<String, Error>] = []
-        for value in values {
-            handlings.append(
-                Task { try await sut.handle(request: Self.request(value: value), threeDSService: Mock3DS2Service()) }
-            )
-            try await Task.sleep(for: .milliseconds(50))
-        }
-        for handling in handlings {
-            _ = try await handling.value
+        try await withThrowingTaskGroup(of: String.self) { group in
+            for value in ["request1", "request2", "request3"] {
+                group.addTask {
+                    try await sut.handle(request: Self.request(value: value), threeDSService: Mock3DS2Service())
+                }
+            }
+            try await group.waitForAll()
         }
 
         // Then
-        #expect(handledValues == values)
+        #expect(inFlightCounts.wrappedValue.maximum == 1)
+        #expect(mockService.handleCallsCount == 3)
     }
 
     @Test
@@ -137,5 +136,19 @@ struct SerialCustomerActionsServiceDecoratorTests {
             webAuthenticationCallback: nil,
             prefersEphemeralWebAuthenticationSession: true
         )
+    }
+
+    private struct InFlightCounts {
+
+        private(set) var current = 0, maximum = 0
+
+        mutating func increment() {
+            current += 1
+            maximum = max(maximum, current)
+        }
+
+        mutating func decrement() {
+            current -= 1
+        }
     }
 }

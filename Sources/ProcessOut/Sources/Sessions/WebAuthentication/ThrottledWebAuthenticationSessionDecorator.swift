@@ -21,7 +21,7 @@ actor ThrottledWebAuthenticationSessionDecorator: POWebAuthenticationSession {
             // Wait for the predecessor regardless of its outcome. The wait itself is not
             // cancellable, so cancellation requested while queued is observed only after
             // the predecessor completes.
-            await previousAuthentication?.value
+            _ = await previousAuthentication?.result
             if Task.isCancelled {
                 throw POFailure(message: "Authentication session was cancelled.", code: .Mobile.cancelled)
             }
@@ -31,20 +31,19 @@ actor ThrottledWebAuthenticationSessionDecorator: POWebAuthenticationSession {
             }
             return try await session.authenticate(using: request)
         }
-        lastAuthentication = Task {
-            _ = try? await authentication.value
-        }
-        return try await withTaskCancellationHandler {
-            try await authentication.value
-        } onCancel: {
-            authentication.cancel()
-        }
+        lastAuthentication = authentication
+        return try await withTaskCancellationHandler(
+            operation: {
+                try await authentication.value
+            },
+            onCancel: authentication.cancel
+        )
     }
 
     // MARK: - Private Properties
 
     private let session: POWebAuthenticationSession
-    private var lastAuthentication: Task<Void, Never>?
+    private var lastAuthentication: Task<URL, Error>?
 
     // MARK: - Authentication Delay
 

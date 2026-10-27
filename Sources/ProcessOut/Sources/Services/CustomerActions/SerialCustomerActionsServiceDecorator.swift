@@ -26,24 +26,23 @@ actor SerialCustomerActionsServiceDecorator: CustomerActionsService {
             // Wait for the predecessor regardless of its outcome. The wait itself is not
             // cancellable, so cancellation requested while queued is observed only after
             // the predecessor completes.
-            await previousHandling?.value
+            _ = await previousHandling?.result
             if Task.isCancelled {
                 throw POFailure(message: "Customer action handling was cancelled.", code: .Mobile.cancelled)
             }
             return try await service.handle(request: request, threeDSService: threeDSService)
         }
-        lastHandling = Task {
-            _ = try? await handling.value
-        }
-        return try await withTaskCancellationHandler {
-            try await handling.value
-        } onCancel: {
-            handling.cancel()
-        }
+        lastHandling = handling
+        return try await withTaskCancellationHandler(
+            operation: {
+                try await handling.value
+            },
+            onCancel: handling.cancel
+        )
     }
 
     // MARK: - Private Properties
 
     private let service: CustomerActionsService
-    private var lastHandling: Task<Void, Never>?
+    private var lastHandling: Task<String, Error>?
 }

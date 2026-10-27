@@ -14,6 +14,9 @@ import ThreeDS_SDK
 /// 3DS flow is strictly sequential: an authentication, optionally followed by a challenge, and
 /// `clean()` at the end. The service does not serialize concurrent calls. Overlapping operations
 /// are considered a developer error and are rejected.
+///
+/// The Netcetera SDK does not tolerate concurrent use, so only one authentication should be
+/// running at a time across all instances of this service.
 public actor PONetcetera3DS2Service: PO3DS2Service {
 
     /// Creates a new instance of `PONetcetera3DS2Service`.
@@ -43,10 +46,13 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
         if Task.isCancelled {
             throw POFailure(message: "Authentication was cancelled.", code: .Mobile.cancelled)
         }
-        guard case .idle = state else {
-            throw POFailure(
-                message: "Another operation is already in progress, call clean() first.", code: .Mobile.generic
-            )
+        switch state {
+        case .idle:
+            break
+        case .ready:
+            throw POFailure(message: "Previous transaction was not cleaned, call clean() first.", code: .Mobile.generic)
+        case .authenticating, .challenging, .cleaning:
+            throw POFailure(message: "Another operation is already in progress.", code: .Mobile.generic)
         }
         state = .authenticating
         do {
