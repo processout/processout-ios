@@ -11,31 +11,44 @@ actor ThrottledWebAuthenticationSessionDecorator: POWebAuthenticationSession {
 
     init(session: POWebAuthenticationSession) {
         self.session = session
-        semaphore = AsyncSemaphore(value: 1)
     }
 
     // MARK: - WebAuthenticationSession
 
     func authenticate(using request: POWebAuthenticationRequest) async throws -> URL {
-        try await semaphore.waitUnlessCancelled(
-            cancellationError: POFailure(message: "Authentication session was cancelled.", code: .Mobile.cancelled)
-        )
-        defer {
-            lastAuthenticationTime = DispatchTime.now()
-            semaphore.signal()
+        let previousAuthentication = lastAuthentication
+        let authentication = Task<URL, Error> {
+            // Wait for the predecessor regardless of its outcome. The wait itself is not
+            // cancellable, so cancellation requested while queued is observed only after
+            // the predecessor completes.
+            await previousAuthentication?.value
+            if Task.isCancelled {
+                throw POFailure(message: "Authentication session was cancelled.", code: .Mobile.cancelled)
+            }
+            await delayAuthenticationIfNeeded()
+            defer {
+                lastAuthenticationTime = DispatchTime.now()
+            }
+            return try await session.authenticate(using: request)
         }
-        await delayAuthenticationIfNeeded()
-        return try await self.session.authenticate(using: request)
+        lastAuthentication = Task {
+            _ = try? await authentication.value
+        }
+        return try await withTaskCancellationHandler {
+            try await authentication.value
+        } onCancel: {
+            authentication.cancel()
+        }
     }
 
     // MARK: - Private Properties
 
     private let session: POWebAuthenticationSession
-    private let semaphore: AsyncSemaphore
+    private var lastAuthentication: Task<Void, Never>?
+
+    // MARK: - Authentication Delay
 
     private var lastAuthenticationTime: DispatchTime?
-
-    // MARK: - Private Methods
 
     /// `ASWebAuthenticationSession`'s `completionHandler` is invoked before session is
     /// dismissed. In attempt to workaround presentation issues sequential authentications are delayed.
