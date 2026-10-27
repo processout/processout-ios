@@ -37,7 +37,7 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
 
     /// Returns the version of the 3DS SDK that is integrated with the 3DS Requestor App.
     public nonisolated var version: String? {
-        "2.5.2.2"
+        "2.7.00"
     }
 
     public func authenticationRequestParameters(
