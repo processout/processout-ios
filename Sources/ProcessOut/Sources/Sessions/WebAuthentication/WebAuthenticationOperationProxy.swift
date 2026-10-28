@@ -15,7 +15,7 @@ final class WebAuthenticationOperationProxy {
         self.eventEmitter = eventEmitter
     }
 
-    func set(session: ASWebAuthenticationSession, continuation: CheckedContinuation<URL, Error>) {
+    func set(session: ASWebAuthenticationSession, continuation: CheckedContinuation<URL, POFailure>) {
         switch state {
         case nil:
             let observation = eventEmitter.on(PODeepLinkReceivedEvent.self) { [weak self] event in
@@ -66,7 +66,7 @@ final class WebAuthenticationOperationProxy {
         struct Processing { // swiftlint:disable:this nesting
 
             /// Continuation.
-            let continuation: CheckedContinuation<URL, Error>
+            let continuation: CheckedContinuation<URL, POFailure>
 
             /// Authentication session.
             let session: ASWebAuthenticationSession

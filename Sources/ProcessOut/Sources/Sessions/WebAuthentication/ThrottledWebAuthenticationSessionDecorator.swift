@@ -15,35 +15,39 @@ actor ThrottledWebAuthenticationSessionDecorator: POWebAuthenticationSession {
 
     // MARK: - WebAuthenticationSession
 
-    func authenticate(using request: POWebAuthenticationRequest) async throws -> URL {
+    func authenticate(using request: POWebAuthenticationRequest) async throws(POFailure) -> URL {
         let previousAuthentication = lastAuthentication
-        let authentication = Task<URL, Error> {
+        let authentication = Task<Result<URL, POFailure>, Never> {
             // Wait for the predecessor regardless of its outcome. The wait itself is not
             // cancellable, so cancellation requested while queued is observed only after
             // the predecessor completes.
-            _ = await previousAuthentication?.result
+            _ = await previousAuthentication?.value
             if Task.isCancelled {
-                throw POFailure(message: "Authentication session was cancelled.", code: .Mobile.cancelled)
+                let failure = POFailure(message: "Authentication session was cancelled.", code: .Mobile.cancelled)
+                return .failure(failure)
             }
             await delayAuthenticationIfNeeded()
             defer {
                 lastAuthenticationTime = DispatchTime.now()
             }
-            return try await session.authenticate(using: request)
+            return await Result(catching: { () async throws(POFailure) in
+                try await session.authenticate(using: request)
+            })
         }
         lastAuthentication = authentication
-        return try await withTaskCancellationHandler(
+        let result = await withTaskCancellationHandler(
             operation: {
-                try await authentication.value
+                await authentication.value
             },
             onCancel: authentication.cancel
         )
+        return try result.get()
     }
 
     // MARK: - Private Properties
 
     private let session: POWebAuthenticationSession
-    private var lastAuthentication: Task<URL, Error>?
+    private var lastAuthentication: Task<Result<URL, POFailure>, Never>?
 
     // MARK: - Authentication Delay
 
