@@ -25,7 +25,7 @@ final class DefaultCustomerActionsService: CustomerActionsService {
 
     // MARK: - CustomerActionsService
 
-    func handle(request: CustomerActionRequest, threeDSService: PO3DS2Service) async throws -> String {
+    func handle(request: CustomerActionRequest, threeDSService: PO3DS2Service) async throws(POFailure) -> String {
         do {
             switch request.customerAction.type {
             case .fingerprintMobile:
@@ -101,7 +101,7 @@ final class DefaultCustomerActionsService: CustomerActionsService {
 
     // MARK: - Redirects
 
-    private func fingerprint(url: String, callback: POWebAuthenticationCallback?) async throws -> String {
+    private func fingerprint(url: String, callback: POWebAuthenticationCallback?) async throws(POFailure) -> String {
         guard let url = URL(string: url) else {
             logger.error("Unable to create URL from string: \(url).")
             throw POFailure(message: "Can't process customer action.", code: .Mobile.internal, underlyingError: nil)
@@ -111,9 +111,10 @@ final class DefaultCustomerActionsService: CustomerActionsService {
                 message: "Unable to complete device fingerprinting within the expected time.", code: .Mobile.timeout
             )
             return try await withTimeout(Constants.webFingerprintTimeout, error: timeoutError) {
+                () async throws(POFailure) -> String in
                 try await self.redirect(url: url.absoluteString, callback: callback, prefersEphemeralSession: true)
             }
-        } catch let failure as POFailure where failure.failureCode == .Mobile.timeout {
+        } catch where error.failureCode == .Mobile.timeout {
             // Fingerprinting timeout is treated differently from other errors.
             let gatewayRequest = GatewayRequest(url: url, body: Constants.fingerprintTimeoutGatewayRequestBody)
             return try encode(gatewayRequest: gatewayRequest)
@@ -122,7 +123,7 @@ final class DefaultCustomerActionsService: CustomerActionsService {
 
     private func redirect(
         url: String, callback: POWebAuthenticationCallback?, prefersEphemeralSession: Bool
-    ) async throws -> String {
+    ) async throws(POFailure) -> String {
         guard let url = URL(string: url) else {
             logger.error("Unable to create URL from string: \(url).")
             throw POFailure(message: "Can't process customer action.", code: .Mobile.internal, underlyingError: nil)
@@ -136,7 +137,7 @@ final class DefaultCustomerActionsService: CustomerActionsService {
 
     // MARK: - Decoding
 
-    private func decode<T: Decodable>(_ type: T.Type, from string: String) throws -> T {
+    private func decode<T: Decodable>(_ type: T.Type, from string: String) throws(POFailure) -> T {
         let paddedString = string.padding(
             toLength: string.count + (4 - string.count % 4) % 4, withPad: "=", startingAt: 0
         )
@@ -154,7 +155,9 @@ final class DefaultCustomerActionsService: CustomerActionsService {
 
     // MARK: - Encoding
 
-    private func encode(requestParameters parameters: PO3DS2AuthenticationRequestParameters) throws -> String {
+    private func encode(
+        requestParameters parameters: PO3DS2AuthenticationRequestParameters
+    ) throws(POFailure) -> String {
         do {
             // Using JSONSerialization helps avoid creating boilerplate objects for JSON Web Key for coding.
             // Implementation doesn't validate JWK correctness and simply re-encodes given value.
@@ -179,7 +182,7 @@ final class DefaultCustomerActionsService: CustomerActionsService {
         }
     }
 
-    private func encode(gatewayRequest: GatewayRequest) throws -> String {
+    private func encode(gatewayRequest: GatewayRequest) throws(POFailure) -> String {
         do {
             return try Constants.gatewayRequestPrefix + encoder.encode(gatewayRequest).base64EncodedString()
         } catch {

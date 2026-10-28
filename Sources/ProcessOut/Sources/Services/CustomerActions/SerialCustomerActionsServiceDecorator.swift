@@ -20,29 +20,33 @@ actor SerialCustomerActionsServiceDecorator: CustomerActionsService {
 
     // MARK: - CustomerActionsService
 
-    func handle(request: CustomerActionRequest, threeDSService: PO3DS2Service) async throws -> String {
+    func handle(request: CustomerActionRequest, threeDSService: PO3DS2Service) async throws(POFailure) -> String {
         let previousHandling = lastHandling
-        let handling = Task<String, Error> {
+        let handling = Task<Result<String, POFailure>, Never> {
             // Wait for the predecessor regardless of its outcome. The wait itself is not
             // cancellable, so cancellation requested while queued is observed only after
             // the predecessor completes.
-            _ = await previousHandling?.result
+            _ = await previousHandling?.value
             if Task.isCancelled {
-                throw POFailure(message: "Customer action handling was cancelled.", code: .Mobile.cancelled)
+                let failure = POFailure(message: "Customer action handling was cancelled.", code: .Mobile.cancelled)
+                return .failure(failure)
             }
-            return try await service.handle(request: request, threeDSService: threeDSService)
+            return await Result(catching: { () async throws(POFailure) in
+                try await service.handle(request: request, threeDSService: threeDSService)
+            })
         }
         lastHandling = handling
-        return try await withTaskCancellationHandler(
+        let result = await withTaskCancellationHandler(
             operation: {
-                try await handling.value
+                await handling.value
             },
             onCancel: handling.cancel
         )
+        return try result.get()
     }
 
     // MARK: - Private Properties
 
     private let service: CustomerActionsService
-    private var lastHandling: Task<String, Error>?
+    private var lastHandling: Task<Result<String, POFailure>, Never>?
 }

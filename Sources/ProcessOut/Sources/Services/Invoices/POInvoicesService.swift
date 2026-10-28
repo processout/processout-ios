@@ -14,37 +14,37 @@ public protocol POInvoicesService: POService { // sourcery: AutoCompletion
 
     /// Creates invoice with given parameters.
     @_spi(PO)
-    func createInvoice(request: POInvoiceCreationRequest) async throws -> POInvoice
+    func createInvoice(request: POInvoiceCreationRequest) async throws(POFailure) -> POInvoice
 
     /// Invoice details.
-    func invoice(request: POInvoiceRequest) async throws -> POInvoice
+    func invoice(request: POInvoiceRequest) async throws(POFailure) -> POInvoice
 
     /// Performs invoice authorization with given request.
-    func authorizeInvoice(request: POInvoiceAuthorizationRequest, threeDSService: PO3DS2Service) async throws
+    func authorizeInvoice(request: POInvoiceAuthorizationRequest, threeDSService: PO3DS2Service) async throws(POFailure)
 
     /// Performs invoice authorization with given request.
     @_disfavoredOverload
     func authorizeInvoice(
         request: POInvoiceAuthorizationRequest, threeDSService: PO3DS2Service
-    ) async throws -> POInvoiceAuthorizationResponse
+    ) async throws(POFailure) -> POInvoiceAuthorizationResponse
 
     /// Performs invoice authorization using given alternative payment method details.
     func authorizeInvoice( // sourcery:completion: skip
         request: PONativeAlternativePaymentAuthorizationRequestV2
-    ) async throws -> PONativeAlternativePaymentAuthorizationResponseV2
+    ) async throws(POFailure) -> PONativeAlternativePaymentAuthorizationResponseV2
 
     /// Resolves native alternative payment return URL.
     @_spi(PO)
     func resolveUrl( // sourcery:completion: skip
         request: PONativeAlternativePaymentUrlResolutionRequestV2
-    ) async throws -> PONativeAlternativePaymentUrlResolutionResponseV2
+    ) async throws(POFailure) -> PONativeAlternativePaymentUrlResolutionResponseV2
 
     // MARK: - Alternative Payment (Deprecated)
 
     /// Requests information needed to continue existing payment or start new one.
     func nativeAlternativePaymentMethodTransactionDetails(
         request: PONativeAlternativePaymentMethodTransactionDetailsRequest
-    ) async throws -> PONativeAlternativePaymentMethodTransactionDetails
+    ) async throws(POFailure) -> PONativeAlternativePaymentMethodTransactionDetails
 
     /// Initiates native alternative payment with a given request.
     ///
@@ -52,30 +52,32 @@ public protocol POInvoicesService: POService { // sourcery: AutoCompletion
     /// `nativeApm` in response object to understand if additional data is required.
     func initiatePayment(
         request: PONativeAlternativePaymentMethodRequest
-    ) async throws -> PONativeAlternativePaymentMethodResponse
+    ) async throws(POFailure) -> PONativeAlternativePaymentMethodResponse
 
     /// Captures native alternative payament.
-    func captureNativeAlternativePayment(request: PONativeAlternativePaymentCaptureRequest) async throws
+    func captureNativeAlternativePayment(request: PONativeAlternativePaymentCaptureRequest) async throws(POFailure)
 }
 
 extension POInvoicesService {
 
     /// Performs invoice authorization with given request.
-    public func authorizeInvoice(request: POInvoiceAuthorizationRequest, threeDSService: PO3DS2Service) async throws {
+    public func authorizeInvoice(
+        request: POInvoiceAuthorizationRequest, threeDSService: PO3DS2Service
+    ) async throws(POFailure) {
         _ = try await authorizeInvoice(
             request: request, threeDSService: threeDSService
         ) as POInvoiceAuthorizationResponse
     }
 
     @_spi(PO)
-    public func createInvoice(request: POInvoiceCreationRequest) async throws -> POInvoice {
+    public func createInvoice(request: POInvoiceCreationRequest) async throws(POFailure) -> POInvoice {
         throw POFailure(code: .Mobile.generic)
     }
 
     @_spi(PO)
     public func resolveUrl(
         request: PONativeAlternativePaymentUrlResolutionRequestV2
-    ) async throws -> PONativeAlternativePaymentUrlResolutionResponseV2 {
+    ) async throws(POFailure) -> PONativeAlternativePaymentUrlResolutionResponseV2 {
         throw POFailure(code: .Mobile.generic)
     }
 }
