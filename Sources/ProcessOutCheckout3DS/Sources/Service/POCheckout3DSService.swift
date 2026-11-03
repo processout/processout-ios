@@ -25,7 +25,7 @@ public final class POCheckout3DSService: PO3DS2Service {
 
     public func authenticationRequestParameters(
         configuration: PO3DS2Configuration
-    ) async throws -> PO3DS2AuthenticationRequestParameters {
+    ) async throws(POFailure) -> PO3DS2AuthenticationRequestParameters {
         delegate?.checkout3DSService(self, willCreateAuthenticationRequestParametersWith: configuration)
         do {
             let service = try Standalone3DSService.initialize(
@@ -49,7 +49,9 @@ public final class POCheckout3DSService: PO3DS2Service {
         }
     }
 
-    public func performChallenge(with parameters: PO3DS2ChallengeParameters) async throws -> PO3DS2ChallengeResult {
+    public func performChallenge(
+        with parameters: PO3DS2ChallengeParameters
+    ) async throws(POFailure) -> PO3DS2ChallengeResult {
         delegate?.checkout3DSService(self, willPerformChallengeWith: parameters)
         do {
             guard let transaction = service?.createTransaction() else {
