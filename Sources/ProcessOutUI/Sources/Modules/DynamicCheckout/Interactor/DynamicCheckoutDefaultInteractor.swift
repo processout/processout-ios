@@ -878,7 +878,7 @@ final class DynamicCheckoutDefaultInteractor:
         saveSource: Bool,
         prefersEphemeralWebAuthenticationSession: Bool,
         startedState: State.Started
-    ) async throws -> POInvoiceAuthorizationResponse {
+    ) async throws(POFailure) -> POInvoiceAuthorizationResponse {
         guard let delegate else {
             throw POFailure(message: "Delegate must be set to authorize invoice.", code: .Mobile.generic)
         }
@@ -920,7 +920,7 @@ extension DynamicCheckoutDefaultInteractor: POCardTokenizationDelegate {
         delegate?.dynamicCheckout(didEmitCardTokenizationEvent: event)
     }
 
-    func cardTokenization(didTokenizeCard card: POCard, shouldSaveCard save: Bool) async throws {
+    func cardTokenization(didTokenizeCard card: POCard, shouldSaveCard save: Bool) async throws(POFailure) {
         invalidateInvoiceIfPossible()
         guard case .paymentProcessing(let currentState) = state else {
             logger.error("Unable to process card in unsupported state: \(state).")
