@@ -36,6 +36,13 @@ struct DeviceMetadata: Encodable, Sendable {
     /// Time zone offset in minutes.
     let appTimeZoneOffset: Int
 
-    /// Device channel. Holds device system name.
+    /// Device channel. Holds device system name. Legacy field, backend uses it for 3DS SDK
+    /// selection when `threedsSdk` is not set. Kept for backward compatibility.
     let channel: String
+
+    /// Type of the 3DS SDK that is (or is expected to be) used to authenticate payments.
+    let threedsSdk: String
+
+    /// Platform of the device, used by backend for analytics and reporting.
+    let platform: String
 }
