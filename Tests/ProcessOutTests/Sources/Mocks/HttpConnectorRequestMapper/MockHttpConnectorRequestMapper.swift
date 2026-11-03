@@ -19,10 +19,17 @@ final class MockHttpConnectorRequestMapper: HttpConnectorRequestMapper {
         set { lock.withLock { _urlRequestFromClosure = newValue } }
     }
 
-    func urlRequest(from request: HttpConnectorRequest<some Decodable>) throws -> URLRequest {
-        try lock.withLock {
+    func urlRequest(from request: HttpConnectorRequest<some Decodable>) throws(HttpConnectorFailure) -> URLRequest {
+        let urlRequestFromClosure = lock.withLock {
             _urlRequestFromCallsCount += 1
-            return try _urlRequestFromClosure()
+            return _urlRequestFromClosure
+        }
+        do {
+            return try urlRequestFromClosure!()
+        } catch let failure as HttpConnectorFailure {
+            throw failure
+        } catch {
+            throw HttpConnectorFailure(code: .internal, underlyingError: error)
         }
     }
 

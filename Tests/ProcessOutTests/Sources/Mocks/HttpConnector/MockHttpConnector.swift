@@ -9,6 +9,8 @@
 
 final class MockHttpConnector: HttpConnector {
 
+    typealias Failure = HttpConnectorFailure
+
     var executeCallsCount: Int {
         lock.withLock { _executeCallsCount }
     }
@@ -20,13 +22,21 @@ final class MockHttpConnector: HttpConnector {
 
     // MARK: - HttpConnector
 
-    func execute<Value>(request: HttpConnectorRequest<Value>) async throws -> HttpConnectorResponse<Value> {
+    func execute<Value>(
+        request: HttpConnectorRequest<Value>
+    ) async throws(HttpConnectorFailure) -> HttpConnectorResponse<Value> {
         let executeFromClosure = lock.withLock {
             _executeCallsCount += 1
             return _executeFromClosure
         }
-        // swiftlint:disable:next force_cast
-        return try await executeFromClosure!(request) as! HttpConnectorResponse<Value>
+        do {
+            // swiftlint:disable:next force_cast
+            return try await executeFromClosure!(request) as! HttpConnectorResponse<Value>
+        } catch let failure as HttpConnectorFailure {
+            throw failure
+        } catch {
+            throw HttpConnectorFailure(code: .internal, underlyingError: error)
+        }
     }
 
     func replace(configuration: HttpConnectorConfiguration) {
