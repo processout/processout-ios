@@ -106,6 +106,72 @@ struct AsyncUtilsTests {
         }
     }
 
+    @Test
+    func withTimeout_whenTimedOutOperationThrowsOnCancellation_throwsTypedTimeoutError() async {
+        // Given
+        let operation = { @Sendable () async throws(Failure) in
+            do {
+                try await Task.sleep(for: .seconds(10))
+            } catch {
+                throw Failure.cancel
+            }
+        }
+
+        // When
+        do throws(Failure) {
+            try await withTimeout(0.2, error: Failure.timeout, perform: operation)
+            Issue.record("Expected timeout error.")
+        } catch {
+            // Then
+            #expect(error == .timeout)
+        }
+    }
+
+    @Test
+    func withTimeout_whenNonCancellableOperationFailsAfterTimeout_throwsTimeoutError() async {
+        // Given
+        let operation = { @Sendable () async throws(Failure) in
+            try? await Task.sleep(for: .seconds(1))
+            throw Failure.generic
+        }
+
+        // When
+        do throws(Failure) {
+            try await withTimeout(0.2, error: Failure.timeout, perform: operation)
+            Issue.record("Expected timeout error.")
+        } catch {
+            // Then
+            #expect(error == .timeout)
+        }
+    }
+
+    @Test
+    func withTimeout_whenCancelled_throwsOperationTypedCancellationErrorNotTimeout() async throws {
+        // Given
+        let task = Task<Result<String, Failure>, Never> {
+            do throws(Failure) {
+                let value = try await withTimeout(10, error: Failure.timeout) { @Sendable () async throws(Failure) in
+                    do {
+                        try await Task.sleep(for: .seconds(10))
+                    } catch {
+                        throw Failure.cancel
+                    }
+                    return "value"
+                }
+                return .success(value)
+            } catch {
+                return .failure(error)
+            }
+        }
+        try await Task.sleep(for: .milliseconds(100))
+
+        // When
+        task.cancel()
+
+        // Then
+        #expect(await task.value == .failure(.cancel))
+    }
+
     // MARK: - Retry
 
     @Test
@@ -297,6 +363,128 @@ struct AsyncUtilsTests {
             return
         }
         Issue.record("Expected cancellation error.")
+    }
+
+    @Test
+    func retry_whenOperationFailsThenSucceeds_returnsSuccessValueAndStopsRetrying() async throws {
+        // Given
+        let attemptsCount = POUnfairlyLocked<Int>(wrappedValue: 0)
+        let observedResults = POUnfairlyLocked<[Result<String, Failure>]>(wrappedValue: [])
+
+        // When
+        let value = try await retry(
+            operation: { @Sendable () async throws(Failure) -> String in
+                let attempt = attemptsCount.withLock { count in
+                    count += 1
+                    return count
+                }
+                guard attempt > 1 else {
+                    throw Failure.generic
+                }
+                return "value"
+            },
+            while: { result in
+                observedResults.withLock { $0.append(result) }
+                if case .failure(.generic) = result {
+                    return true
+                }
+                return false
+            },
+            timeout: 10,
+            timeoutError: Failure.timeout,
+            retryStrategy: .init(function: .linear(interval: 0), maximumRetries: 3, minimum: 0)
+        )
+
+        // Then
+        #expect(value == "value")
+        #expect(observedResults.wrappedValue == [.failure(.generic), .success("value")])
+    }
+
+    @Test
+    func retry_whenRetriesAreExhaustedOnFailure_throwsLastTypedOperationError() async {
+        // Given
+        let attemptsCount = POUnfairlyLocked<Int>(wrappedValue: 0)
+
+        // When
+        do throws(Failure) {
+            _ = try await retry(
+                operation: { @Sendable () async throws(Failure) -> String in
+                    attemptsCount.withLock { $0 += 1 }
+                    throw Failure.generic
+                },
+                while: { _ in true },
+                timeout: 10,
+                timeoutError: Failure.timeout,
+                retryStrategy: .init(function: .linear(interval: 0), maximumRetries: 2, minimum: 0)
+            )
+            Issue.record("Expected operation error.")
+        } catch {
+            // Then
+            #expect(error == .generic)
+        }
+        #expect(attemptsCount.wrappedValue == 3)
+    }
+
+    @Test
+    func retry_waitsForRetryStrategyDelayBeforeNextAttempt() async throws {
+        // Given
+        let clock = ContinuousClock()
+        let attemptTimes = POUnfairlyLocked<[ContinuousClock.Instant]>(wrappedValue: [])
+        let delay: TimeInterval = 0.5
+
+        // When
+        _ = try await retry(
+            operation: { @Sendable () async throws(Failure) -> String in
+                attemptTimes.withLock { $0.append(clock.now) }
+                return "value"
+            },
+            while: { _ in true },
+            timeout: 10,
+            timeoutError: Failure.timeout,
+            // Minimum equal to interval prevents jitter from shortening the delay.
+            retryStrategy: .init(function: .linear(interval: delay), maximumRetries: 1, minimum: delay)
+        )
+
+        // Then
+        let times = attemptTimes.wrappedValue
+        try #require(times.count == 2)
+        #expect(times[1] - times[0] >= .seconds(delay))
+    }
+
+    @Test
+    func retry_whenCancelledDuringOperation_throwsTypedCancellationErrorWithoutRetrying() async throws {
+        // Given
+        let attemptsCount = POUnfairlyLocked<Int>(wrappedValue: 0)
+        let task = Task<Result<String, Failure>, Never> {
+            do throws(Failure) {
+                let value = try await retry(
+                    operation: { @Sendable () async throws(Failure) -> String in
+                        attemptsCount.withLock { $0 += 1 }
+                        do {
+                            try await Task.sleep(for: .seconds(10))
+                        } catch {
+                            throw Failure.cancel
+                        }
+                        return "value"
+                    },
+                    while: { _ in true },
+                    timeout: 10,
+                    timeoutError: Failure.timeout,
+                    retryStrategy: .init(function: .linear(interval: 0), maximumRetries: 3, minimum: 0)
+                )
+                return .success(value)
+            } catch {
+                return .failure(error)
+            }
+        }
+        try await Task.sleep(for: .milliseconds(100))
+
+        // When
+        task.cancel()
+
+        // Then
+        #expect(await task.value == .failure(.cancel))
+        #expect(attemptsCount.wrappedValue == 1)
     }
 
     // MARK: - Private Nested Types
