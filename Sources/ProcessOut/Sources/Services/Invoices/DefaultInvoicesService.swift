@@ -34,7 +34,7 @@ final class DefaultInvoicesService: POInvoicesService {
     func authorizeInvoice(
         request: POInvoiceAuthorizationRequest, threeDSService: PO3DS2Service
     ) async throws(POFailure) -> POInvoiceAuthorizationResponse {
-        do {
+        do throws(POFailure) {
             let response = try await _authorizeInvoice(request: request, threeDSService: threeDSService)
             await threeDSService.clean()
             return response
@@ -124,7 +124,7 @@ final class DefaultInvoicesService: POInvoicesService {
             return .init(customerTokenId: response.customerTokenId, outcome: response.outcome)
         }
         let newRequest: POInvoiceAuthorizationRequest
-        do {
+        do throws(POFailure) {
             let customerActionRequest = CustomerActionRequest(
                 customerAction: customerAction,
                 webAuthenticationCallback: request.webAuthenticationCallback,

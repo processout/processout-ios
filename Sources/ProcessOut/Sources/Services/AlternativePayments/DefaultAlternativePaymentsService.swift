@@ -46,7 +46,7 @@ final class DefaultAlternativePaymentsService: POAlternativePaymentsService {
     func authenticate(
         request: POAlternativePaymentAuthenticationRequest
     ) async throws(POFailure) -> POAlternativePaymentResponse {
-        do {
+        do throws(POFailure) {
             let returnUrl = try await webSession.authenticate(
                 using: .init(
                     url: request.url,

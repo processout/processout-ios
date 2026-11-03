@@ -18,7 +18,7 @@ final class HttpConnectorErrorDecorator: HttpConnector {
     }
 
     func execute<Value>(request: HttpConnectorRequest<Value>) async throws(POFailure) -> HttpConnectorResponse<Value> {
-        do {
+        do throws(HttpConnectorFailure) {
             return try await connector.execute(request: request)
         } catch {
             throw failureMapper.failure(from: error)

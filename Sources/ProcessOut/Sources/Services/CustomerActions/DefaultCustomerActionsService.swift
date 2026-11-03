@@ -106,7 +106,7 @@ final class DefaultCustomerActionsService: CustomerActionsService {
             logger.error("Unable to create URL from string: \(url).")
             throw POFailure(message: "Can't process customer action.", code: .Mobile.internal, underlyingError: nil)
         }
-        do {
+        do throws(POFailure) {
             let timeoutError = POFailure(
                 message: "Unable to complete device fingerprinting within the expected time.", code: .Mobile.timeout
             )

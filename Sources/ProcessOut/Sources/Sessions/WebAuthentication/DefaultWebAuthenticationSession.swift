@@ -25,23 +25,21 @@ final class DefaultWebAuthenticationSession:
         )
         let result = await withTaskCancellationHandler(
             operation: {
-                await Result(catching: { () async throws(POFailure) -> URL in
-                    try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<URL, POFailure>) in
-                        let session = Self.createAuthenticationSession(
-                            with: request, redirectUrl: redirectUrl, completion: operationProxy.setCompleted
-                        )
-                        session.prefersEphemeralWebBrowserSession = request.prefersEphemeralSession
-                        session.presentationContextProvider = self
-                        operationProxy.set(session: session, continuation: continuation)
-                        if Task.isCancelled {
-                            let failure = POFailure(message: "Authentication was cancelled.", code: .Mobile.cancelled)
-                            operationProxy.setCompleted(with: .failure(failure))
-                        } else if !session.start() {
-                            let failure = POFailure(message: "Unable to start authentication.", code: .Mobile.generic)
-                            operationProxy.setCompleted(with: .failure(failure))
-                        }
+                await withCheckedContinuation { (continuation: WebAuthenticationOperationProxy.Continuation) in
+                    let session = Self.createAuthenticationSession(
+                        with: request, redirectUrl: redirectUrl, completion: operationProxy.setCompleted
+                    )
+                    session.prefersEphemeralWebBrowserSession = request.prefersEphemeralSession
+                    session.presentationContextProvider = self
+                    operationProxy.set(session: session, continuation: continuation)
+                    if Task.isCancelled {
+                        let failure = POFailure(message: "Authentication was cancelled.", code: .Mobile.cancelled)
+                        operationProxy.setCompleted(with: .failure(failure))
+                    } else if !session.start() {
+                        let failure = POFailure(message: "Unable to start authentication.", code: .Mobile.generic)
+                        operationProxy.setCompleted(with: .failure(failure))
                     }
-                })
+                }
             },
             onCancel: {
                 Task { @MainActor in operationProxy.cancel() }

@@ -28,7 +28,7 @@ final class DefaultCustomerTokensService: POCustomerTokensService {
     func assignCustomerToken(
         request: POAssignCustomerTokenRequest, threeDSService: PO3DS2Service
     ) async throws(POFailure) -> POCustomerToken {
-        do {
+        do throws(POFailure) {
             let customerToken = try await _assignCustomerToken(request: request, threeDSService: threeDSService)
             await threeDSService.clean()
             return customerToken
@@ -67,7 +67,7 @@ final class DefaultCustomerTokensService: POCustomerTokensService {
         let response = try await repository.assignCustomerToken(request: request)
         if let customerAction = response.customerAction {
             let newRequest: POAssignCustomerTokenRequest
-            do {
+            do throws(POFailure) {
                 let customerActionRequest = CustomerActionRequest(
                     customerAction: customerAction,
                     webAuthenticationCallback: request.webAuthenticationCallback,
