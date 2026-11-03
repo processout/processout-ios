@@ -95,8 +95,8 @@ public final class POCheckout3DSService: PO3DS2Service {
 
     private func serviceConfiguration(
         with configuration: PO3DS2Configuration
-    ) async throws -> ThreeDS2ServiceConfiguration {
-        let configParameters = try configurationMapper.convert(configuration: configuration)
+    ) async -> ThreeDS2ServiceConfiguration {
+        let configParameters = configurationMapper.convert(configuration: configuration)
         let serviceConfiguration = delegate?.checkout3DSService(self, configurationWith: configParameters)
         return serviceConfiguration ?? .init(configParameters: configParameters)
     }
