@@ -17,13 +17,15 @@ import Checkout3DS
 public final class POCheckout3DSService: PO3DS2Service {
 
     /// Creates service instance.
-    public nonisolated init(delegate: POCheckout3DSServiceDelegate? = nil, environment: Environment = .production) {
-        self.errorMapper = DefaultAuthenticationErrorMapper()
-        self.configurationMapper = DefaultConfigurationMapper()
-        self.eventEmitter = ProcessOut.shared.eventEmitter
-        self.logger = ProcessOut.shared.logger
-        self.delegate = delegate
-        self.environment = environment
+    public nonisolated convenience init(
+        delegate: POCheckout3DSServiceDelegate? = nil, environment: Environment = .production
+    ) {
+        self.init(
+            delegate: delegate,
+            environment: environment,
+            eventEmitter: ProcessOut.shared.eventEmitter,
+            logger: ProcessOut.shared.logger
+        )
     }
 
     // MARK: - PO3DS2Service
@@ -94,12 +96,32 @@ public final class POCheckout3DSService: PO3DS2Service {
             break
         case .ready(let context):
             state = .cleaning
-            tearDown(service: context.service, transaction: context.transaction)
+            tearDown(service: context.service)
             deepLinkObservation = nil
             state = .idle
         case .authenticating, .challenging, .cleaning:
             logger.warn("Ignoring clean() while another operation is in progress.")
         }
+    }
+
+    // MARK: -
+
+    typealias ServiceProvider = @MainActor (ThreeDS2ServiceConfiguration, Environment) throws -> ThreeDS2Service
+
+    nonisolated init(
+        delegate: POCheckout3DSServiceDelegate? = nil,
+        environment: Environment = .production,
+        eventEmitter: POEventEmitter,
+        logger: POLogger,
+        serviceProvider: @escaping ServiceProvider = { try Standalone3DSService.initialize(with: $0, environment: $1) }
+    ) {
+        self.errorMapper = DefaultAuthenticationErrorMapper()
+        self.configurationMapper = DefaultConfigurationMapper()
+        self.eventEmitter = eventEmitter
+        self.logger = logger
+        self.delegate = delegate
+        self.environment = environment
+        self.serviceProvider = serviceProvider
     }
 
     // MARK: - Private Nested Types
@@ -135,6 +157,7 @@ public final class POCheckout3DSService: PO3DS2Service {
 
     private let environment: Checkout3DS.Environment
     private let delegate: POCheckout3DSServiceDelegate?
+    private let serviceProvider: ServiceProvider
 
     private var state: State = .idle
     private var deepLinkObservation: AnyObject?
@@ -150,24 +173,21 @@ public final class POCheckout3DSService: PO3DS2Service {
     private func createTransaction(
         configuration: PO3DS2Configuration
     ) async throws -> (TransactionContext, PO3DS2AuthenticationRequestParameters) {
-        var initializedService: ThreeDS2Service?, createdTransaction: Transaction?
+        var initializedService: ThreeDS2Service?
         do {
-            let service = try Standalone3DSService.initialize(
-                with: await serviceConfiguration(with: configuration), environment: environment
-            )
+            let service = try serviceProvider(await serviceConfiguration(with: configuration), environment)
             initializedService = service
             if let delegate, await !delegate.checkout3DSService(self, shouldContinueWith: await service.warnings) {
                 throw POFailure(code: .Mobile.cancelled)
             }
             let transaction = service.createTransaction()
-            createdTransaction = transaction
             let parameters = authenticationRequest(with: try await transaction.getAuthenticationRequestParameters())
             let context = TransactionContext(
                 service: service, transaction: transaction, transactionId: configuration.directoryServerTransactionId
             )
             return (context, parameters)
         } catch {
-            tearDown(service: initializedService, transaction: createdTransaction)
+            tearDown(service: initializedService)
             throw error
         }
     }
@@ -186,8 +206,8 @@ public final class POCheckout3DSService: PO3DS2Service {
 
     // MARK: - Clean
 
-    private func tearDown(service: ThreeDS2Service?, transaction: Transaction?) {
-        transaction?.close()
+    /// - NOTE: Checkout's `cleanUp()` closes the current transaction, so transaction is not closed explicitly.
+    private func tearDown(service: ThreeDS2Service?) {
         service?.cleanUp()
     }
 
