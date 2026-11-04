@@ -17,15 +17,13 @@ import Checkout3DS
 public final class POCheckout3DSService: PO3DS2Service {
 
     /// Creates service instance.
-    public nonisolated convenience init(
-        delegate: POCheckout3DSServiceDelegate? = nil, environment: Environment = .production
-    ) {
-        self.init(
-            delegate: delegate,
-            environment: environment,
-            eventEmitter: ProcessOut.shared.eventEmitter,
-            logger: ProcessOut.shared.logger
-        )
+    public nonisolated init(delegate: POCheckout3DSServiceDelegate? = nil, environment: Environment = .production) {
+        self.errorMapper = DefaultAuthenticationErrorMapper()
+        self.configurationMapper = DefaultConfigurationMapper()
+        self.eventEmitter = ProcessOut.shared.eventEmitter
+        self.logger = ProcessOut.shared.logger
+        self.delegate = delegate
+        self.environment = environment
     }
 
     // MARK: - PO3DS2Service
@@ -104,26 +102,6 @@ public final class POCheckout3DSService: PO3DS2Service {
         }
     }
 
-    // MARK: -
-
-    typealias ServiceProvider = @MainActor (ThreeDS2ServiceConfiguration, Environment) throws -> ThreeDS2Service
-
-    nonisolated init(
-        delegate: POCheckout3DSServiceDelegate? = nil,
-        environment: Environment = .production,
-        eventEmitter: POEventEmitter,
-        logger: POLogger,
-        serviceProvider: @escaping ServiceProvider = { try Standalone3DSService.initialize(with: $0, environment: $1) }
-    ) {
-        self.errorMapper = DefaultAuthenticationErrorMapper()
-        self.configurationMapper = DefaultConfigurationMapper()
-        self.eventEmitter = eventEmitter
-        self.logger = logger
-        self.delegate = delegate
-        self.environment = environment
-        self.serviceProvider = serviceProvider
-    }
-
     // MARK: - Private Nested Types
 
     private enum State {
@@ -157,7 +135,6 @@ public final class POCheckout3DSService: PO3DS2Service {
 
     private let environment: Checkout3DS.Environment
     private let delegate: POCheckout3DSServiceDelegate?
-    private let serviceProvider: ServiceProvider
 
     private var state: State = .idle
     private var deepLinkObservation: AnyObject?
@@ -175,7 +152,9 @@ public final class POCheckout3DSService: PO3DS2Service {
     ) async throws -> (TransactionContext, PO3DS2AuthenticationRequestParameters) {
         var initializedService: ThreeDS2Service?
         do {
-            let service = try serviceProvider(await serviceConfiguration(with: configuration), environment)
+            let service = try Standalone3DSService.initialize(
+                with: await serviceConfiguration(with: configuration), environment: environment
+            )
             initializedService = service
             if let delegate, await !delegate.checkout3DSService(self, shouldContinueWith: await service.warnings) {
                 throw POFailure(code: .Mobile.cancelled)
