@@ -43,7 +43,7 @@ public final class POCheckout3DSService: PO3DS2Service {
                 throw POFailure(
                     message: "Previous transaction was not cleaned, call clean() first.", code: .Mobile.generic
                 )
-            case .authenticating, .challenging, .cleaning:
+            case .authenticating, .challenging:
                 throw POFailure(message: "Another operation is already in progress.", code: .Mobile.generic)
             }
             state = .authenticating
@@ -93,11 +93,10 @@ public final class POCheckout3DSService: PO3DS2Service {
         case .idle:
             break
         case .ready(let context):
-            state = .cleaning
-            tearDown(service: context.service)
+            tearDown(service: context.service, transaction: context.transaction)
             deepLinkObservation = nil
             state = .idle
-        case .authenticating, .challenging, .cleaning:
+        case .authenticating, .challenging:
             logger.warn("Ignoring clean() while another operation is in progress.")
         }
     }
@@ -117,9 +116,6 @@ public final class POCheckout3DSService: PO3DS2Service {
 
         /// Challenge is being performed on the transaction.
         case challenging(TransactionContext)
-
-        /// Transaction is being closed and SDK resources are being released.
-        case cleaning
     }
 
     private struct TransactionContext {
@@ -150,7 +146,7 @@ public final class POCheckout3DSService: PO3DS2Service {
     private func createTransaction(
         configuration: PO3DS2Configuration
     ) async throws -> (TransactionContext, PO3DS2AuthenticationRequestParameters) {
-        var initializedService: ThreeDS2Service?
+        var initializedService: ThreeDS2Service?, createdTransaction: Transaction?
         do {
             let service = try Standalone3DSService.initialize(
                 with: await serviceConfiguration(with: configuration), environment: environment
@@ -160,13 +156,14 @@ public final class POCheckout3DSService: PO3DS2Service {
                 throw POFailure(code: .Mobile.cancelled)
             }
             let transaction = service.createTransaction()
+            createdTransaction = transaction
             let parameters = authenticationRequest(with: try await transaction.getAuthenticationRequestParameters())
             let context = TransactionContext(
                 service: service, transaction: transaction, transactionId: configuration.directoryServerTransactionId
             )
             return (context, parameters)
         } catch {
-            tearDown(service: initializedService)
+            tearDown(service: initializedService, transaction: createdTransaction)
             throw error
         }
     }
@@ -185,8 +182,8 @@ public final class POCheckout3DSService: PO3DS2Service {
 
     // MARK: - Clean
 
-    /// - NOTE: Checkout's `cleanUp()` closes the current transaction, so transaction is not closed explicitly.
-    private func tearDown(service: ThreeDS2Service?) {
+    private func tearDown(service: ThreeDS2Service?, transaction: Transaction?) {
+        transaction?.close()
         service?.cleanUp()
     }
 
