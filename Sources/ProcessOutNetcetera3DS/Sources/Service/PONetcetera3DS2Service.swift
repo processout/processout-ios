@@ -137,7 +137,8 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
     // MARK: - Private Properties
 
     private let configuration: PONetcetera3DS2ServiceConfiguration
-    private let eventEmitter: POEventEmitter, logger: POLogger
+    private let eventEmitter: POEventEmitter
+    private let logger: POLogger
 
     private var state: State = .idle
     private var deepLinkObservation: AnyObject?
