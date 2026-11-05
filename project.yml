@@ -17,6 +17,9 @@ packages:
   ThreeDS_SDK:
     url: https://github.com/netceteragroup/ios-3ds-sdk-spm
     version: 2.7.00
+  swift-cmark:
+    url: https://github.com/swiftlang/swift-cmark
+    version: 0.7.1
 targets:
   ProcessOutCoreUI:
     type: framework
@@ -70,7 +73,8 @@ targets:
     sources:
       - path: Sources/ProcessOut
     dependencies:
-      - framework: Vendor/cmark_gfm.xcframework
+      - package: swift-cmark
+        product: cmark-gfm
   ProcessOutTests:
     type: bundle.unit-test
     platform: iOS
