@@ -9,6 +9,10 @@
 import Checkout3DS
 
 /// 3DS2 service implementation that is based on Checkout3DS.
+///
+/// 3DS flow is strictly sequential: an authentication, optionally followed by a challenge, and
+/// `clean()` at the end. The service does not serialize concurrent calls. Overlapping operations
+/// are considered a developer error and are rejected.
 @MainActor
 public final class POCheckout3DSService: PO3DS2Service {
 
@@ -17,6 +21,7 @@ public final class POCheckout3DSService: PO3DS2Service {
         self.errorMapper = DefaultAuthenticationErrorMapper()
         self.configurationMapper = DefaultConfigurationMapper()
         self.eventEmitter = ProcessOut.shared.eventEmitter
+        self.logger = ProcessOut.shared.logger
         self.delegate = delegate
         self.environment = environment
     }
@@ -28,20 +33,30 @@ public final class POCheckout3DSService: PO3DS2Service {
     ) async throws -> PO3DS2AuthenticationRequestParameters {
         delegate?.checkout3DSService(self, willCreateAuthenticationRequestParametersWith: configuration)
         do {
-            let service = try Standalone3DSService.initialize(
-                with: await serviceConfiguration(with: configuration), environment: environment
-            )
-            self.service = service
-            guard await delegate?.checkout3DSService(self, shouldContinueWith: await service.warnings) ?? true else {
-                throw POFailure(code: .Mobile.cancelled)
+            if Task.isCancelled {
+                throw POFailure(message: "Authentication was cancelled.", code: .Mobile.cancelled)
             }
-            let authenticationRequest = authenticationRequest(
-                with: try await service.createTransaction().getAuthenticationRequestParameters()
-            )
-            delegate?.checkout3DSService(
-                self, didCreateAuthenticationRequestParameters: .success(authenticationRequest)
-            )
-            return authenticationRequest
+            switch state {
+            case .idle:
+                break
+            case .ready:
+                throw POFailure(
+                    message: "Previous transaction was not cleaned, call clean() first.", code: .Mobile.generic
+                )
+            case .authenticating, .challenging:
+                throw POFailure(message: "Another operation is already in progress.", code: .Mobile.generic)
+            }
+            state = .authenticating
+            let (context, parameters): (TransactionContext, PO3DS2AuthenticationRequestParameters)
+            do {
+                (context, parameters) = try await createTransaction(configuration: configuration)
+            } catch {
+                state = .idle
+                throw error
+            }
+            state = .ready(context)
+            delegate?.checkout3DSService(self, didCreateAuthenticationRequestParameters: .success(parameters))
+            return parameters
         } catch {
             let failure = failure(with: error)
             delegate?.checkout3DSService(self, didCreateAuthenticationRequestParameters: .failure(failure))
@@ -52,16 +67,18 @@ public final class POCheckout3DSService: PO3DS2Service {
     public func performChallenge(with parameters: PO3DS2ChallengeParameters) async throws -> PO3DS2ChallengeResult {
         delegate?.checkout3DSService(self, willPerformChallengeWith: parameters)
         do {
-            guard let transaction = service?.createTransaction() else {
-                throw POFailure(code: .Mobile.generic)
+            if Task.isCancelled {
+                throw POFailure(message: "Challenge was cancelled.", code: .Mobile.cancelled)
             }
-            observeDeepLinks()
-            let authenticationResult = try await transaction.doChallenge(
-                challengeParameters: challengeParameters(with: parameters)
-            )
-            let challengeResult = PO3DS2ChallengeResult(
-                transactionStatus: authenticationResult.transactionStatus ?? "N"
-            )
+            guard case .ready(let context) = state,
+                  context.transactionId == parameters.threeDSServerTransactionId else {
+                throw POFailure(message: "Unable to resolve current transaction.", code: .Mobile.generic)
+            }
+            state = .challenging(context)
+            defer {
+                state = .ready(context)
+            }
+            let challengeResult = try await performChallenge(with: parameters, in: context)
             delegate?.checkout3DSService(self, didPerformChallenge: .success(challengeResult))
             return challengeResult
         } catch {
@@ -72,9 +89,37 @@ public final class POCheckout3DSService: PO3DS2Service {
     }
 
     public func clean() async {
-        deepLinkObservation = nil
-        service?.cleanUp()
-        service = nil
+        switch state {
+        case .idle:
+            break
+        case .ready(let context):
+            tearDown(service: context.service, transaction: context.transaction)
+            deepLinkObservation = nil
+            state = .idle
+        case .authenticating, .challenging:
+            logger.warn("Ignoring clean() while another operation is in progress.")
+        }
+    }
+
+    // MARK: - Private Nested Types
+
+    private enum State {
+
+        /// No transaction. The only state from which authentication may start.
+        case idle
+
+        /// Authentication request parameters are being created.
+        case authenticating
+
+        /// Transaction exists and may be challenged or cleaned.
+        case ready(TransactionContext)
+
+        /// Challenge is being performed on the transaction.
+        case challenging(TransactionContext)
+    }
+
+    private struct TransactionContext {
+        let service: ThreeDS2Service, transaction: Transaction, transactionId: String
     }
 
     // MARK: - Private Properties
@@ -82,12 +127,65 @@ public final class POCheckout3DSService: PO3DS2Service {
     private let errorMapper: AuthenticationErrorMapper
     private let configurationMapper: ConfigurationMapper
     private let eventEmitter: POEventEmitter
+    private let logger: POLogger
 
     private let environment: Checkout3DS.Environment
     private let delegate: POCheckout3DSServiceDelegate?
 
-    private var service: ThreeDS2Service?
+    private var state: State = .idle
     private var deepLinkObservation: AnyObject?
+
+    // MARK: - Authentication
+
+    /// Initializes the SDK and creates a transaction. Resources created before a failure are
+    /// released here, so a failed authentication leaves nothing behind to clean.
+    ///
+    /// - NOTE: Transaction must be retained and reused for the challenge. Checkout's
+    /// `createTransaction()` closes the current transaction and creates a new one with fresh
+    /// SDK transaction ID and ephemeral keys, which would not match authentication request.
+    private func createTransaction(
+        configuration: PO3DS2Configuration
+    ) async throws -> (TransactionContext, PO3DS2AuthenticationRequestParameters) {
+        var initializedService: ThreeDS2Service?, createdTransaction: Transaction?
+        do {
+            let service = try Standalone3DSService.initialize(
+                with: await serviceConfiguration(with: configuration), environment: environment
+            )
+            initializedService = service
+            if let delegate, await !delegate.checkout3DSService(self, shouldContinueWith: await service.warnings) {
+                throw POFailure(code: .Mobile.cancelled)
+            }
+            let transaction = service.createTransaction()
+            createdTransaction = transaction
+            let parameters = authenticationRequest(with: try await transaction.getAuthenticationRequestParameters())
+            let context = TransactionContext(
+                service: service, transaction: transaction, transactionId: configuration.directoryServerTransactionId
+            )
+            return (context, parameters)
+        } catch {
+            tearDown(service: initializedService, transaction: createdTransaction)
+            throw error
+        }
+    }
+
+    // MARK: - Challenge
+
+    private func performChallenge(
+        with parameters: PO3DS2ChallengeParameters, in context: TransactionContext
+    ) async throws -> PO3DS2ChallengeResult {
+        observeDeepLinks()
+        let authenticationResult = try await context.transaction.doChallenge(
+            challengeParameters: challengeParameters(with: parameters)
+        )
+        return PO3DS2ChallengeResult(transactionStatus: authenticationResult.transactionStatus ?? "N")
+    }
+
+    // MARK: - Clean
+
+    private func tearDown(service: ThreeDS2Service?, transaction: Transaction?) {
+        transaction?.close()
+        service?.cleanUp()
+    }
 
     // MARK: - Mapping
 

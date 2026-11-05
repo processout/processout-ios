@@ -37,7 +37,6 @@ jobs:
         with:
           token: ${{ steps.app-token.outputs.token }}
           add-paths: |
-            *.podspec
             Version.resolved
             Sources/**/*.swift
           commit-message: Update version

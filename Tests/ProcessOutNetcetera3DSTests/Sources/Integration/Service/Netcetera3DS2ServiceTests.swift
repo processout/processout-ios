@@ -10,6 +10,7 @@ import Testing
 @testable import ProcessOutNetcetera3DS
 @_spi(PO) @testable import ProcessOut
 
+@Suite(.serialized)
 struct Netcetera3DS2ServiceTests {
 
     init() async {
@@ -21,7 +22,7 @@ struct Netcetera3DS2ServiceTests {
     @Test
     func authenticationRequestParameters_whenConfigurationIsInvalid_fails() async throws {
         // Given
-        let sut = PONetcetera3DS2Service(eventEmitter: processOut.eventEmitter)
+        let sut = PONetcetera3DS2Service(eventEmitter: processOut.eventEmitter, logger: processOut.logger)
         let configuration = PO3DS2Configuration(
             directoryServerId: "",
             directoryServerPublicKey: "",
@@ -42,7 +43,7 @@ struct Netcetera3DS2ServiceTests {
     @Test
     func authenticationRequestParameters_whenDirectoryServerIsKnown_ignoresInvalidPublicKey() async throws {
         // Given
-        let sut = PONetcetera3DS2Service(eventEmitter: processOut.eventEmitter)
+        let sut = PONetcetera3DS2Service(eventEmitter: processOut.eventEmitter, logger: processOut.logger)
         let configuration = PO3DS2Configuration(
             directoryServerId: "A000000003",
             directoryServerPublicKey: "",
@@ -64,7 +65,7 @@ struct Netcetera3DS2ServiceTests {
     @Test
     func authenticationRequestParameters_whenDirectoryServerIsUnknown_succeeds() async throws {
         // Given
-        let sut = PONetcetera3DS2Service(eventEmitter: processOut.eventEmitter)
+        let sut = PONetcetera3DS2Service(eventEmitter: processOut.eventEmitter, logger: processOut.logger)
         let configuration = PO3DS2Configuration(
             directoryServerId: "0000123456",
             directoryServerPublicKey:
@@ -93,6 +94,113 @@ struct Netcetera3DS2ServiceTests {
 
         // Cleanup
         await sut.clean()
+    }
+
+    // MARK: - State
+
+    @Test
+    func authenticationRequestParameters_whenAnotherAuthenticationIsInProgress_fails() async throws {
+        // Given
+        let sut = PONetcetera3DS2Service(eventEmitter: processOut.eventEmitter, logger: processOut.logger)
+        _ = try await sut.authenticationRequestParameters(configuration: Self.knownDirectoryServerConfiguration())
+
+        // When
+        await withKnownIssue {
+            _ = try await sut.authenticationRequestParameters(configuration: Self.knownDirectoryServerConfiguration())
+        }
+
+        // Cleanup
+        await sut.clean()
+    }
+
+    @Test
+    func authenticationRequestParameters_afterFailure_succeeds() async throws {
+        // Given
+        let sut = PONetcetera3DS2Service(eventEmitter: processOut.eventEmitter, logger: processOut.logger)
+        let invalidConfiguration = PO3DS2Configuration(
+            directoryServerId: "",
+            directoryServerPublicKey: "",
+            directoryServerRootCertificates: [],
+            directoryServerTransactionId: "",
+            messageVersion: ""
+        )
+        await withKnownIssue {
+            _ = try await sut.authenticationRequestParameters(configuration: invalidConfiguration)
+        }
+
+        // When
+        let requestParameters = try await sut.authenticationRequestParameters(
+            configuration: Self.knownDirectoryServerConfiguration()
+        )
+
+        // Then
+        #expect(!requestParameters.deviceData.isEmpty)
+
+        // Cleanup
+        await sut.clean()
+    }
+
+    @Test
+    func authenticationRequestParameters_afterClean_succeeds() async throws {
+        // Given
+        let sut = PONetcetera3DS2Service(eventEmitter: processOut.eventEmitter, logger: processOut.logger)
+        _ = try await sut.authenticationRequestParameters(configuration: Self.knownDirectoryServerConfiguration())
+        await sut.clean()
+
+        // When
+        let requestParameters = try await sut.authenticationRequestParameters(
+            configuration: Self.knownDirectoryServerConfiguration()
+        )
+
+        // Then
+        #expect(!requestParameters.deviceData.isEmpty)
+
+        // Cleanup
+        await sut.clean()
+    }
+
+    @Test
+    func performChallenge_whenThereIsNoTransaction_fails() async throws {
+        // Given
+        let sut = PONetcetera3DS2Service(eventEmitter: processOut.eventEmitter, logger: processOut.logger)
+        let parameters = PO3DS2ChallengeParameters(
+            acsTransactionId: "", acsReferenceNumber: "", acsSignedContent: "", threeDSServerTransactionId: ""
+        )
+
+        // When
+        await withKnownIssue {
+            _ = try await sut.performChallenge(with: parameters)
+        }
+    }
+
+    @Test
+    func performChallenge_whenTransactionIdDoesNotMatch_fails() async throws {
+        // Given
+        let sut = PONetcetera3DS2Service(eventEmitter: processOut.eventEmitter, logger: processOut.logger)
+        _ = try await sut.authenticationRequestParameters(configuration: Self.knownDirectoryServerConfiguration())
+        let parameters = PO3DS2ChallengeParameters(
+            acsTransactionId: "", acsReferenceNumber: "", acsSignedContent: "", threeDSServerTransactionId: "other"
+        )
+
+        // When
+        await withKnownIssue {
+            _ = try await sut.performChallenge(with: parameters)
+        }
+
+        // Cleanup
+        await sut.clean()
+    }
+
+    // MARK: - Private Methods
+
+    private static func knownDirectoryServerConfiguration() -> PO3DS2Configuration {
+        PO3DS2Configuration(
+            directoryServerId: "A000000003",
+            directoryServerPublicKey: "",
+            directoryServerRootCertificates: [],
+            directoryServerTransactionId: UUID().uuidString,
+            messageVersion: "2.3.1"
+        )
     }
 
     // MARK: - Private Properties

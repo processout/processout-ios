@@ -242,7 +242,10 @@ public final class ProcessOut: @unchecked Sendable {
         logger: POLogger
     ) -> CustomerActionsService {
         let decoder = JSONDecoder(), encoder = JSONEncoder()
-        return DefaultCustomerActionsService(decoder: decoder, encoder: encoder, webSession: webSession, logger: logger)
+        let service = DefaultCustomerActionsService(
+            decoder: decoder, encoder: encoder, webSession: webSession, logger: logger
+        )
+        return SerialCustomerActionsServiceDecorator(service: service)
     }
 
     private static func createTelemetryService(
