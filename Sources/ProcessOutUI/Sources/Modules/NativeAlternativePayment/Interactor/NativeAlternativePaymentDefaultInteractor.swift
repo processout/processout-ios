@@ -407,8 +407,24 @@ final class NativeAlternativePaymentDefaultInteractor:
                 callback: configuration.redirect.callback,
                 prefersEphemeralSession: configuration.redirect.prefersEphemeralSession
             )
-            let returnUrl = try await webAuthenticationSession.authenticate(using: authenticationRequest)
-            redirectResult = .init(success: true, result: .init(url: returnUrl))
+            do {
+                let returnUrl = try await webAuthenticationSession.authenticate(using: authenticationRequest)
+                redirectResult = .init(success: true, result: .init(url: returnUrl))
+            } catch {
+                // Report failed redirect to backend, mirroring the deep link branch,
+                // so that invoice state doesn't remain pending when customer cancels
+                // or authentication session is unable to start.
+                if redirect.confirmationRequired {
+                    _ = try? await serviceAdapter.continuePayment(
+                        with: .init(
+                            flow: configuration.flow,
+                            redirect: .init(success: false),
+                            localeIdentifier: configuration.localization.localeOverride?.identifier
+                        )
+                    )
+                }
+                throw error
+            }
         default:
             throw POFailure(errorDescription: "Unknown redirect type.", code: .Mobile.internal)
         }
