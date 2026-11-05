@@ -29,7 +29,9 @@ actor DefaultDeviceMetadataProvider: DeviceMetadataProvider {
                 appScreenWidth: Int(screen.nativeBounds.width), // Specified in pixels
                 appScreenHeight: Int(screen.nativeBounds.height),
                 appTimeZoneOffset: TimeZone.current.secondsFromGMT() / 60,
-                channel: "ios"
+                channel: "ios",
+                threedsSdk: "ios",
+                platform: "ios"
             )
             return metadata
         }

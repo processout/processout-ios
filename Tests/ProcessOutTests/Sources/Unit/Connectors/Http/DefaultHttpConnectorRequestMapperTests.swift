@@ -64,7 +64,7 @@ struct DefaultHttpConnectorRequestMapperTests {
 
         // Then
         // swiftlint:disable:next line_length
-        let expectedBody = #"{"device":{"appLanguage":"en","appScreenHeight":2,"appScreenWidth":1,"appTimeZoneOffset":3,"channel":"test","id":"id"}}"#
+        let expectedBody = #"{"device":{"appLanguage":"en","appScreenHeight":2,"appScreenWidth":1,"appTimeZoneOffset":3,"channel":"test","id":"id","platform":"test","threedsSdk":"test"}}"#
         #expect(urlRequest.httpBody == Data(expectedBody.utf8))
     }
 
@@ -81,7 +81,7 @@ struct DefaultHttpConnectorRequestMapperTests {
 
         // Then
         // swiftlint:disable:next line_length
-        let expectedBody = #"{"device":{"appLanguage":"en","appScreenHeight":2,"appScreenWidth":1,"appTimeZoneOffset":3,"channel":"test","id":"id"},"key":"value"}"#
+        let expectedBody = #"{"device":{"appLanguage":"en","appScreenHeight":2,"appScreenWidth":1,"appTimeZoneOffset":3,"channel":"test","id":"id","platform":"test","threedsSdk":"test"},"key":"value"}"#
         #expect(urlRequest.httpBody == Data(expectedBody.utf8))
     }
 
