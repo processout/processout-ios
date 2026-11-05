@@ -9,6 +9,7 @@ import Foundation
 import Testing
 import ProcessOut
 import ProcessOutCheckout3DS
+import Checkout3DS
 
 @MainActor
 @Suite(.serialized)
@@ -55,15 +56,44 @@ struct Checkout3DSServiceTests {
     // MARK: - State
 
     @Test
-    func authenticationRequestParameters_whenAnotherAuthenticationIsInProgress_fails() async throws {
+    func authenticationRequestParameters_whenPreviousTransactionIsNotCleaned_fails() async throws {
         // Given
         let sut = POCheckout3DSService()
         _ = try await sut.authenticationRequestParameters(configuration: try Self.validConfiguration())
 
         // When
-        await withKnownIssue {
+        let failure = await #expect(throws: POFailure.self) {
             _ = try await sut.authenticationRequestParameters(configuration: try Self.validConfiguration())
         }
+
+        // Then
+        #expect(failure?.message == "Previous transaction was not cleaned, call clean() first.")
+
+        // Cleanup
+        await sut.clean()
+    }
+
+    @Test
+    func authenticationRequestParameters_whenAnotherAuthenticationIsInProgress_fails() async throws {
+        // Given
+        let delegate = SuspendingDelegate()
+        let sut = POCheckout3DSService(delegate: delegate)
+        let configuration = try Self.validConfiguration()
+        let authentication = Task {
+            try await sut.authenticationRequestParameters(configuration: configuration)
+        }
+        await delegate.waitForSuspension()
+
+        // When
+        let failure = await #expect(throws: POFailure.self) {
+            _ = try await sut.authenticationRequestParameters(configuration: try Self.validConfiguration())
+        }
+
+        // Then
+        #expect(failure?.message == "Another operation is already in progress.")
+        delegate.resume()
+        let requestParameters = try await authentication.value
+        #expect(!requestParameters.deviceData.isEmpty)
 
         // Cleanup
         await sut.clean()
@@ -116,9 +146,12 @@ struct Checkout3DSServiceTests {
         let parameters = try Self.challengeParameters(transactionId: "")
 
         // When
-        await withKnownIssue {
+        let failure = await #expect(throws: POFailure.self) {
             _ = try await sut.performChallenge(with: parameters)
         }
+
+        // Then
+        #expect(failure?.message == "Unable to resolve current transaction.")
     }
 
     @Test
@@ -129,9 +162,12 @@ struct Checkout3DSServiceTests {
         let parameters = try Self.challengeParameters(transactionId: "other")
 
         // When
-        await withKnownIssue {
+        let failure = await #expect(throws: POFailure.self) {
             _ = try await sut.performChallenge(with: parameters)
         }
+
+        // Then
+        #expect(failure?.message == "Unable to resolve current transaction.")
 
         // Cleanup
         await sut.clean()
@@ -192,4 +228,36 @@ struct Checkout3DSServiceTests {
         let data = try JSONSerialization.data(withJSONObject: object)
         return try JSONDecoder().decode(T.self, from: data)
     }
+}
+
+/// Suspends authentication when asked whether to continue, until resumed by the test.
+@MainActor
+private final class SuspendingDelegate: POCheckout3DSServiceDelegate {
+
+    func waitForSuspension() async {
+        guard continuation == nil else {
+            return
+        }
+        await withCheckedContinuation { suspensionContinuation = $0 }
+    }
+
+    func resume() {
+        continuation?.resume(returning: true)
+        continuation = nil
+    }
+
+    // MARK: - POCheckout3DSServiceDelegate
+
+    func checkout3DSService(_ service: POCheckout3DSService, shouldContinueWith warnings: Set<Warning>) async -> Bool {
+        await withCheckedContinuation { continuation in
+            self.continuation = continuation
+            suspensionContinuation?.resume()
+            suspensionContinuation = nil
+        }
+    }
+
+    // MARK: - Private Properties
+
+    private var continuation: CheckedContinuation<Bool, Never>?
+    private var suspensionContinuation: CheckedContinuation<Void, Never>?
 }
