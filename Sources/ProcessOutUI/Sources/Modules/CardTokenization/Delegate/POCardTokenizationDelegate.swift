@@ -74,11 +74,17 @@ extension POCardTokenizationDelegate {
         // Ignored
     }
 
+    #if hasAttribute(diagnose)
+    @diagnose(DeprecatedDeclaration, as: ignored)
+    #endif
     @MainActor
     public func cardTokenization(preferredSchemeWith issuerInformation: POCardIssuerInformation) -> POCardScheme? {
         preferredScheme(issuerInformation: issuerInformation).map(POCardScheme.init)
     }
 
+    #if hasAttribute(diagnose)
+    @diagnose(DeprecatedDeclaration, as: ignored)
+    #endif
     @MainActor
     public func cardTokenization(didTokenizeCard card: POCard, shouldSaveCard: Bool) async throws {
         try await processTokenizedCard(card: card)
@@ -99,7 +105,7 @@ extension POCardTokenizationDelegate {
 
     @MainActor
     public func preferredScheme(issuerInformation: POCardIssuerInformation) -> String? {
-        issuerInformation.scheme
+        issuerInformation.$scheme.typed.rawValue
     }
 
     @MainActor

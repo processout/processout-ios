@@ -18,14 +18,17 @@ public struct POCard: Codable, Hashable, Sendable {
     public let projectId: String
 
     /// Scheme of the card.
+    @available(*, deprecated, message: "Use $scheme.typed instead.")
     @POTypedRepresentation<String, POCardScheme>
     public private(set) var scheme: String
 
     /// Co-scheme of the card, such as Carte Bancaire.
+    @available(*, deprecated, message: "Use $coScheme.typed instead.")
     @POTypedRepresentation<String?, POCardScheme>
     public private(set) var coScheme: String?
 
     /// Preferred scheme defined by the Customer.
+    @available(*, deprecated, message: "Use $preferredScheme.typed instead.")
     @POTypedRepresentation<String?, POCardScheme>
     public private(set) var preferredScheme: String?
 
@@ -60,6 +63,7 @@ public struct POCard: Codable, Hashable, Sendable {
     public let expYear: Int
 
     /// CVC check status.
+    @available(*, deprecated, message: "Use $cvcCheck.typed instead.")
     @POTypedRepresentation<String, POCardCvcCheck>
     public var cvcCheck: String
 

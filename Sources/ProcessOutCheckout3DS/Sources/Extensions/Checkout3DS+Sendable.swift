@@ -21,6 +21,3 @@ extension AuthenticationResult: @retroactive @unchecked Sendable { }
 
 /// Marks `ChallengeParameters` as `Sendable` retroactively.
 extension ChallengeParameters: @retroactive @unchecked Sendable { }
-
-/// Marks `AuthenticationError` as `Sendable` retroactively.
-extension AuthenticationError: @retroactive @unchecked Sendable { }

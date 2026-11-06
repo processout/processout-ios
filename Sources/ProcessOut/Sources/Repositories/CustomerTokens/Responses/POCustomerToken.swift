@@ -32,6 +32,7 @@ public struct POCustomerToken: Identifiable, Codable, Sendable {
     public let invoiceId: String?
 
     /// Source used to create the token (which will usually be a Card).
+    @available(*, deprecated, message: "Use $type.typed instead.")
     @POTypedRepresentation<String, POCustomerTokenType>
     public private(set) var type: String
 

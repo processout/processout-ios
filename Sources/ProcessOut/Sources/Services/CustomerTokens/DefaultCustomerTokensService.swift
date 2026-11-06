@@ -102,7 +102,7 @@ private extension POAssignCustomerTokenRequest { // swiftlint:disable:this no_ex
             customerId: customerId,
             tokenId: tokenId,
             source: newSource ?? source,
-            preferredScheme: preferredScheme,
+            preferredScheme: $preferredScheme.typed?.rawValue,
             verify: verify,
             invoiceId: invoiceId,
             thirdPartySdkVersion: newSdkVersion ?? thirdPartySdkVersion,

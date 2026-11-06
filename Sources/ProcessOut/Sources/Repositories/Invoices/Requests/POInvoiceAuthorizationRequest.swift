@@ -30,6 +30,7 @@ public struct POInvoiceAuthorizationRequest: Codable, Sendable { // sourcery: Au
     public let enableThreeDS2 = true // sourcery:coding: key="enable_three_d_s_2"
 
     /// Card scheme or co-scheme that should get priority if it is available.
+    @available(*, deprecated, message: "Use $preferredScheme.typed instead.")
     @POTypedRepresentation<String?, POCardScheme>
     public private(set) var preferredScheme: String?
 
