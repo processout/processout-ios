@@ -667,6 +667,7 @@ final class DynamicCheckoutDefaultInteractor:
         interactor.start()
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     private func nativeAlternativePayment(willChangeState state: NativeAlternativePaymentInteractorState) {
         guard case .paymentProcessing(var currentState) = self.state,
               case .nativeAlternativePayment = currentState.paymentMethod else {
@@ -705,6 +706,11 @@ final class DynamicCheckoutDefaultInteractor:
             currentState.isCancellable = awaitingCaptureState.isCancellable
             currentState.isReady = true
             currentState.isAwaitingNativeAlternativePaymentCapture = true
+            self.state = .paymentProcessing(currentState)
+        case .finalizing:
+            // Capture flag is intentionally preserved so cancel button keeps its appearance.
+            currentState.isCancellable = false
+            currentState.isReady = true
             self.state = .paymentProcessing(currentState)
         case .completed:
             setSuccessState(authorizationOutcome: .success)
@@ -1025,6 +1031,25 @@ extension DynamicCheckoutDefaultInteractor: PONativeAlternativePaymentDelegateV2
             paymentMethod: paymentMethod, parameters: parameters
         )
         return await delegate?.dynamicCheckout(alternativePaymentDefaultsWith: request) ?? [:]
+    }
+
+    func nativeAlternativePayment(
+        finalizeWith request: PONativeAlternativePaymentFinalizeRequestV2
+    ) async throws(POFailure) {
+        guard case .paymentProcessing(let currentState) = state,
+              case .nativeAlternativePayment(let paymentMethod) = currentState.paymentMethod else {
+            logger.error("Unable to finalize payment in current state: \(state).")
+            throw POFailure(message: "Unable to finalize payment in current state.", code: .Mobile.generic)
+        }
+        guard let delegate else {
+            throw POFailure(message: "Delegate is not set, unable to finalize payment.", code: .Mobile.internal)
+        }
+        let dynamicCheckoutRequest = PODynamicCheckoutAlternativePaymentFinalizeRequest(
+            paymentMethod: paymentMethod,
+            paymentState: request.paymentState,
+            availableActions: request.availableActions
+        )
+        try await delegate.dynamicCheckout(finalizeAlternativePaymentWith: dynamicCheckoutRequest)
     }
 }
 

@@ -63,7 +63,7 @@ final class DefaultNativeAlternativePaymentServiceAdapter: NativeAlternativePaym
             while: { result in
                 switch result {
                 case let .success(response):
-                    return response.state != .success
+                    return response.state == .pending || response.state == .authorizationPending
                 case let .failure(failure as POFailure):
                     let retriableCodes: [POFailureCode] = [
                         .Mobile.networkUnreachable, .Mobile.timeout, .Mobile.internal

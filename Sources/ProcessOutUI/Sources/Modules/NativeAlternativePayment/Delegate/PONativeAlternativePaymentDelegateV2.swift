@@ -22,4 +22,26 @@ public protocol PONativeAlternativePaymentDelegateV2: AnyObject, Sendable {
     func nativeAlternativePayment(
         defaultValuesFor parameters: [PONativeAlternativePaymentFormV2.Parameter]
     ) async -> [String: PONativeAlternativePaymentParameterValue]
+
+    /// Asks delegate to finalize payment by explicitly advancing it to an authorized and/or captured state
+    /// using one of the available actions.
+    ///
+    /// Method is invoked at most once, either when all customer actions are completed or when payment is
+    /// already authorized and could still be captured. In the latter case implementation may return without
+    /// advancing payment to leave it authorized.
+    @MainActor
+    func nativeAlternativePayment(
+        finalizeWith request: PONativeAlternativePaymentFinalizeRequestV2
+    ) async throws(POFailure)
+}
+
+extension PONativeAlternativePaymentDelegateV2 {
+
+    @MainActor
+    public func nativeAlternativePayment(
+        finalizeWith request: PONativeAlternativePaymentFinalizeRequestV2
+    ) async throws(POFailure) {
+        assertionFailure("Method must be implemented when manual finalization is used.")
+        throw .init(message: "Manual finalization is not implemented.", code: .Mobile.generic)
+    }
 }
