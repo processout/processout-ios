@@ -18,7 +18,7 @@ struct StubDeviceMetadataProvider: DeviceMetadataProvider {
             appLanguage: "en",
             appScreenWidth: 1,
             appScreenHeight: 2,
-            appTimeZoneOffset: 3,
+            appTimezoneOffset: 3,
             channel: "test",
             threedsSdk: "test",
             platform: "test"
