@@ -11,13 +11,13 @@ protocol NativeAlternativePaymentServiceAdapter {
 
     func continuePayment(
         with request: NativeAlternativePaymentServiceAdapterRequest
-    ) async throws -> NativeAlternativePaymentServiceAdapterResponse
+    ) async throws(POFailure) -> NativeAlternativePaymentServiceAdapterResponse
 
     func expectPaymentCompletion(
         with request: NativeAlternativePaymentServiceAdapterRequest
-    ) async throws -> NativeAlternativePaymentServiceAdapterResponse
+    ) async throws(POFailure) -> NativeAlternativePaymentServiceAdapterResponse
 
     func resolveUrl(
         with request: PONativeAlternativePaymentUrlResolutionRequestV2
-    ) async throws -> PONativeAlternativePaymentUrlResolutionResponseV2
+    ) async throws(POFailure) -> PONativeAlternativePaymentUrlResolutionResponseV2
 }

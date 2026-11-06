@@ -128,6 +128,25 @@ struct SerialCustomerActionsServiceDecoratorTests {
         #expect(mockService.handleCallsCount == 2)
     }
 
+    @Test
+    func handle_whenServiceFails_propagatesFailureUnchanged() async {
+        // Given
+        let mockService = MockCustomerActionsService()
+        let serviceFailure = POFailure(message: "Handling failed.", code: .Mobile.generic)
+        mockService.handleFromClosure = { _, _ in throw serviceFailure }
+        let sut = SerialCustomerActionsServiceDecorator(service: mockService)
+
+        // When
+        do throws(POFailure) {
+            _ = try await sut.handle(request: Self.request(value: "request"), threeDSService: Mock3DS2Service())
+            Issue.record("Handling is expected to fail.")
+        } catch {
+            // Then
+            #expect(error.failureCode == serviceFailure.failureCode)
+            #expect(error.message == serviceFailure.message)
+        }
+    }
+
     // MARK: - Private Methods
 
     private static func request(value: String) -> CustomerActionRequest {

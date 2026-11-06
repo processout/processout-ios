@@ -24,7 +24,7 @@ final class DefaultNativeAlternativePaymentServiceAdapter: NativeAlternativePaym
 
     func continuePayment(
         with request: NativeAlternativePaymentServiceAdapterRequest
-    ) async throws -> NativeAlternativePaymentServiceAdapterResponse {
+    ) async throws(POFailure) -> NativeAlternativePaymentServiceAdapterResponse {
         switch request.flow {
         case .authorization(let flow):
             let authorizationRequest = PONativeAlternativePaymentAuthorizationRequestV2(
@@ -55,22 +55,20 @@ final class DefaultNativeAlternativePaymentServiceAdapter: NativeAlternativePaym
 
     func expectPaymentCompletion(
         with request: NativeAlternativePaymentServiceAdapterRequest
-    ) async throws -> NativeAlternativePaymentServiceAdapterResponse {
+    ) async throws(POFailure) -> NativeAlternativePaymentServiceAdapterResponse {
         try await retry(
-            operation: {
+            operation: { () async throws(POFailure) in
                 try await self.continuePayment(with: request)
             },
             while: { result in
                 switch result {
                 case let .success(response):
                     return response.state != .success
-                case let .failure(failure as POFailure):
+                case let .failure(failure):
                     let retriableCodes: [POFailureCode] = [
                         .Mobile.networkUnreachable, .Mobile.timeout, .Mobile.internal
                     ]
                     return retriableCodes.contains(failure.failureCode)
-                case .failure:
-                    return false
                 }
             },
             timeout: min(paymentConfirmationTimeout, 15 * 60),
@@ -83,7 +81,7 @@ final class DefaultNativeAlternativePaymentServiceAdapter: NativeAlternativePaym
 
     func resolveUrl(
         with request: PONativeAlternativePaymentUrlResolutionRequestV2
-    ) async throws -> PONativeAlternativePaymentUrlResolutionResponseV2 {
+    ) async throws(POFailure) -> PONativeAlternativePaymentUrlResolutionResponseV2 {
         try await invoicesService.resolveUrl(request: request)
     }
 

@@ -24,22 +24,22 @@ final class DefaultCardsService: POCardsService {
 
     // MARK: - POCardsService
 
-    func issuerInformation(iin cardNumber: String) async throws -> POCardIssuerInformation {
+    func issuerInformation(iin cardNumber: String) async throws(POFailure) -> POCardIssuerInformation {
         // todo(andrii-vysotskyi): indicate in method arguments that method accepts full card number
         let iin = try issuerIdentificationNumber(of: cardNumber)
         return try await repository.issuerInformation(iin: iin)
     }
 
-    func tokenize(request: POCardTokenizationRequest) async throws -> POCard {
+    func tokenize(request: POCardTokenizationRequest) async throws(POFailure) -> POCard {
         try await repository.tokenize(request: request)
     }
 
-    func updateCard(request: POCardUpdateRequest) async throws -> POCard {
+    func updateCard(request: POCardUpdateRequest) async throws(POFailure) -> POCard {
         try await repository.updateCard(request: request)
     }
 
     @MainActor
-    func tokenize(request: POApplePayPaymentTokenizationRequest) async throws -> POCard {
+    func tokenize(request: POApplePayPaymentTokenizationRequest) async throws(POFailure) -> POCard {
         let request = try applePayCardTokenizationRequestMapper.tokenizationRequest(from: request)
         return try await repository.tokenize(request: request)
     }
@@ -47,7 +47,7 @@ final class DefaultCardsService: POCardsService {
     @MainActor
     func tokenize(
         request: POApplePayTokenizationRequest, delegate: POApplePayTokenizationDelegate?
-    ) async throws -> POCard {
+    ) async throws(POFailure) -> POCard {
         let coordinator = ApplePayTokenizationCoordinator(
             cardsService: self, errorMapper: applePayErrorMapper, request: request, delegate: delegate
         )
@@ -69,7 +69,7 @@ final class DefaultCardsService: POCardsService {
 
     // MARK: - Private Methods
 
-    private func issuerIdentificationNumber(of cardNumber: String) throws -> String {
+    private func issuerIdentificationNumber(of cardNumber: String) throws(POFailure) -> String {
         let iinLength: Int, filteredNumber = cardNumber.filter(\.isNumber)
         if filteredNumber.count >= 8 {
             iinLength = 8

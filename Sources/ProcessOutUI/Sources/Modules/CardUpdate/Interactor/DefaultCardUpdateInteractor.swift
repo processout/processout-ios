@@ -89,7 +89,7 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
         logger.debug("Will submit card information.")
         delegate?.cardUpdateDidEmitEvent(.willUpdateCard)
         let task = Task { @MainActor in
-            do {
+            do throws(POFailure) {
                 let request = POCardUpdateRequest(
                     cardId: configuration.cardId,
                     cvc: currentState.cvc,
@@ -197,17 +197,10 @@ final class DefaultCardUpdateInteractor: BaseInteractor<CardUpdateInteractorStat
 
     // MARK: - Failure Recovery
 
-    private func attemptRecoverUpdateError(_ error: Error) {
+    private func attemptRecoverUpdateError(_ failure: POFailure) {
         guard case .updating(let currentState) = state else {
             logger.debug("Unable to recover update error from unsupported state: \(state).")
             return
-        }
-        let failure: POFailure
-        if let error = error as? POFailure {
-            failure = error
-        } else {
-            logger.error("Unexpected error type: \(error).")
-            failure = POFailure(message: "Something went wrong.", code: .Mobile.generic, underlyingError: error)
         }
         if delegate?.shouldContinueUpdate(after: failure) != false {
             var newState = currentState.snapshot
