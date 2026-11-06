@@ -99,7 +99,7 @@ extension POCardTokenizationDelegate {
 
     @MainActor
     public func preferredScheme(issuerInformation: POCardIssuerInformation) -> String? {
-        issuerInformation.scheme
+        issuerInformation.$scheme.typed.rawValue
     }
 
     @MainActor

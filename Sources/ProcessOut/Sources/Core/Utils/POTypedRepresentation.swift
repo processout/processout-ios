@@ -17,7 +17,6 @@ public struct POTypedRepresentation<Wrapped, Representation: RawRepresentable> {
         self._wrappedValue = wrappedValue
     }
 
-    @available(*, deprecated, message: "Use typed representation accessible via projectedValue.typed instead.")
     public var wrappedValue: Wrapped {
         get { _wrappedValue }
         set { _wrappedValue = newValue }

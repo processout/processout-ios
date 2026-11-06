@@ -22,14 +22,17 @@ public struct POCardUpdateInformation: Sendable {
     public let iin: String?
 
     /// Scheme of the card.
+    @available(*, deprecated, message: "Use $scheme.typed instead.")
     @POTypedRepresentation<String?, POCardScheme>
     public private(set) var scheme: String?
 
     /// Co-scheme of the card, such as Carte Bancaire.
+    @available(*, deprecated, message: "Use $coScheme.typed instead.")
     @POTypedRepresentation<String?, POCardScheme>
     public private(set) var coScheme: String?
 
     /// Preferred scheme previously selected by customer if any.
+    @available(*, deprecated, message: "Use $preferredScheme.typed instead.")
     @POTypedRepresentation<String?, POCardScheme>
     public private(set) var preferredScheme: String?
 

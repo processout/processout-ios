@@ -23,6 +23,7 @@ public struct POAssignCustomerTokenRequest: Codable, Sendable { // sourcery: Aut
     public let source: String
 
     /// Card scheme or co-scheme that should get priority if it is available.
+    @available(*, deprecated, message: "Use $preferredScheme.typed instead.")
     @POTypedRepresentation<String?, POCardScheme>
     public private(set) var preferredScheme: String?
 
