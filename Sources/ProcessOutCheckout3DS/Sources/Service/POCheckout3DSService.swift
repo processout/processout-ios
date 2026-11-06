@@ -28,6 +28,10 @@ public final class POCheckout3DSService: PO3DS2Service {
 
     // MARK: - PO3DS2Service
 
+    public nonisolated var version: String? {
+        Checkout3DSService.productVersion
+    }
+
     public func authenticationRequestParameters(
         configuration: PO3DS2Configuration
     ) async throws -> PO3DS2AuthenticationRequestParameters {
