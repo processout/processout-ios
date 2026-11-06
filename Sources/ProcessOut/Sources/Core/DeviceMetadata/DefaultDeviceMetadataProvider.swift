@@ -9,11 +9,18 @@ import UIKit
 
 actor DefaultDeviceMetadataProvider: DeviceMetadataProvider {
 
-    init(screen: UIScreen, device: UIDevice, bundle: Bundle, keychain: Keychain) {
+    init(
+        screen: UIScreen,
+        device: UIDevice,
+        bundle: Bundle,
+        keychain: Keychain,
+        timeZone: TimeZone = .autoupdatingCurrent
+    ) {
         self.screen = screen
         self.device = device
         self.bundle = bundle
         self.keychain = keychain
+        self.timeZone = timeZone
     }
 
     // MARK: - DeviceMetadataProvider
@@ -28,7 +35,7 @@ actor DefaultDeviceMetadataProvider: DeviceMetadataProvider {
                 appLanguage: bundle.preferredLocalizations.first!, // swiftlint:disable:this force_unwrapping
                 appScreenWidth: Int(screen.nativeBounds.width), // Specified in pixels
                 appScreenHeight: Int(screen.nativeBounds.height),
-                appTimeZoneOffset: TimeZone.current.secondsFromGMT() / 60,
+                appTimezoneOffset: -timeZone.secondsFromGMT() / 60, // UTC - local, e.g. -60 for UTC+1
                 channel: "ios",
                 threedsSdk: "ios",
                 platform: "ios"
@@ -48,6 +55,7 @@ actor DefaultDeviceMetadataProvider: DeviceMetadataProvider {
     private let screen: UIScreen
     private let device: UIDevice
     private let bundle: Bundle
+    private let timeZone: TimeZone
     private let keychain: Keychain
 
     private lazy var machineName: String? = {

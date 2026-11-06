@@ -97,7 +97,7 @@ final class DefaultTelemetryService: TelemetryService, @unchecked Sendable {
         )
         let device: Telemetry.DeviceMetadata = await {
             let metadata = await deviceMetadataProvider.deviceMetadata
-            return .init(language: metadata.appLanguage, model: metadata.model, timeZone: metadata.appTimeZoneOffset)
+            return .init(language: metadata.appLanguage, model: metadata.model, timeZone: metadata.appTimezoneOffset)
         }()
         return Telemetry.Metadata(application: application, device: device)
     }

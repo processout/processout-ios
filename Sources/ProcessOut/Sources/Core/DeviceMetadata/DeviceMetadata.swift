@@ -33,8 +33,9 @@ struct DeviceMetadata: Encodable, Sendable {
     /// Height of the screen in pixels.
     let appScreenHeight: Int
 
-    /// Time zone offset in minutes.
-    let appTimeZoneOffset: Int
+    /// Difference in minutes between UTC and device local time (UTC - local), e.g. -60 for UTC+1.
+    /// Follows JavaScript `Date.getTimezoneOffset()` and EMVCo browser time zone semantics.
+    let appTimezoneOffset: Int
 
     /// Device channel. Holds device system name. Legacy field, backend uses it for 3DS SDK
     /// selection when `threedsSdk` is not set. Kept for backward compatibility.
