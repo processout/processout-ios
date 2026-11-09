@@ -93,6 +93,9 @@ public protocol POCheckout3DSServiceDelegate: AnyObject, Sendable {
 /// Provides default implementations to ensure backward compatibility.
 extension POCheckout3DSServiceDelegate {
 
+    #if hasAttribute(diagnose)
+    @diagnose(DeprecatedDeclaration, as: ignored)
+    #endif
     @MainActor
     public func checkout3DSService(
         _ service: POCheckout3DSService,
@@ -101,6 +104,9 @@ extension POCheckout3DSServiceDelegate {
         willCreateAuthenticationRequest(configuration: configuration)
     }
 
+    #if hasAttribute(diagnose)
+    @diagnose(DeprecatedDeclaration, as: ignored)
+    #endif
     @MainActor
     public func checkout3DSService(
         _ service: POCheckout3DSService,
@@ -109,6 +115,9 @@ extension POCheckout3DSServiceDelegate {
         configuration(with: parameters)
     }
 
+    #if hasAttribute(diagnose)
+    @diagnose(DeprecatedDeclaration, as: ignored)
+    #endif
     @MainActor
     public func checkout3DSService(
         _ service: POCheckout3DSService, shouldContinueWith warnings: Set<Warning>
@@ -118,6 +127,9 @@ extension POCheckout3DSServiceDelegate {
         }
     }
 
+    #if hasAttribute(diagnose)
+    @diagnose(DeprecatedDeclaration, as: ignored)
+    #endif
     @MainActor
     public func checkout3DSService(
         _ service: POCheckout3DSService,
@@ -126,6 +138,9 @@ extension POCheckout3DSServiceDelegate {
         didCreateAuthenticationRequest(result: result)
     }
 
+    #if hasAttribute(diagnose)
+    @diagnose(DeprecatedDeclaration, as: ignored)
+    #endif
     @MainActor
     public func checkout3DSService(
         _ service: POCheckout3DSService, willPerformChallengeWith parameters: PO3DS2ChallengeParameters
@@ -133,6 +148,9 @@ extension POCheckout3DSServiceDelegate {
         willHandle(challenge: parameters)
     }
 
+    #if hasAttribute(diagnose)
+    @diagnose(DeprecatedDeclaration, as: ignored)
+    #endif
     @MainActor
     public func checkout3DSService(
         _ service: POCheckout3DSService, didPerformChallenge result: Result<PO3DS2ChallengeResult, POFailure>

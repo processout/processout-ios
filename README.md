@@ -4,6 +4,7 @@ Get started with our ProcessOut [documentation](https://docs.processout.com/) or
 
 - [ProcessOut](https://swiftpackageindex.com/processout/processout-ios/documentation/processout)
 - [ProcessOutCheckout3DS](https://swiftpackageindex.com/processout/processout-ios/documentation/processoutcheckout3ds)
+- [ProcessOutCoreUI](https://swiftpackageindex.com/processout/processout-ios/documentation/processoutcoreui)
 - [ProcessOutNetcetera3DS](https://swiftpackageindex.com/processout/processout-ios/documentation/processoutnetcetera3ds)
 - [ProcessOutUI](https://swiftpackageindex.com/processout/processout-ios/documentation/processoutui)
 
@@ -17,6 +18,7 @@ Get started with our ProcessOut [documentation](https://docs.processout.com/) or
 | ---------------------- | ---------------------------------------------------------------------------- |
 | ProcessOut             | Allows to interact with ProcessOut API and provides a UI to handle payments. |
 | ProcessOutCheckout3DS  | Integration with Checkout.com 3D Secure (3DS) mobile SDK.                    |
+| ProcessOutCoreUI       | Shared styling primitives used by ProcessOutUI.                              |
 | ProcessOutNetcetera3DS | Integration with Netcetera 3D Secure (3DS) mobile SDK.                       |
 | ProcessOutUI           | ProcessOut prebuilt UI to handle payments.                                   |
 
@@ -32,7 +34,7 @@ We welcome contributions of any kind including new features, bug fixes, and gene
 
 ### Development requirements
 
-- A recent version of Xcode (tested with 16.0)
+- Xcode 26.2 or later
 - [Homebrew](https://brew.sh/) package manager
 
 ### Installation

@@ -712,6 +712,8 @@ final class NativeAlternativePaymentDefaultInteractor:
             return .group(try await resolve(group: group))
         case .unknown:
             return nil
+        @unknown default:
+            return nil
         }
         return nil
     }
@@ -916,6 +918,9 @@ final class NativeAlternativePaymentDefaultInteractor:
             }
             errorMessage = validation.errorMessage
         case .unknown:
+            assertionFailure("Unable to validate unknown parameter.")
+            return nil
+        @unknown default:
             assertionFailure("Unable to validate unknown parameter.")
             return nil
         }

@@ -29,6 +29,7 @@ public struct POCardTokenizationRequest: Codable, Sendable {
     public let contact: POContact?
 
     /// Preferred scheme defined by the Customer.
+    @available(*, deprecated, message: "Use $preferredScheme.typed instead.")
     @POTypedRepresentation<String?, POCardScheme>
     public private(set) var preferredScheme: String?
 

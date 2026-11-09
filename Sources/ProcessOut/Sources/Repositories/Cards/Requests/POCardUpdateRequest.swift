@@ -17,6 +17,7 @@ public struct POCardUpdateRequest: Codable, Sendable {
 
     /// Preferred scheme defined by the Customer. This gets priority when processing the Transaction.
     /// Pass `nil` to keep existing value.
+    @available(*, deprecated, message: "Use $preferredScheme.typed instead.")
     @POTypedRepresentation<String?, POCardScheme>
     public private(set) var preferredScheme: String?
 

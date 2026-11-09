@@ -5,7 +5,7 @@
 //  Created by Andrii Vysotskyi on 25.11.2024.
 //
 
-import class UIKit.UIApplication
+import UIKit
 import AVFoundation
 @_spi(PO) import ProcessOut
 

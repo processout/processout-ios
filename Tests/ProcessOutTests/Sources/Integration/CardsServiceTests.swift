@@ -110,7 +110,7 @@ struct CardsServiceTests {
         let card = try await sut.tokenize(request: request)
 
         // Then
-        #expect(card.preferredScheme == request.preferredScheme)
+        #expect(card.$preferredScheme.typed == request.$preferredScheme.typed)
     }
 
     // MARK: - Private Properties

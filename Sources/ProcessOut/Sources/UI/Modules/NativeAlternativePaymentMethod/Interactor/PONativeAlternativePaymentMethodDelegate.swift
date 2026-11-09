@@ -42,11 +42,17 @@ public protocol PONativeAlternativePaymentMethodDelegate: AnyObject, Sendable {
 
 extension PONativeAlternativePaymentMethodDelegate {
 
+    #if hasAttribute(diagnose)
+    @diagnose(DeprecatedDeclaration, as: ignored)
+    #endif
     @MainActor
     public func nativeAlternativePayment(didEmitEvent event: PONativeAlternativePaymentMethodEvent) {
         nativeAlternativePaymentMethodDidEmitEvent(event)
     }
 
+    #if hasAttribute(diagnose)
+    @diagnose(DeprecatedDeclaration, as: ignored)
+    #endif
     @MainActor
     public func nativeAlternativePayment(
         defaultValuesFor parameters: [PONativeAlternativePaymentMethodParameter]

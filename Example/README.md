@@ -4,7 +4,7 @@ Project demonstrates multiple flows that ProcessOut framework is capable of.
 
 ## Requirements
 
-- A recent version of Xcode (tested with 16.0)
+- Xcode 26.2 or later
 - [Homebrew](https://brew.sh) package manager
 
 ### Installation
