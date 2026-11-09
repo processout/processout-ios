@@ -21,7 +21,7 @@ public struct PO3DS2Configuration: Codable, Hashable, Sendable {
     public let directoryServerTransactionId: String
 
     /// Card scheme from the card used to initiate the payment.
-    @available(*, deprecated, message: "Use $scheme.typed instead.")
+    @available(*, deprecated, message: "Use $scheme.typed() instead.")
     @POTypedRepresentation<PO3DS2ConfigurationCardScheme?, POCardScheme>
     public private(set) var scheme: PO3DS2ConfigurationCardScheme?
 
