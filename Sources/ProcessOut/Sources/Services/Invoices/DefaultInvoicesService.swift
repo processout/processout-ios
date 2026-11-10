@@ -162,6 +162,7 @@ private extension POInvoiceAuthorizationRequest { // swiftlint:disable:this no_e
             clientSecret: clientSecret,
             metadata: metadata,
             webAuthenticationCallback: webAuthenticationCallback,
+            prefersEphemeralWebAuthenticationSession: prefersEphemeralWebAuthenticationSession,
             localeIdentifier: localeIdentifier
         )
         return updatedRequest
