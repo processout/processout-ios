@@ -145,8 +145,19 @@ public struct PONativeAlternativePaymentConfiguration {
 
         /// Enables headless mode.
         ///
-        /// The web redirect will be handled directly when it's the first step in the flow,
-        /// and if it's the only required step, it will complete the flow without starting the bottom sheet.
+        /// When enabled, a redirect returned as the first step of the flow is performed immediately,
+        /// skipping the confirmation configured with ``redirectButton``. Redirects required at later
+        /// steps (for example, after parameters are submitted) still respect ``redirectButton``.
+        ///
+        /// - Note: When ``redirectButton`` is `nil` (the default), redirects never require confirmation,
+        ///   so this option has no effect.
+        ///
+        /// - Note: For web redirects the flow waits for the customer to return, so if the redirect is
+        ///   the only required step the payment may complete before the component's `start()` returns,
+        ///   without presenting the component's own UI. The redirect itself is still presented in a system
+        ///   web authentication session, which requires a foreground-active window. For deep link redirects
+        ///   the flow continues as soon as the link is opened, so `start()` usually returns while the payment
+        ///   is still pending.
         public let enableHeadlessMode: Bool
 
         /// Redirect confirmation button configuration. To remove button use `nil`, this is default behaviour.
