@@ -27,7 +27,7 @@ public final class POTest3DSService: PO3DS2Service {
 
     public func authenticationRequestParameters(
         configuration: PO3DS2Configuration
-    ) async throws -> PO3DS2AuthenticationRequestParameters {
+    ) async throws(POFailure) -> PO3DS2AuthenticationRequestParameters {
         PO3DS2AuthenticationRequestParameters(
             deviceData: "",
             sdkAppId: "",
@@ -37,7 +37,9 @@ public final class POTest3DSService: PO3DS2Service {
         )
     }
 
-    public func performChallenge(with parameters: PO3DS2ChallengeParameters) async throws -> PO3DS2ChallengeResult {
+    public func performChallenge(
+        with parameters: PO3DS2ChallengeParameters
+    ) async throws(POFailure) -> PO3DS2ChallengeResult {
         guard let presentingViewController = PresentingViewControllerProvider.find() else {
             throw POFailure(message: "Unable to present 3DS challenge.", code: .Mobile.generic)
         }

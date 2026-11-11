@@ -10,7 +10,7 @@ import Checkout3DS
 
 struct DefaultConfigurationMapper: ConfigurationMapper {
 
-    func convert(configuration: PO3DS2Configuration) throws -> ThreeDS2ServiceConfiguration.ConfigParameters {
+    func convert(configuration: PO3DS2Configuration) -> ThreeDS2ServiceConfiguration.ConfigParameters {
         let directoryServerData = ThreeDS2ServiceConfiguration.DirectoryServerData(
             directoryServerID: configuration.directoryServerId,
             directoryServerPublicKey: configuration.directoryServerPublicKey,

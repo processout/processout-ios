@@ -7,13 +7,13 @@
 
 final class HttpCustomersRepository: CustomersRepository {
 
-    init(connector: HttpConnector) {
+    init(connector: any HttpConnector<POFailure>) {
         self.connector = connector
     }
 
     // MARK: - CustomersRepository
 
-    func createCustomer(request: POCustomerCreationRequest) async throws -> POCustomer {
+    func createCustomer(request: POCustomerCreationRequest) async throws(POFailure) -> POCustomer {
         struct Response: Decodable, Sendable {
             let customer: POCustomer
         }
@@ -25,5 +25,5 @@ final class HttpCustomersRepository: CustomersRepository {
 
     // MARK: - Private Properties
 
-    private let connector: HttpConnector
+    private let connector: any HttpConnector<POFailure>
 }

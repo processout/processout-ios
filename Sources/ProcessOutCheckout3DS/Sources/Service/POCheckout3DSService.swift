@@ -34,7 +34,7 @@ public final class POCheckout3DSService: PO3DS2Service {
 
     public func authenticationRequestParameters(
         configuration: PO3DS2Configuration
-    ) async throws -> PO3DS2AuthenticationRequestParameters {
+    ) async throws(POFailure) -> PO3DS2AuthenticationRequestParameters {
         delegate?.checkout3DSService(self, willCreateAuthenticationRequestParametersWith: configuration)
         do {
             if Task.isCancelled {
@@ -68,7 +68,9 @@ public final class POCheckout3DSService: PO3DS2Service {
         }
     }
 
-    public func performChallenge(with parameters: PO3DS2ChallengeParameters) async throws -> PO3DS2ChallengeResult {
+    public func performChallenge(
+        with parameters: PO3DS2ChallengeParameters
+    ) async throws(POFailure) -> PO3DS2ChallengeResult {
         delegate?.checkout3DSService(self, willPerformChallengeWith: parameters)
         do {
             if Task.isCancelled {
@@ -195,8 +197,8 @@ public final class POCheckout3DSService: PO3DS2Service {
 
     private func serviceConfiguration(
         with configuration: PO3DS2Configuration
-    ) async throws -> ThreeDS2ServiceConfiguration {
-        let configParameters = try configurationMapper.convert(configuration: configuration)
+    ) async -> ThreeDS2ServiceConfiguration {
+        let configParameters = configurationMapper.convert(configuration: configuration)
         let serviceConfiguration = delegate?.checkout3DSService(self, configurationWith: configParameters)
         return serviceConfiguration ?? .init(configParameters: configParameters)
     }

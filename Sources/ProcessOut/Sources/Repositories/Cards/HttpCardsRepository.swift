@@ -9,13 +9,13 @@ import Foundation
 
 final class HttpCardsRepository: CardsRepository {
 
-    init(connector: HttpConnector) {
+    init(connector: any HttpConnector<POFailure>) {
         self.connector = connector
     }
 
     // MARK: - CardsRepository
 
-    func issuerInformation(iin: String) async throws -> POCardIssuerInformation {
+    func issuerInformation(iin: String) async throws(POFailure) -> POCardIssuerInformation {
         struct Response: Decodable, Sendable {
             let cardInformation: POCardIssuerInformation
         }
@@ -23,7 +23,7 @@ final class HttpCardsRepository: CardsRepository {
         return try await connector.execute(request: httpRequest).cardInformation
     }
 
-    func tokenize(request: POCardTokenizationRequest) async throws -> POCard {
+    func tokenize(request: POCardTokenizationRequest) async throws(POFailure) -> POCard {
         let httpRequest = HttpConnectorRequest<CardTokenizationResponse>.post(
             path: "/cards",
             body: request,
@@ -33,7 +33,7 @@ final class HttpCardsRepository: CardsRepository {
         return try await connector.execute(request: httpRequest).card
     }
 
-    func updateCard(request: POCardUpdateRequest) async throws -> POCard {
+    func updateCard(request: POCardUpdateRequest) async throws(POFailure) -> POCard {
         let httpRequest = HttpConnectorRequest<CardTokenizationResponse>.put(
             path: "/cards/" + request.cardId,
             body: request,
@@ -43,7 +43,7 @@ final class HttpCardsRepository: CardsRepository {
         return try await connector.execute(request: httpRequest).card
     }
 
-    func tokenize(request: ApplePayCardTokenizationRequest) async throws -> POCard {
+    func tokenize(request: ApplePayCardTokenizationRequest) async throws(POFailure) -> POCard {
         let httpRequest = HttpConnectorRequest<CardTokenizationResponse>.post(
             path: "/cards", body: request, includesDeviceMetadata: true
         )
@@ -52,5 +52,5 @@ final class HttpCardsRepository: CardsRepository {
 
     // MARK: - Private Properties
 
-    private let connector: HttpConnector
+    private let connector: any HttpConnector<POFailure>
 }

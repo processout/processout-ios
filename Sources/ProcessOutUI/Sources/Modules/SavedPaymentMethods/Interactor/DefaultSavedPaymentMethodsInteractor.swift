@@ -43,7 +43,7 @@ final class DefaultSavedPaymentMethodsInteractor:
                 setFailureState(failure)
                 return
             }
-            do {
+            do throws(POFailure) {
                 let invoice = try await invoicesService.invoice(
                     request: configuration.invoiceRequest.replacing(
                         expand: [.paymentMethods],
@@ -120,11 +120,10 @@ final class DefaultSavedPaymentMethodsInteractor:
 
     // MARK: - Failure State
 
-    private func setFailureState(_ error: Error) {
+    private func setFailureState(_ failure: POFailure) {
         if state.isSink {
-            logger.debug("Already in a sink state, ignoring attempt to set completed state with: \(error).")
+            logger.debug("Already in a sink state, ignoring attempt to set completed state with: \(failure).")
         } else {
-            let failure = self.failure(with: error)
             logger.info("Did complete with error: \(failure).")
             state = .completed(.failure(failure))
             delegate?.savedPaymentMethods(didEmitEvent: .didComplete(.failure(failure)))
@@ -153,18 +152,17 @@ final class DefaultSavedPaymentMethodsInteractor:
         delegate?.savedPaymentMethods(didEmitEvent: .didStart(.init(paymentMethods: paymentMethods)))
     }
 
-    private func setStartedState(afterDeletionError error: Error) {
+    private func setStartedState(afterDeletionError failure: POFailure) {
         guard case .removing(let currentState) = state else {
             return
         }
-        let failure = self.failure(with: error)
         let nextState = State.Started(
             paymentMethods: currentState.startedStateSnapshot.paymentMethods,
             customerId: currentState.startedStateSnapshot.customerId,
             recentFailure: failure
         )
         logger.warn(
-            "Did fail to delete payment method: \(error).",
+            "Did fail to delete payment method: \(failure).",
             attributes: [.customerTokenId: currentState.removedPaymentMethod.configuration.customerTokenId]
         )
         state = .started(nextState)
@@ -216,7 +214,7 @@ final class DefaultSavedPaymentMethodsInteractor:
                 clientSecret: configuration.invoiceRequest.clientSecret ?? "",
                 localeIdentifier: configuration.localization.localeOverride?.identifier
             )
-            do {
+            do throws(POFailure) {
                 try await customerTokensService.deleteCustomerToken(request: request)
                 logger.debug("Did delete payment method.", attributes: [.customerTokenId: customerTokenId])
                 delegate?.savedPaymentMethods(didEmitEvent: .didDeletePaymentMethod(
@@ -247,12 +245,5 @@ final class DefaultSavedPaymentMethodsInteractor:
             return nil
         }
         return customerToken
-    }
-
-    private func failure(with error: Error) -> POFailure {
-        if let failure = error as? POFailure {
-            return failure
-        }
-        return POFailure(message: "Something went wrong.", code: .Mobile.generic, underlyingError: error)
     }
 }

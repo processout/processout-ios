@@ -21,12 +21,18 @@ final class MockWebAuthenticationSession: POWebAuthenticationSession {
 
     // MARK: -
 
-    func authenticate(using request: POWebAuthenticationRequest) async throws -> URL {
+    func authenticate(using request: POWebAuthenticationRequest) async throws(POFailure) -> URL {
         let authenticate = lock.withLock {
             _authenticateCallsCount += 1
             return _authenticateFromClosure
         }
-        return try await authenticate!(request)
+        do {
+            return try await authenticate!(request)
+        } catch let failure as POFailure {
+            throw failure
+        } catch {
+            throw POFailure(code: .Mobile.internal, underlyingError: error)
+        }
     }
 
     // MARK: - Private Properties

@@ -19,7 +19,7 @@ import ThreeDS_SDK
 ///
 /// The Netcetera SDK does not tolerate concurrent use, so only one authentication should be
 /// running at a time across all instances of this service.
-public actor PONetcetera3DS2Service: PO3DS2Service {
+public actor PONetcetera3DS2Service: PO3DS2Service { // swiftlint:disable:this type_body_length
 
     /// Creates a new instance of `PONetcetera3DS2Service`.
     public init(
@@ -44,7 +44,7 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
 
     public func authenticationRequestParameters(
         configuration: PO3DS2Configuration
-    ) async throws -> PO3DS2AuthenticationRequestParameters {
+    ) async throws(POFailure) -> PO3DS2AuthenticationRequestParameters {
         if Task.isCancelled {
             throw POFailure(message: "Authentication was cancelled.", code: .Mobile.cancelled)
         }
@@ -63,13 +63,13 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
             return parameters
         } catch {
             state = .idle
-            throw error
+            throw POFailure(wrapping: error, message: "Unable to create authentication request parameters.")
         }
     }
 
     public func performChallenge(
         with parameters: PO3DS2ChallengeParameters
-    ) async throws -> PO3DS2ChallengeResult {
+    ) async throws(POFailure) -> PO3DS2ChallengeResult {
         if Task.isCancelled {
             throw POFailure(message: "Challenge was cancelled.", code: .Mobile.cancelled)
         }
@@ -81,7 +81,11 @@ public actor PONetcetera3DS2Service: PO3DS2Service {
         defer {
             state = .ready(context)
         }
-        return try await performChallenge(with: parameters, in: context)
+        do {
+            return try await performChallenge(with: parameters, in: context)
+        } catch {
+            throw POFailure(wrapping: error, message: "Unable to perform challenge.")
+        }
     }
 
     public func clean() async {

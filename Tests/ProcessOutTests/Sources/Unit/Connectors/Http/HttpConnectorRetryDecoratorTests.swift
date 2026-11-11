@@ -72,5 +72,5 @@ struct HttpConnectorRetryDecoratorTests {
     // MARK: - Private Properties
 
     private let mock: MockHttpConnector
-    private let sut: HttpConnector
+    private let sut: any HttpConnector<HttpConnectorFailure>
 }

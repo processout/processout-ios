@@ -128,6 +128,25 @@ struct ThrottledWebAuthenticationSessionDecoratorTests {
         #expect(mockSession.authenticateCallsCount == 2)
     }
 
+    @Test
+    func authenticate_whenSessionFails_propagatesFailureUnchanged() async {
+        // Given
+        let mockSession = MockWebAuthenticationSession()
+        let sessionFailure = POFailure(message: "Authentication failed.", code: .Mobile.generic)
+        mockSession.authenticateFromClosure = { _ in throw sessionFailure }
+        let sut = ThrottledWebAuthenticationSessionDecorator(session: mockSession)
+
+        // When
+        do throws(POFailure) {
+            _ = try await sut.authenticate(using: Self.request(url: "request.com"))
+            Issue.record("Authentication is expected to fail.")
+        } catch {
+            // Then
+            #expect(error.failureCode == sessionFailure.failureCode)
+            #expect(error.message == sessionFailure.message)
+        }
+    }
+
     @Test(.disabled("Flaky"))
     func authenticate_throttlesAuthentications() async throws {
         var lastAuthenticationStartTime: DispatchTime?

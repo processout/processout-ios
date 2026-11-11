@@ -10,12 +10,15 @@ import AuthenticationServices
 @MainActor
 final class WebAuthenticationOperationProxy {
 
+    /// Continuation that is resumed with the authentication result.
+    typealias Continuation = CheckedContinuation<Result<URL, POFailure>, Never>
+
     init(callback: POWebAuthenticationCallback?, eventEmitter: POEventEmitter) {
         self.callback = callback
         self.eventEmitter = eventEmitter
     }
 
-    func set(session: ASWebAuthenticationSession, continuation: CheckedContinuation<URL, Error>) {
+    func set(session: ASWebAuthenticationSession, continuation: Continuation) {
         switch state {
         case nil:
             let observation = eventEmitter.on(PODeepLinkReceivedEvent.self) { [weak self] event in
@@ -31,7 +34,7 @@ final class WebAuthenticationOperationProxy {
         case .processing:
             assertionFailure("Already in processing state.")
         case .completed(let result):
-            continuation.resume(with: result)
+            continuation.resume(returning: result)
             cancel(session: session)
         }
     }
@@ -42,7 +45,7 @@ final class WebAuthenticationOperationProxy {
             state = .completed(newResult)
         case .processing(let currentState):
             state = .completed(newResult)
-            currentState.continuation.resume(with: newResult)
+            currentState.continuation.resume(returning: newResult)
             cancel(session: currentState.session, startTime: currentState.startTime)
         case .completed:
             break // Already completed
@@ -66,7 +69,7 @@ final class WebAuthenticationOperationProxy {
         struct Processing { // swiftlint:disable:this nesting
 
             /// Continuation.
-            let continuation: CheckedContinuation<URL, Error>
+            let continuation: Continuation
 
             /// Authentication session.
             let session: ASWebAuthenticationSession

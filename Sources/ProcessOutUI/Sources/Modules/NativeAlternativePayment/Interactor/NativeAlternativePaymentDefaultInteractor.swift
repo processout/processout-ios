@@ -54,7 +54,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         logger.info("Starting native alternative payment.")
         send(event: .willStart)
         let task = Task { @MainActor in
-            do {
+            do throws(POFailure) {
                 let request = NativeAlternativePaymentServiceAdapterRequest(
                     flow: configuration.flow, localeIdentifier: configuration.localization.localeOverride?.identifier
                 )
@@ -97,7 +97,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         }
         willSubmit(parameters: Array(currentState.parameters.values))
         let task = Task { @MainActor in
-            do {
+            do throws(POFailure) {
                 let values = try validatedValues(for: Array(currentState.parameters.values))
                 let request = NativeAlternativePaymentServiceAdapterRequest(
                     flow: configuration.flow,
@@ -141,7 +141,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             return
         }
         let task = Task {
-            do {
+            do throws(POFailure) {
                 try await uncheckedRedirect(to: currentState.redirect)
             } catch {
                 setFailureState(error: error)
@@ -196,7 +196,9 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     // MARK: - State Handling
 
-    private func setState(with response: NativeAlternativePaymentServiceAdapterResponse) async throws {
+    private func setState(
+        with response: NativeAlternativePaymentServiceAdapterResponse
+    ) async throws(POFailure) {
         switch response.state {
         case .nextStepRequired:
             if let redirect = response.redirect {
@@ -217,7 +219,9 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     // MARK: - Started State
 
-    private func setStartedState(response: NativeAlternativePaymentServiceAdapterResponse) async throws {
+    private func setStartedState(
+        response: NativeAlternativePaymentServiceAdapterResponse
+    ) async throws(POFailure) {
         let elements = try await resolve(elements: response.elements ?? [])
         let paymentMethod = await resolve(paymentMethod: response.paymentMethod)
         let parameters = await createParameters(for: response.elements ?? [])
@@ -332,7 +336,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         }
         var newState = currentState
         newState.task = Task { @MainActor [configuration] in
-            do {
+            do throws(POFailure) {
                 let request = NativeAlternativePaymentServiceAdapterRequest(
                     flow: configuration.flow, localeIdentifier: configuration.localization.localeOverride?.identifier
                 )
@@ -353,7 +357,7 @@ final class NativeAlternativePaymentDefaultInteractor:
     private func setAwaitingRedirectState(
         response: NativeAlternativePaymentServiceAdapterResponse,
         redirect: PONativeAlternativePaymentRedirectV2
-    ) async throws {
+    ) async throws(POFailure) {
         if shouldConfirmRedirect(redirect, in: state) {
             let paymentMethod = await resolve(paymentMethod: response.paymentMethod)
             let elements = try await resolve(elements: response.elements ?? [])
@@ -392,7 +396,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         }
     }
 
-    private func uncheckedRedirect(to redirect: PONativeAlternativePaymentRedirectV2) async throws {
+    private func uncheckedRedirect(to redirect: PONativeAlternativePaymentRedirectV2) async throws(POFailure) {
         delegate?.nativeAlternativePayment(
             didEmitEvent: .willStartRedirect(.init(redirect: redirect))
         )
@@ -470,12 +474,8 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     // MARK: - Submission Recovery
 
-    private func attemptRecoverSubmissionError(_ error: Error) {
-        logger.info("Did fail to submit parameters: \(error)")
-        guard let failure = error as? POFailure else {
-            setFailureState(error: error)
-            return
-        }
+    private func attemptRecoverSubmissionError(_ failure: POFailure) {
+        logger.info("Did fail to submit parameters: \(failure)")
         var newState: State.Started
         switch state {
         case let .started(state):
@@ -505,23 +505,16 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     // MARK: - Failure State
 
-    private func setFailureState(error: Error) {
+    private func setFailureState(error failure: POFailure) {
         guard !Task.isCancelled else {
-            logger.debug("Task is cancelled, ignoring attempt to set failure state with: \(error).")
+            logger.debug("Task is cancelled, ignoring attempt to set failure state with: \(failure).")
             return
         }
         guard !state.isSink else {
-            logger.debug("Already in a sink state, ignoring attempt to set failure state with: \(error).")
+            logger.debug("Already in a sink state, ignoring attempt to set failure state with: \(failure).")
             return
         }
-        logger.warn("Did fail to process native payment: \(error)")
-        let failure: POFailure
-        if let error = error as? POFailure {
-            failure = error
-        } else {
-            logger.error("Unexpected error type: \(error)")
-            failure = POFailure(message: "Something went wrong.", code: .Mobile.generic, underlyingError: error)
-        }
+        logger.warn("Did fail to process native payment: \(failure)")
         state = .failure(failure)
         let failureEvent = PONativeAlternativePaymentEventV2.DidFail(
             failure: failure, paymentState: currentPaymentState
@@ -645,7 +638,7 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     private func resolve(
         group: PONativeAlternativePaymentInstructionsGroupV2
-    ) async throws -> NativeAlternativePaymentResolvedElement.Group {
+    ) async throws(POFailure) -> NativeAlternativePaymentResolvedElement.Group {
         var resolvedInstructions: [NativeAlternativePaymentResolvedElement.Instruction] = []
         for instruction in group.instructions {
             if let resolvedInstruction = try await resolve(customerInstruction: instruction) {
@@ -657,7 +650,7 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     private func resolve(
         customerInstruction: PONativeAlternativePaymentCustomerInstructionV2
-    ) async throws -> NativeAlternativePaymentResolvedElement.Instruction? {
+    ) async throws(POFailure) -> NativeAlternativePaymentResolvedElement.Instruction? {
         switch customerInstruction {
         case .barcode(let barcode):
             let minimumSize = CGSize(width: 250, height: 250)
@@ -683,7 +676,7 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     private func resolve(
         elements: [PONativeAlternativePaymentElementV2]
-    ) async throws -> [NativeAlternativePaymentResolvedElement] {
+    ) async throws(POFailure) -> [NativeAlternativePaymentResolvedElement] {
         var resolvedElements: [NativeAlternativePaymentResolvedElement] = []
         for element in elements {
             if let resolvedElement = try await resolve(element: element) {
@@ -695,7 +688,7 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     private func resolve(
         element: PONativeAlternativePaymentElementV2
-    ) async throws -> NativeAlternativePaymentResolvedElement? {
+    ) async throws(POFailure) -> NativeAlternativePaymentResolvedElement? {
         switch element {
         case .form(let form):
             for parameter in form.parameters.parameterDefinitions {
@@ -791,7 +784,7 @@ final class NativeAlternativePaymentDefaultInteractor:
 
     private func validatedValues(
         for parameters: [NativeAlternativePaymentInteractorState.Parameter]
-    ) throws -> [String: PONativeAlternativePaymentSubmitDataV2.Parameter] {
+    ) throws(POFailure) -> [String: PONativeAlternativePaymentSubmitDataV2.Parameter] {
         var validatedValues: [String: PONativeAlternativePaymentSubmitDataV2.Parameter] = [:]
         var invalidFields: [POFailure.InvalidField] = []
         parameters.forEach { parameter in
@@ -953,7 +946,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             return false
         }
         Task { @MainActor in
-            do {
+            do throws(POFailure) {
                 let response = try await serviceAdapter.resolveUrl(
                     with: .init(redirect: .init(result: .init(url: event.url)))
                 )
@@ -984,7 +977,7 @@ final class NativeAlternativePaymentDefaultInteractor:
             redirect: response.redirect
         )
         Task { @MainActor in
-            do {
+            do throws(POFailure) {
                 switch state {
                 case .idle, .started, .awaitingRedirect:
                     try await setState(with: adapterResponse)
@@ -1001,14 +994,7 @@ final class NativeAlternativePaymentDefaultInteractor:
         }
     }
 
-    private func didFailToResolveDeepLinkReturnUrl(error: Error) {
-        let failure: POFailure
-        if let error = error as? POFailure {
-            failure = error
-        } else {
-            logger.error("Unexpected error type: \(error)")
-            failure = .init(message: "Unable to resolve deep link URL.", code: .Mobile.generic, underlyingError: error)
-        }
+    private func didFailToResolveDeepLinkReturnUrl(error failure: POFailure) {
         guard failure.failureCode != .RequestValidation.redirectResultInvalid else {
             return
         }

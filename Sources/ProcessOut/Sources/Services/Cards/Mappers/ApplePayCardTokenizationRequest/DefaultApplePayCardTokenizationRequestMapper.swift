@@ -22,7 +22,7 @@ final class DefaultApplePayCardTokenizationRequestMapper: ApplePayCardTokenizati
     /// - Throws: `POFailure` instance in case of error.
     func tokenizationRequest(
         from request: POApplePayPaymentTokenizationRequest
-    ) throws -> ApplePayCardTokenizationRequest {
+    ) throws(POFailure) -> ApplePayCardTokenizationRequest {
         do {
             let token = ApplePayCardTokenizationRequest.ApplePayToken(
                 paymentData: try decoder.decode(

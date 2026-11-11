@@ -21,12 +21,18 @@ final class MockCustomerActionsService: CustomerActionsService {
 
     // MARK: - CustomerActionsService
 
-    func handle(request: CustomerActionRequest, threeDSService: PO3DS2Service) async throws -> String {
+    func handle(request: CustomerActionRequest, threeDSService: PO3DS2Service) async throws(POFailure) -> String {
         let handle = lock.withLock {
             _handleCallsCount += 1
             return _handleFromClosure
         }
-        return try await handle!(request, threeDSService)
+        do {
+            return try await handle!(request, threeDSService)
+        } catch let failure as POFailure {
+            throw failure
+        } catch {
+            throw POFailure(code: .Mobile.internal, underlyingError: error)
+        }
     }
 
     // MARK: - Private Properties
