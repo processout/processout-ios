@@ -50,13 +50,17 @@ public struct POInvoiceCreationRequest: Encodable, Sendable {
     /// Invoice details.
     public let details: [Detail]
 
+    /// Additional metadata attached to the invoice.
+    public let metadata: [String: String]?
+
     public init(
         name: String,
         amount: Decimal,
         currency: String,
         returnUrl: URL? = nil,
         customerId: String? = nil,
-        details: [Detail] = []
+        details: [Detail] = [],
+        metadata: [String: String]? = nil
     ) {
         self.name = name
         self._amount = .init(value: amount)
@@ -64,5 +68,6 @@ public struct POInvoiceCreationRequest: Encodable, Sendable {
         self.returnUrl = returnUrl
         self.customerId = customerId
         self.details = details
+        self.metadata = metadata
     }
 }
