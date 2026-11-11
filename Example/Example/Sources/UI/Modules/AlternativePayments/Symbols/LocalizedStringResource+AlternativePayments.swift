@@ -43,6 +43,9 @@ extension LocalizedStringResource {
         /// Payment flow.
         static let flow = LocalizedStringResource("alternative-payments.flow")
 
+        /// Preferred finalization mode.
+        static let finalizationMode = LocalizedStringResource("alternative-payments.finalization-mode")
+
         /// Generic error message.
         static let errorMessage = LocalizedStringResource("alternative-payments.error-message")
 

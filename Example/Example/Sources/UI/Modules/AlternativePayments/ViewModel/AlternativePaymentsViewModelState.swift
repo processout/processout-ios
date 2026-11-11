@@ -12,6 +12,19 @@ import ProcessOutUI
 
 struct AlternativePaymentsViewModelState {
 
+    /// Describes how payment is expected to be finalized once all customer actions are completed.
+    enum FinalizationMode: String, Hashable {
+
+        /// Backend decides how to finalize payment.
+        case automatic
+
+        /// Payment is expected to be manually advanced to an authorized state.
+        case authorization
+
+        /// Payment is expected to be manually captured.
+        case capture
+    }
+
     enum Flow: String, Hashable {
 
         /// One time payment.
@@ -62,8 +75,15 @@ struct AlternativePaymentsViewModelState {
     /// Boolean value indicating whether native flow should be preferred if available.
     var preferNative = false
 
+    // swiftlint:disable implicitly_unwrapped_optional
+
     /// Payment flow.
-    var flow: PickerData<Flow, Flow>! // swiftlint:disable:this implicitly_unwrapped_optional
+    var flow: PickerData<Flow, Flow>!
+
+    /// Mode that describes how payment is finalized once all customer actions are completed.
+    var finalizationMode: PickerData<FinalizationMode, FinalizationMode>!
+
+    // swiftlint:enable implicitly_unwrapped_optional
 
     /// Currently presented native alternative payment.
     var nativePayment: NativePayment?
