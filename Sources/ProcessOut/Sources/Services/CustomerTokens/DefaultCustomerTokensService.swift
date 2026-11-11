@@ -71,7 +71,7 @@ final class DefaultCustomerTokensService: POCustomerTokensService {
                 let customerActionRequest = CustomerActionRequest(
                     customerAction: customerAction,
                     webAuthenticationCallback: request.webAuthenticationCallback,
-                    prefersEphemeralWebAuthenticationSession: true
+                    prefersEphemeralWebAuthenticationSession: request.prefersEphemeralWebAuthenticationSession
                 )
                 let newSource = try await customerActionsService.handle(
                     request: customerActionRequest, threeDSService: threeDSService
@@ -107,7 +107,9 @@ private extension POAssignCustomerTokenRequest { // swiftlint:disable:this no_ex
             invoiceId: invoiceId,
             thirdPartySdkVersion: newSdkVersion ?? thirdPartySdkVersion,
             metadata: metadata,
-            webAuthenticationCallback: webAuthenticationCallback
+            webAuthenticationCallback: webAuthenticationCallback,
+            prefersEphemeralWebAuthenticationSession: prefersEphemeralWebAuthenticationSession,
+            localeIdentifier: localeIdentifier
         )
         return updatedRequest
     }

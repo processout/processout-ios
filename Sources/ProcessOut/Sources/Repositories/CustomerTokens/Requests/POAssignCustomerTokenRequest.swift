@@ -52,6 +52,17 @@ public struct POAssignCustomerTokenRequest: Codable, Sendable { // sourcery: Aut
     @POExcludedEncodable
     public private(set) var webAuthenticationCallback: POWebAuthenticationCallback? // sourcery:coding:skip
 
+    /// A boolean value that indicates whether the web authentication session should ask the browser
+    /// for a private authentication session.
+    ///
+    /// Set `prefersEphemeralWebAuthenticationSession` to true to request that the browser
+    /// doesn’t share cookies or other browsing data between the authentication session
+    /// and the user’s normal browser session.
+    ///
+    /// The value of this property is `true` by default.
+    @POExcludedEncodable
+    public private(set) var prefersEphemeralWebAuthenticationSession: Bool
+
     /// Customer's locale identifier override.
     public let localeIdentifier: String?
 
@@ -67,6 +78,7 @@ public struct POAssignCustomerTokenRequest: Codable, Sendable { // sourcery: Aut
         thirdPartySdkVersion: String? = nil,
         metadata: [String: String]? = nil,
         webAuthenticationCallback: POWebAuthenticationCallback? = nil,
+        prefersEphemeralWebAuthenticationSession: Bool = true,
         localeIdentifier: String? = nil
     ) {
         self.customerId = customerId
@@ -78,6 +90,7 @@ public struct POAssignCustomerTokenRequest: Codable, Sendable { // sourcery: Aut
         self.thirdPartySdkVersion = thirdPartySdkVersion
         self.metadata = metadata
         self.webAuthenticationCallback = webAuthenticationCallback
+        self.prefersEphemeralWebAuthenticationSession = prefersEphemeralWebAuthenticationSession
         self.localeIdentifier = localeIdentifier
     }
 }

@@ -93,7 +93,7 @@ final class DefaultTelemetryService: TelemetryService, @unchecked Sendable {
 
     private func telemetryMetadata(configuration: TelemetryServiceConfiguration) async -> Telemetry.Metadata {
         let application = Telemetry.ApplicationMetadata(
-            name: configuration.applicationVersion, version: configuration.applicationVersion
+            name: configuration.applicationName, version: configuration.applicationVersion
         )
         let device: Telemetry.DeviceMetadata = await {
             let metadata = await deviceMetadataProvider.deviceMetadata
