@@ -292,17 +292,16 @@ final class NativeAlternativePaymentDefaultInteractor:
     // MARK: - Awaiting Completion State
 
     private func setAwaitingCompletionState(response: NativeAlternativePaymentServiceAdapterResponse) async {
-        if case .awaitingCompletion(let currentState) = state, !currentState.shouldConfirmPayment {
-            let failure = POFailure(code: .Mobile.generic)
-            setFailureState(error: failure, paymentState: response.state)
-            return
-        }
         do {
             let resolvedElements = try await resolve(elements: response.elements ?? [])
             let paymentMethod = await resolve(paymentMethod: response.paymentMethod)
             try Task.poCheckCancellation()
             switch state {
             case .starting, .submitting, .redirecting:
+                break
+            case .awaitingCompletion:
+                // Payment could become pending again after an automatic redirect that happened while awaiting
+                // completion. Polling never resolves with a pending state, so this doesn't cause a loop.
                 break
             default:
                 logger.debug("Ignoring attempt to wait for payment confirmation from unsupported state.")
