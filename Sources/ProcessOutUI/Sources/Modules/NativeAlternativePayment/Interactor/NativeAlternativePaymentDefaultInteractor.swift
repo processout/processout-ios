@@ -265,6 +265,8 @@ final class NativeAlternativePaymentDefaultInteractor:
         }
         let task = Task { @MainActor in
             try? await Task.sleep(seconds: disabledFor)
+            // Allows states that are created later to schedule their own enabling.
+            cancelationEnablingTask = nil
             switch state {
             case .started(var currentState):
                 currentState.isCancellable = true
@@ -575,6 +577,8 @@ final class NativeAlternativePaymentDefaultInteractor:
         }
         let task = Task { @MainActor in
             try? await Task.sleep(seconds: disabledFor)
+            // Allows states that are created later to schedule their own enabling.
+            paymentConfirmationCancellationEnablingTask = nil
             guard case .awaitingCompletion(var newState) = state else {
                 return
             }
