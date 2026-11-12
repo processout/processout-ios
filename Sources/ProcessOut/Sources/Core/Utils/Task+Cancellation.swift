@@ -16,7 +16,7 @@ extension Task where Success == Never, Failure == Never {
         throw POFailure(
             message: "Task was cancelled.",
             code: .Mobile.cancelled,
-            underlyingError: Swift.CancellationError()
+            underlyingError: _Concurrency.CancellationError()
         )
     }
 }
