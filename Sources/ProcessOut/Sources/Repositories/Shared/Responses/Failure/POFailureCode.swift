@@ -368,6 +368,16 @@ extension POFailureCode {
 
         /// The redirect result is not support and can't be handled.
         public static let redirectResultInvalid = POFailureCode(rawValue: "request.validation.redirect-result-invalid")
+
+        /// The redirect result is not expected, for example because payment has already advanced past the redirect.
+        public static let redirectResultUnexpected = POFailureCode(
+            rawValue: "request.validation.redirect-result-unexpected"
+        )
+
+        /// The redirect result is not expected for the step payment is currently at.
+        public static let redirectResultUnexpectedForStep = POFailureCode(
+            rawValue: "request.validation.redirect-result-unexpected-for-step"
+        )
     }
 
     public enum Request {

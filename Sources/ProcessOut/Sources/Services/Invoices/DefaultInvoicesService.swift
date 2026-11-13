@@ -71,30 +71,29 @@ final class DefaultInvoicesService: POInvoicesService {
     }
 
     func captureNativeAlternativePayment(request: PONativeAlternativePaymentCaptureRequest) async throws {
-        let captureTimeout = min(request.timeout ?? .greatestFiniteMagnitude, Constants.maximumCaptureTimeout)
         _ = try await retry(
             operation: { [repository] in
                 let request = NativeAlternativePaymentCaptureRequest(
                     invoiceId: request.invoiceId, source: request.gatewayConfigurationId
                 )
-                return try await repository.captureNativeAlternativePayment(request: request)
+                let response = try await repository.captureNativeAlternativePayment(request: request)
+                return response.state == .captured ? response : nil
             },
-            while: { result in
-                switch result {
-                case let .success(response):
-                    return response.state != .captured
-                case let .failure(failure as POFailure):
-                    let retriableCodes: [POFailureCode] = [
-                        .Mobile.networkUnreachable, .Mobile.timeout, .Mobile.internal
-                    ]
-                    return retriableCodes.contains(failure.failureCode)
-                case .failure:
+            shouldRetry: { error in
+                guard let failure = error as? POFailure else {
                     return false
                 }
+                let retriableCodes: [POFailureCode] = [
+                    .Mobile.networkUnreachable, .Mobile.timeout, .Mobile.internal
+                ]
+                return retriableCodes.contains(failure.failureCode)
             },
-            timeout: captureTimeout,
+            timeout: min(request.timeout ?? .greatestFiniteMagnitude, Constants.maximumCaptureTimeout),
             timeoutError: POFailure(
                 message: "Unable to capture alternative payment within the expected time.", code: .Mobile.timeout
+            ),
+            cancellationError: POFailure(
+                message: "Alternative payment capture was cancelled.", code: .Mobile.cancelled
             ),
             retryStrategy: .init(function: .exponential(interval: 0.15, rate: 1.45), minimum: 3, maximum: 90)
         )

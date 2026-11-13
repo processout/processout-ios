@@ -118,11 +118,13 @@ struct AsyncUtilsTests {
             operation: {
                 isOperationExecuted.withLock { $0 = true }
             },
-            while: { _ in
+            shouldRetry: { _ in
                 false
             },
             timeout: 0,
-            timeoutError: Failure.timeout
+            timeoutError: Failure.timeout,
+            cancellationError: Failure.cancel,
+            retryStrategy: .init(function: .linear(interval: 0), maximumRetries: 0)
         )
 
         // Then
@@ -137,9 +139,11 @@ struct AsyncUtilsTests {
                 operation: {
                     try await Task.sleep(for: .seconds(10))
                 },
-                while: { _ in false },
+                shouldRetry: { _ in false },
                 timeout: 1,
-                timeoutError: Failure.timeout
+                timeoutError: Failure.timeout,
+                cancellationError: Failure.cancel,
+                retryStrategy: .init(function: .linear(interval: 0), maximumRetries: 0)
             )
         } matching: { issue in
             if let failure = issue.error as? Failure, failure == .timeout {
@@ -155,16 +159,17 @@ struct AsyncUtilsTests {
         let isConditionChecked = POUnfairlyLocked<Bool>(wrappedValue: false)
 
         // When
-        _ = try await retry(
+        _ = try? await retry(
             operation: {
-                ""
+                throw Failure.generic
             },
-            while: { _ in
+            shouldRetry: { _ in
                 isConditionChecked.withLock { $0 = true }
                 return false
             },
             timeout: 10,
             timeoutError: Failure.timeout,
+            cancellationError: Failure.cancel,
             retryStrategy: .init(function: .linear(interval: 0), maximumRetries: 1, minimum: 0)
         )
 
@@ -178,15 +183,17 @@ struct AsyncUtilsTests {
         let operationStartsCount = POUnfairlyLocked<Int>(wrappedValue: 0)
 
         // When
-        _ = try await retry(
+        _ = try? await retry(
             operation: {
                 operationStartsCount.withLock { $0 += 1 }
+                throw Failure.generic
             },
-            while: { _ in
+            shouldRetry: { _ in
                 true
             },
             timeout: 10,
             timeoutError: Failure.timeout,
+            cancellationError: Failure.cancel,
             retryStrategy: .init(function: .linear(interval: 0), maximumRetries: 1, minimum: 0)
         )
 
@@ -201,13 +208,14 @@ struct AsyncUtilsTests {
             try await retry(
                 operation: {
                     try Task.checkCancellation()
-                    return ""
+                    return nil as String?
                 },
-                while: { _ in
+                shouldRetry: { _ in
                     true
                 },
                 timeout: 10,
                 timeoutError: Failure.timeout,
+                cancellationError: Failure.cancel,
                 retryStrategy: .init(function: .linear(interval: 5), maximumRetries: 1)
             )
         }
@@ -217,7 +225,7 @@ struct AsyncUtilsTests {
         task.cancel()
 
         // Then
-        if case .failure(let failure) = await task.result, failure is CancellationError {
+        if case .failure(let failure as Failure) = await task.result, failure == .cancel {
             return
         }
         Issue.record("Expected cancellation error.")
@@ -236,11 +244,12 @@ struct AsyncUtilsTests {
                     return value
                 }
             },
-            while: { _ in
+            shouldRetry: { _ in
                 true
             },
             timeout: 10,
             timeoutError: Failure.timeout,
+            cancellationError: Failure.cancel,
             retryStrategy: .init(function: .linear(interval: 0), maximumRetries: 1, minimum: 0)
         )
 
@@ -261,11 +270,12 @@ struct AsyncUtilsTests {
                     return value
                 }
             },
-            while: { _ in
+            shouldRetry: { _ in
                 false
             },
             timeout: 10,
             timeoutError: Failure.timeout,
+            cancellationError: Failure.cancel,
             retryStrategy: .init(function: .linear(interval: 0), maximumRetries: 1, minimum: 0)
         )
 
@@ -281,11 +291,13 @@ struct AsyncUtilsTests {
                 operation: {
                     try await Task.sleep(for: .seconds(1))
                 },
-                while: { _ in
+                shouldRetry: { _ in
                     true
                 },
                 timeout: 10,
-                timeoutError: Failure.timeout
+                timeoutError: Failure.timeout,
+                cancellationError: Failure.cancel,
+                retryStrategy: .init(function: .linear(interval: 0), maximumRetries: 0)
             )
         }
 
@@ -297,6 +309,61 @@ struct AsyncUtilsTests {
             return
         }
         Issue.record("Expected cancellation error.")
+    }
+
+    @Test
+    func retry_whenTimesOutAfterOperationCompletesWithRetriableResult_throwsTimeoutError() async throws {
+        // When
+        try await withKnownIssue {
+            _ = try await retry(
+                operation: {
+                    // Non-cancellable operation that completes after timeout
+                    try? await Task.sleep(for: .seconds(2))
+                    return nil as String?
+                },
+                shouldRetry: { _ in
+                    true
+                },
+                timeout: 1,
+                timeoutError: Failure.timeout,
+                cancellationError: Failure.cancel,
+                retryStrategy: .init(function: .linear(interval: 0), minimum: 0)
+            )
+        } matching: { issue in
+            if let failure = issue.error as? Failure, failure == .timeout {
+                return true
+            }
+            return false
+        }
+    }
+
+    @Test
+    func retry_whenCancelledAndOperationCompletesWithFinalResult_completesWithResult() async throws {
+        // Given
+        let task = Task {
+            try await retry(
+                operation: {
+                    while !Task.isCancelled {
+                        await Task.yield() // Await caller's cancellation
+                    }
+                    return "value" // Operation still completes with a final value
+                },
+                shouldRetry: { _ in
+                    false
+                },
+                timeout: 10,
+                timeoutError: Failure.timeout,
+                cancellationError: Failure.cancel,
+                retryStrategy: .init(function: .linear(interval: 0), minimum: 0)
+            )
+        }
+
+        // When
+        task.cancel()
+
+        // Then
+        let value = try await task.value
+        #expect(value == "value")
     }
 
     // MARK: - Private Nested Types
