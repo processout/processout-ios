@@ -20,8 +20,8 @@ final class HttpConnectorRetryDecorator: HttpConnector {
             operation: { [connector] in
                 try await connector.execute(request: updatedRequest)
             },
-            while: { result in
-                guard case .failure(let failure as Failure) = result else {
+            shouldRetry: { error in
+                guard let failure = error as? Failure else {
                     return false
                 }
                 switch failure.code {
@@ -37,6 +37,7 @@ final class HttpConnectorRetryDecorator: HttpConnector {
             },
             timeout: 3600, // 1 hour
             timeoutError: HttpConnectorFailure(code: .timeout, underlyingError: nil),
+            cancellationError: HttpConnectorFailure(code: .cancelled, underlyingError: nil),
             retryStrategy: retryStrategy
         )
     }
