@@ -48,48 +48,40 @@ func withTimeout<T: Sendable>(
 // MARK: - Retry
 
 @_spi(PO)
-public func retry<T: Sendable>(
-    operation: @escaping @Sendable @isolated(any) () async throws -> T,
-    while condition: @escaping @Sendable (Result<T, Error>) -> Bool,
+public func retry<T: Sendable>( // swiftlint:disable:this function_parameter_count
+    operation: @escaping @Sendable @isolated(any) () async throws -> T?,
+    shouldRetry: @escaping @Sendable (Error) -> Bool,
     timeout: TimeInterval,
     timeoutError: Error,
-    retryStrategy: RetryStrategy? = nil
+    cancellationError: Error,
+    retryStrategy: RetryStrategy
 ) async throws -> T {
-    let operationBox = { @Sendable in
-        try await retry(
-            operation: operation,
-            after: await Result(catching: operation),
-            while: condition,
-            retryStrategy: retryStrategy,
-            attempt: 0
-        )
+    try await withTimeout(timeout, error: timeoutError) {
+        var attempt = 0
+        repeat {
+            let lastError: Error
+            do {
+                if let value = try await operation() {
+                    return value
+                }
+                // Value isn't ready yet. Thrown only if polling stops before it becomes available,
+                // i.e. on cancellation or once retries are exhausted. On timeout it is replaced.
+                lastError = cancellationError
+            } catch where shouldRetry(error) {
+                lastError = error
+            }
+            guard attempt < retryStrategy.maximumRetries, !Task.isCancelled else {
+                throw lastError
+            }
+            do {
+                let delay = retryStrategy.interval(for: attempt)
+                try await Task.sleep(seconds: delay)
+            } catch {
+                throw cancellationError
+            }
+            attempt += 1
+        } while true
     }
-    return try await withTimeout(timeout, error: timeoutError, perform: operationBox)
-}
-
-private func retry<T: Sendable>(
-    operation: @escaping @Sendable @isolated(any) () async throws -> T,
-    after result: Result<T, Error>,
-    while condition: @escaping (Result<T, Error>) -> Bool,
-    retryStrategy: RetryStrategy?,
-    attempt: Int
-) async throws -> T {
-    guard let retryStrategy, attempt < retryStrategy.maximumRetries, !Task.isCancelled, condition(result) else {
-        return try result.get()
-    }
-    do {
-        let delay = retryStrategy.interval(for: attempt)
-        try await Task.sleep(seconds: delay)
-    } catch {
-        // Ignored
-    }
-    return try await retry(
-        operation: operation,
-        after: await Result(catching: operation),
-        while: condition,
-        retryStrategy: retryStrategy,
-        attempt: attempt + 1
-    )
 }
 
 extension Result where Failure == Error, Success: Sendable {

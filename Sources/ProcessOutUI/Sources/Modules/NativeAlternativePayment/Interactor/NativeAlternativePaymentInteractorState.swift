@@ -26,6 +26,9 @@ enum NativeAlternativePaymentInteractorState {
         /// Invoice information if any.
         let invoice: PONativeAlternativePaymentInvoiceV2?
 
+        /// Payment state.
+        let paymentState: PONativeAlternativePaymentStateV2
+
         /// Elements.
         var elements: [NativeAlternativePaymentResolvedElement]
 
@@ -52,6 +55,9 @@ enum NativeAlternativePaymentInteractorState {
 
         /// Invoice information if any.
         let invoice: PONativeAlternativePaymentInvoiceV2?
+
+        /// Payment state.
+        let paymentState: PONativeAlternativePaymentStateV2
 
         /// Resolved elements.
         let elements: [NativeAlternativePaymentResolvedElement]
@@ -80,6 +86,9 @@ enum NativeAlternativePaymentInteractorState {
         /// Invoice information if any.
         let invoice: PONativeAlternativePaymentInvoiceV2?
 
+        /// Payment state.
+        let paymentState: PONativeAlternativePaymentStateV2
+
         /// Resolved elements.
         let elements: [NativeAlternativePaymentResolvedElement]
 
@@ -104,6 +113,9 @@ enum NativeAlternativePaymentInteractorState {
 
         /// Invoice information if any.
         let invoice: PONativeAlternativePaymentInvoiceV2?
+
+        /// Payment state.
+        let paymentState: PONativeAlternativePaymentStateV2
 
         /// Resolved elements.
         let elements: [NativeAlternativePaymentResolvedElement]
@@ -173,6 +185,25 @@ extension NativeAlternativePaymentInteractorState: InteractorState {
             return state.snapshot
         default:
             return nil
+        }
+    }
+
+    var paymentState: PONativeAlternativePaymentStateV2? {
+        switch self {
+        case .idle, .starting, .failure:
+            nil
+        case .started(let state):
+            state.paymentState
+        case .submitting(let state):
+            state.snapshot.paymentState
+        case .awaitingRedirect(let state):
+            state.paymentState
+        case .redirecting(let state):
+            state.snapshot.paymentState
+        case .awaitingCompletion(let state):
+            state.paymentState
+        case .completed(let state):
+            state.paymentState
         }
     }
 

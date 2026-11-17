@@ -58,24 +58,24 @@ final class DefaultNativeAlternativePaymentServiceAdapter: NativeAlternativePaym
     ) async throws -> NativeAlternativePaymentServiceAdapterResponse {
         try await retry(
             operation: {
-                try await self.continuePayment(with: request)
+                let response = try await self.continuePayment(with: request)
+                return response.state == .pending ? nil : response // Any other state is handled by caller
             },
-            while: { result in
-                switch result {
-                case let .success(response):
-                    return response.state != .success
-                case let .failure(failure as POFailure):
-                    let retriableCodes: [POFailureCode] = [
-                        .Mobile.networkUnreachable, .Mobile.timeout, .Mobile.internal
-                    ]
-                    return retriableCodes.contains(failure.failureCode)
-                case .failure:
+            shouldRetry: { error in
+                guard let failure = error as? POFailure else {
                     return false
                 }
+                let retriableCodes: [POFailureCode] = [
+                    .Mobile.networkUnreachable, .Mobile.timeout, .Mobile.internal
+                ]
+                return retriableCodes.contains(failure.failureCode)
             },
             timeout: min(paymentConfirmationTimeout, 15 * 60),
             timeoutError: POFailure(
                 message: "Unable to confirm payment completion within the expected time.", code: .Mobile.timeout
+            ),
+            cancellationError: POFailure(
+                message: "Payment completion expectation was cancelled.", code: .Mobile.cancelled
             ),
             retryStrategy: .init(function: .exponential(interval: 0.15, rate: 1.45), minimum: 3, maximum: 90)
         )
