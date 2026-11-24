@@ -154,7 +154,7 @@ end the summary with a full stop.
 3. Name the failure codes the caller can handle.
 4. Describe behavior the caller can see, not the implementation.
 5. Make every deprecation name its replacement. If there is no replacement, say why.
-6. Start each script with a comment that says what the script does.
+6. Start each script, after the shebang line, with a comment that says what the script does.
 
 ---
 
