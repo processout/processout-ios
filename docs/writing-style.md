@@ -1,6 +1,6 @@
-# Writing Style Guide
+# Writing style guide
 
-This guide defines how we write text in this repository. It gives contributors, developers who integrate the SDK, and tools one consistent language.
+This guide defines 1 consistent language for text in this repository, for contributors, developers who integrate the SDK, and tools.
 
 ## Scope
 
@@ -30,13 +30,13 @@ Use the fewest words that keep the meaning clear. If a shorter sentence says the
 
 Each verb has 1 meaning. Use no other verb of obligation.
 
-| Verb       | Meaning                                              | Example                                                           |
-| ---------- | ---------------------------------------------------- | ----------------------------------------------------------------- |
-| **must**   | Mandatory.                                           | The release tag must match the version in `Version.resolved`.     |
-| **should** | Recommended. A documented alternative is acceptable. | You should call `processDeepLink(url:)` from your scene delegate. |
-| **may**    | Permitted. The reader chooses.                       | You may provide a custom style for the submit button.             |
-| **can**    | A capability, not an obligation.                     | ``POCardTokenizationView`` can collect a billing address.         |
-| **will**   | A fact about the future or an external system.       | Apple will reject a build that uses a private API.                |
+| Verb       | Meaning                                              | Example                                                       |
+| ---------- | ---------------------------------------------------- | ------------------------------------------------------------- |
+| **must**   | Mandatory.                                           | The release tag must match the version in `Version.resolved`. |
+| **should** | Recommended. A documented alternative is acceptable. | Your scene delegate should call `processDeepLink(url:)`.      |
+| **may**    | Permitted. The reader chooses.                       | You may provide a custom style for the submit button.         |
+| **can**    | A capability, not an obligation.                     | ``POCardTokenizationView`` can collect a billing address.     |
+| **will**   | A fact about the future or an external system.       | Apple will reject a build that uses a private API.            |
 
 **Do not use:** shall, needs to, has to, is required to, ought to.
 
@@ -48,10 +48,10 @@ Each verb has 1 meaning. Use no other verb of obligation.
 2. Use at most 20 words in an instruction and 25 in a description.
 3. Use the active voice: "The SDK sends the request", not "The request is sent".
 4. Use the present tense for descriptions and the imperative for instructions.
-5. Start an instruction with the verb: "Run `xcodegen`", not "You should run `xcodegen`".
+5. Start an instruction with the verb: "Run `./Scripts/BootstrapProject.sh`", not "You should run `./Scripts/BootstrapProject.sh`".
 6. Write 1 instruction per sentence or list item.
 7. Put the condition first: "If the build fails, delete `DerivedData`."
-8. Do not use fragments as sentences. Labels that end with a colon and code documentation summaries (section 7) are exceptions.
+8. Do not use fragments as sentences in prose. Labels, table cells, checklist items and code documentation summaries (section 7) are exceptions.
 
 ---
 
@@ -66,7 +66,7 @@ Each verb has 1 meaning. Use no other verb of obligation.
 7. Do not put a slash between words. Write "or", "and", or both cases.
 8. Do not use em-dashes. Use a full stop, a comma or parentheses.
 9. Use short, common words: "use", not "utilize"; "start", not "initiate".
-10. Use American English to match Apple APIs and our public API: "color", "behavior".
+10. Use American English to match Apple APIs: "color", "behavior". Keep the spelling of an existing public API term, for example "cancelled" (`POFailureCode.cancelled`).
 11. Write proper names as their owners do: Apple Pay, SwiftUI, UIKit, Xcode, Swift Package Index, Checkout.com.
 12. Write "API", "ID" and "URL" in capitals in prose. Symbols keep their own spelling, for example `projectId`.
 
@@ -107,7 +107,7 @@ Each verb has 1 meaning. Use no other verb of obligation.
 
 ### Summary
 
-The summary is the first sentence of a comment. Tools such as DocC show the summary in symbol lists. Use these patterns and end the summary with a full stop.
+The summary is the first line of a comment. Tools such as DocC show the summary in symbol lists. Use these patterns and end the summary with a full stop.
 
 | Declaration      | Pattern                                                     | Example                                                              |
 | ---------------- | ----------------------------------------------------------- | -------------------------------------------------------------------- |
@@ -144,5 +144,5 @@ Commit subjects follow [Conventional Commits](https://www.conventionalcommits.or
 - [ ] Each concept has 1 term throughout
 - [ ] No vague quantifiers, slashes between words or em-dashes
 - [ ] The conclusion comes first
-- [ ] Symbols are linked with double backticks and DocC builds without warnings
+- [ ] Symbols are linked with double backticks
 - [ ] Code documentation follows section 7
