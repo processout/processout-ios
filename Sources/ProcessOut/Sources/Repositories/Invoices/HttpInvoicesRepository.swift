@@ -48,7 +48,7 @@ final class HttpInvoicesRepository: InvoicesRepository {
         return response.value.invoice.replacing(clientSecret: clientSecret)
     }
 
-    func authorizeInvoice(request: POInvoiceAuthorizationRequest) async throws -> InvoiceAuthorizationResponse {
+    func authorizeInvoice(request: InvoiceAuthorizationRequest) async throws -> InvoiceAuthorizationResponse {
         let headers = [
             "X-Processout-Client-Secret": request.clientSecret
         ]

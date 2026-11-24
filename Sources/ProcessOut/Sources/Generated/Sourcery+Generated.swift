@@ -6,6 +6,37 @@ import UIKit
 
 // MARK: - AutoCodingKeys
 
+extension AssignCustomerTokenRequest {
+
+    enum CodingKeys: String, CodingKey {
+        case source
+        case preferredScheme
+        case verify
+        case invoiceId
+        case enableThreeDS2 = "enable_three_d_s_2"
+        case thirdPartySdkVersion
+        case metadata
+    }
+}
+
+extension InvoiceAuthorizationRequest {
+
+    enum CodingKeys: String, CodingKey {
+        case source
+        case saveSource
+        case incremental
+        case enableThreeDS2 = "enable_three_d_s_2"
+        case preferredScheme
+        case thirdPartySdkVersion
+        case overrideMacBlocking
+        case initialSchemeTransactionId
+        case autoCaptureAt
+        case captureAmount
+        case allowFallbackToSale
+        case metadata
+    }
+}
+
 extension NativeAlternativePaymentCaptureRequest {
 
     enum CodingKeys: String, CodingKey {

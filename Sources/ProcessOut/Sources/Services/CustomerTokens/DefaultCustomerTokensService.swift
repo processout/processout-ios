@@ -64,7 +64,7 @@ final class DefaultCustomerTokensService: POCustomerTokensService {
         let request = request.replacing(
             thirdPartySdkVersion: request.thirdPartySdkVersion ?? threeDSService.version
         )
-        let response = try await repository.assignCustomerToken(request: request)
+        let response = try await repository.assignCustomerToken(request: .init(request: request))
         if let customerAction = response.customerAction {
             let newRequest: POAssignCustomerTokenRequest
             do {
@@ -112,5 +112,22 @@ private extension POAssignCustomerTokenRequest { // swiftlint:disable:this no_ex
             localeIdentifier: localeIdentifier
         )
         return updatedRequest
+    }
+}
+
+private extension AssignCustomerTokenRequest { // swiftlint:disable:this no_extension_access_modifier
+
+    init(request: POAssignCustomerTokenRequest) {
+        self.init(
+            customerId: request.customerId,
+            tokenId: request.tokenId,
+            source: request.source,
+            preferredScheme: request.$preferredScheme.typed,
+            verify: request.verify,
+            invoiceId: request.invoiceId,
+            thirdPartySdkVersion: request.thirdPartySdkVersion,
+            metadata: request.metadata,
+            localeIdentifier: request.localeIdentifier
+        )
     }
 }
