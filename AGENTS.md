@@ -10,13 +10,21 @@ Before you plan, change or review code:
 4. Follow its rules during implementation and review.
 5. Before you finish, check the change against each applicable document.
 
-If existing code or text conflicts with a document, follow the document. Report the conflict instead of copying the existing pattern.
+If existing code or text conflicts with a document, follow the document. Report the conflict instead of copying the
+existing pattern.
 
 ## Verification
 
 - To verify a change, run `./Scripts/Tests/Run.sh`. The script cleans, builds and tests every module.
-- To test 1 module, run `xcodebuild test -project ProcessOut.xcodeproj -scheme ProcessOut -destination "$(./Scripts/Tests/Destination.swift)"` with the scheme of that module.
-- Each build runs SwiftLint in strict mode. A lint violation fails the build. To lint without a build, run `./Scripts/Lint.sh`.
+- To test one module, run the following command with the scheme of that module:
+
+  ```bash
+  xcodebuild test -project ProcessOut.xcodeproj -scheme ProcessOut -destination "$(./Scripts/Tests/Destination.swift)"
+  ```
+
+- Each build runs SwiftLint in strict mode. A lint violation fails the build. To lint without a build, run
+  `./Scripts/Lint.sh`.
 - Files in `Sources/*/Sources/Generated/` are generated. Do not edit them.
 - `ProcessOut.xcodeproj` is generated. Edit `project.yml`, then run `./Scripts/BootstrapProject.sh`.
-- Integration tests in `Tests/*/Sources/Integration/` call the live API with the credentials in `Constants.swift`. If they fail because of the network or the credentials, report the failure and use the unit test results.
+- Integration tests in `Tests/*/Sources/Integration/` call the live API with the credentials in `Constants.swift`. If
+  they fail because of the network or the credentials, report the failure and use the unit test results.

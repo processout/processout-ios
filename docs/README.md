@@ -1,6 +1,7 @@
 # Documentation
 
-This folder holds internal documentation for contributors to the SDK. For integration guides and the API reference, see the [root README](../README.md).
+This folder holds internal documentation for contributors to the SDK. For integration guides and the API reference, see
+the [root README](../README.md).
 
 | Document                                | Description                                                                |
 | --------------------------------------- | -------------------------------------------------------------------------- |

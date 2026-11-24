@@ -28,7 +28,8 @@ Get started with the [ProcessOut documentation](https://docs.processout.com/) or
 
 ## Contributing
 
-We welcome contributions of any kind: new features, bug fixes and improvements. Before you contribute, read the [project documentation](docs/README.md).
+We welcome contributions of any kind: new features, bug fixes and improvements. Before you contribute, read the
+[project documentation](docs/README.md).
 
 ### Development requirements
 
@@ -38,12 +39,14 @@ We welcome contributions of any kind: new features, bug fixes and improvements. 
 ### Installation
 
 1. Install the [development requirements](#development-requirements).
-2. From the repository root, run `./Scripts/BootstrapProject.sh`. The script installs the Homebrew dependencies and generates `ProcessOut.xcodeproj`.
+2. From the repository root, run `./Scripts/BootstrapProject.sh`. The script installs the Homebrew dependencies and
+   generates `ProcessOut.xcodeproj`.
 3. Open `ProcessOut.xcodeproj` for development.
 
 > [!NOTE]
 > 
-> Before you run tests, set the constants in `Tests/ProcessOutTests/Sources/Core/Constants.swift` and `Tests/ProcessOutUITests/Sources/Core/Constants.swift` to test project credentials:
+> Before you run tests, set the constants in `Tests/ProcessOutTests/Sources/Core/Constants.swift` and
+> `Tests/ProcessOutUITests/Sources/Core/Constants.swift` to test project credentials:
 >
 > ```swift
 > enum Constants {
@@ -61,7 +64,8 @@ We welcome contributions of any kind: new features, bug fixes and improvements. 
 
 ### Running tests
 
-Run `./Scripts/Tests/Run.sh`. You can also run the tests in Xcode from the `ProcessOut` target in `ProcessOut.xcodeproj`.
+Run `./Scripts/Tests/Run.sh`. You can also run the tests in Xcode from the `ProcessOut` target in
+`ProcessOut.xcodeproj`.
 
 ## License
 
