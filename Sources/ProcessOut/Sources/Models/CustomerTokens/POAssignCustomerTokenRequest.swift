@@ -64,7 +64,8 @@ public struct POAssignCustomerTokenRequest: Codable, Sendable { // sourcery: Aut
     public private(set) var prefersEphemeralWebAuthenticationSession: Bool
 
     /// Customer's locale identifier override.
-    public let localeIdentifier: String?
+    @POExcludedEncodable
+    public private(set) var localeIdentifier: String?
 
     /// Creates request instance.
     public init(
