@@ -9,7 +9,7 @@ import Foundation
 
 struct InvoiceAuthorizationRequest: Encodable, Sendable { // sourcery: AutoCodingKeys
 
-    /// Invoice identifier to to perform authorization for.
+    /// Invoice identifier to perform authorization for.
     let invoiceId: String // sourcery:coding: skip
 
     /// Payment source to use for authorization.
