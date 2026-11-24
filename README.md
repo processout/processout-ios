@@ -1,6 +1,6 @@
 # ProcessOut
 
-Get started with our ProcessOut [documentation](https://docs.processout.com/) or browse the SDK reference:
+Get started with the [ProcessOut documentation](https://docs.processout.com/) or browse the SDK reference:
 
 - [ProcessOut](https://swiftpackageindex.com/processout/processout-ios/documentation/processout)
 - [ProcessOutCheckout3DS](https://swiftpackageindex.com/processout/processout-ios/documentation/processoutcheckout3ds)
@@ -14,23 +14,21 @@ Get started with our ProcessOut [documentation](https://docs.processout.com/) or
 
 ## Modules
 
-| Module                 | Description                                                                  |
-| ---------------------- | ---------------------------------------------------------------------------- |
-| ProcessOut             | Allows to interact with ProcessOut API and provides a UI to handle payments. |
-| ProcessOutCheckout3DS  | Integration with Checkout.com 3D Secure (3DS) mobile SDK.                    |
-| ProcessOutCoreUI       | Shared styling primitives used by ProcessOutUI.                              |
-| ProcessOutNetcetera3DS | Integration with Netcetera 3D Secure (3DS) mobile SDK.                       |
-| ProcessOutUI           | ProcessOut prebuilt UI to handle payments.                                   |
+| Module                   | Description                                       |
+| ------------------------ | ------------------------------------------------- |
+| `ProcessOut`             | Access to the ProcessOut API.                     |
+| `ProcessOutCheckout3DS`  | Integration with the Checkout.com 3DS mobile SDK. |
+| `ProcessOutCoreUI`       | Shared styling primitives for `ProcessOutUI`.     |
+| `ProcessOutNetcetera3DS` | Integration with the Netcetera 3DS mobile SDK.    |
+| `ProcessOutUI`           | Prebuilt SwiftUI UI for payments.                 |
 
 > [!NOTE]
 >
-> We are currently in the process of migrating UI from ProcessOut to ProcessOutUI module. The new module
-> is based on SwiftUI, so styling is not compatible with ProcessOut (that is based on UIKit). Also
-> beware that UI in ProcessOut will be removed in `5.0.0`.
+> The UIKit UI in `ProcessOut` is deprecated, and version `5.0.0` will remove it. Use `ProcessOutUI` instead.
 
 ## Contributing
 
-We welcome contributions of any kind including new features, bug fixes, and general improvements. Before you contribute, read the [project documentation](docs/README.md).
+We welcome contributions of any kind: new features, bug fixes and improvements. Before you contribute, read the [project documentation](docs/README.md).
 
 ### Development requirements
 
@@ -39,11 +37,13 @@ We welcome contributions of any kind including new features, bug fixes, and gene
 
 ### Installation
 
-Before going further please make sure that you have installed all dependencies specified in [requirements](#development-requirements) section. Then in order to install remaining dependencies and prepare a project run `./Scripts/BootstrapProject.sh` script from repository's root directory. It will create `ProcessOut.xcodeproj` project that should be used for development.
+1. Install the [development requirements](#development-requirements).
+2. From the repository root, run `./Scripts/BootstrapProject.sh`. The script installs the Homebrew dependencies and generates `ProcessOut.xcodeproj`.
+3. Open `ProcessOut.xcodeproj` for development.
 
 > [!NOTE]
 > 
-> If you plan to run tests ensure that constants defined in `Tests/ProcessOutTests/Sources/Core/Constants.swift` and `Tests/ProcessOutUITests/Sources/Core/Constants.swift` are set to test project credentials. E.g.:
+> Before you run tests, set the constants in `Tests/ProcessOutTests/Sources/Core/Constants.swift` and `Tests/ProcessOutUITests/Sources/Core/Constants.swift` to test project credentials:
 >
 > ```swift
 > enum Constants {
@@ -61,8 +61,8 @@ Before going further please make sure that you have installed all dependencies s
 
 ### Running tests
 
-To run tests locally use `./Scripts/Tests/Run.sh` script. It is also possible to run them directly in Xcode from the ProcessOut target in `ProcessOut.xcodeproj`.
+Run `./Scripts/Tests/Run.sh`. You can also run the tests in Xcode from the `ProcessOut` target in `ProcessOut.xcodeproj`.
 
 ## License
 
-ProcessOut is available under the MIT license. See the [LICENSE](LICENSE) file for more info.
+ProcessOut is available under the MIT license. See [LICENSE](LICENSE).
