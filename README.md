@@ -30,7 +30,7 @@ Get started with our ProcessOut [documentation](https://docs.processout.com/) or
 
 ## Contributing
 
-We welcome contributions of any kind including new features, bug fixes, and general improvements.
+We welcome contributions of any kind including new features, bug fixes, and general improvements. Before you contribute, read the [project documentation](docs/README.md).
 
 ### Development requirements
 
