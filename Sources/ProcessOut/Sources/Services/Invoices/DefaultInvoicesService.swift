@@ -120,7 +120,7 @@ final class DefaultInvoicesService: POInvoicesService {
         let request = request.replacing(
             thirdPartySdkVersion: request.thirdPartySdkVersion ?? threeDSService.version
         )
-        let response = try await repository.authorizeInvoice(request: request)
+        let response = try await repository.authorizeInvoice(request: .init(request: request))
         guard let customerAction = response.customerAction else {
             return .init(customerTokenId: response.customerTokenId, outcome: response.outcome)
         }
@@ -165,5 +165,27 @@ private extension POInvoiceAuthorizationRequest { // swiftlint:disable:this no_e
             localeIdentifier: localeIdentifier
         )
         return updatedRequest
+    }
+}
+
+private extension InvoiceAuthorizationRequest { // swiftlint:disable:this no_extension_access_modifier
+
+    init(request: POInvoiceAuthorizationRequest) {
+        self.init(
+            invoiceId: request.invoiceId,
+            source: request.source,
+            saveSource: request.saveSource,
+            incremental: request.incremental,
+            preferredScheme: request.$preferredScheme.typed,
+            thirdPartySdkVersion: request.thirdPartySdkVersion,
+            overrideMacBlocking: request.overrideMacBlocking,
+            initialSchemeTransactionId: request.initialSchemeTransactionId,
+            autoCaptureAt: request.autoCaptureAt,
+            captureAmount: request.captureAmount,
+            allowFallbackToSale: request.allowFallbackToSale,
+            clientSecret: request.clientSecret,
+            metadata: request.metadata,
+            localeIdentifier: request.localeIdentifier
+        )
     }
 }

@@ -28,7 +28,7 @@ final class HttpCustomerTokensRepository: CustomerTokensRepository {
         return try await connector.execute(request: httpRequest).token
     }
 
-    func assignCustomerToken(request: POAssignCustomerTokenRequest) async throws -> AssignCustomerTokenResponse {
+    func assignCustomerToken(request: AssignCustomerTokenRequest) async throws -> AssignCustomerTokenResponse {
         let httpRequest = HttpConnectorRequest<AssignCustomerTokenResponse>.put(
             path: "/customers/\(request.customerId)/tokens/\(request.tokenId)",
             body: request,

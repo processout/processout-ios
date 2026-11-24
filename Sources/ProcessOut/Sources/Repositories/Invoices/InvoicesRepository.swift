@@ -18,7 +18,7 @@ protocol InvoicesRepository: PORepository {
     // MARK: - Invoice Authorization
 
     /// Performs invoice authorization with given request.
-    func authorizeInvoice(request: POInvoiceAuthorizationRequest) async throws -> InvoiceAuthorizationResponse
+    func authorizeInvoice(request: InvoiceAuthorizationRequest) async throws -> InvoiceAuthorizationResponse
 
     /// Continue alternative payment.
     func authorizeInvoice(

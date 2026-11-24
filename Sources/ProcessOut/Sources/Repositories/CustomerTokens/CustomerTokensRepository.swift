@@ -11,7 +11,7 @@ protocol CustomerTokensRepository: PORepository {
     func createCustomerToken(request: POCreateCustomerTokenRequest) async throws -> POCustomerToken
 
     /// Assigns a token to a customer.
-    func assignCustomerToken(request: POAssignCustomerTokenRequest) async throws -> AssignCustomerTokenResponse
+    func assignCustomerToken(request: AssignCustomerTokenRequest) async throws -> AssignCustomerTokenResponse
 
     /// Tokenize alternative payment.
     func tokenize(
