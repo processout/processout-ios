@@ -7,4 +7,5 @@ the [root README](../README.md).
 
 | Document                                | Description                                                                |
 | --------------------------------------- | -------------------------------------------------------------------------- |
+| [Development setup](development.md)     | How to set up, build and test the SDK.                                     |
 | [Writing style guide](writing-style.md) | How we write documentation, code documentation, commits and pull requests. |

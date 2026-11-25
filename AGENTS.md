@@ -15,20 +15,8 @@ existing pattern.
 
 ## Verification
 
-- `ProcessOut.xcodeproj` is generated and not committed. If the project does not exist, run
-  `./Scripts/BootstrapProject.sh`.
-- To verify a change, run `./Scripts/Tests/Run.sh`. The script cleans, builds and tests every module that has tests.
-- To test one module, run the following command with the scheme of that module:
+Set up, build and test the project as [`docs/development.md`](docs/development.md) describes. In addition:
 
-  ```bash
-  xcodebuild test -project ProcessOut.xcodeproj -scheme ProcessOut -destination "$(./Scripts/Tests/Destination.swift)"
-  ```
-
-  The schemes with tests are `ProcessOut`, `ProcessOutUI`, `ProcessOutCheckout3DS` and `ProcessOutNetcetera3DS`.
-  `ProcessOutCoreUI` has no tests of its own. Run the `ProcessOutUI` tests to cover it.
-- Each build runs SwiftLint in strict mode. A lint violation fails the build. To lint without a build, run
-  `./Scripts/Lint.sh`.
-- Files in `Sources/*/Sources/Generated/` are generated. Do not edit them.
-- To change the Xcode project, edit `project.yml`. Then run `./Scripts/BootstrapProject.sh`.
-- Integration tests in `Tests/*/Sources/Integration/` call the live API with the credentials in `Constants.swift`. If
-  they fail because of the network or the credentials, report the failure. Use the unit test results instead.
+- Do not edit generated files. These files include `Sources/*/Sources/Generated/` and `ProcessOut.xcodeproj`.
+- If integration tests fail because of the network or the credentials, report the failure. Use the unit test results
+  instead.
