@@ -18,5 +18,5 @@ existing pattern.
 Set up, build and test the project as [`docs/development.md`](docs/development.md) describes. In addition:
 
 - Do not edit generated files. These files include `Sources/*/Sources/Generated/` and `ProcessOut.xcodeproj`.
-- If integration tests fail because of the network or the credentials, report the failure. Use the unit test results
-  instead.
+- If integration tests fail because of the network or the credentials, report the failure. Then test each module
+  separately, as `docs/development.md` describes. Use the unit test results of each module.

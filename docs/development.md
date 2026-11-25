@@ -4,11 +4,12 @@ This document describes how to set up, build and test the SDK on a Mac.
 
 ## Requirements
 
-| Tool                  | Version       | Purpose                                                                     |
-| --------------------- | ------------- | --------------------------------------------------------------------------- |
-| Xcode                 | 26.2 or later | Builds the SDK. CI uses Xcode 26.2.                                         |
-| iOS simulator runtime | iOS 26        | Runs the tests. The test scripts select the latest iOS 26 iPhone simulator. |
-| [Homebrew][homebrew]  | Latest        | Installs the command-line tools that the project needs.                     |
+| Tool                  | Version       | Purpose                                                                              |
+| --------------------- | ------------- | ------------------------------------------------------------------------------------ |
+| Xcode                 | 26.2 or later | Builds the SDK. CI uses Xcode 26.2.                                                  |
+| iOS simulator runtime | iOS 26        | Runs the tests. The test scripts select the latest iOS 26 iPhone simulator.          |
+| [Homebrew][homebrew]  | Latest        | Installs the command-line tools that the project needs.                              |
+| [xcpretty][xcpretty]  | Latest        | Optional. Formats the output of `Run.sh`. To install it, run `gem install xcpretty`. |
 
 ### Homebrew
 
@@ -76,11 +77,13 @@ xcodebuild test -project ProcessOut.xcodeproj -scheme ProcessOut -destination "$
 
 To test one module in Xcode, select the scheme of that module and choose **Product > Test**.
 
-Without credentials, the integration tests of `ProcessOut` and `ProcessOutUI` fail, and `Run.sh` reports a failure. In
-that case, check only the results of the unit tests.
+Without credentials, the integration tests of `ProcessOut` and `ProcessOutUI` fail. `Run.sh` stops at the first module
+that fails, so it does not test the other modules. In that case, test each module separately with the command above.
+Then check the unit test results of each module.
 
 ## Linting
 
 To lint without a build, run `./Scripts/Lint.sh`.
 
 [homebrew]: https://brew.sh
+[xcpretty]: https://github.com/xcpretty/xcpretty
